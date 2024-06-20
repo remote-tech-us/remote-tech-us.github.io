@@ -3,9 +3,32 @@ h1{
 }
 
 body{
-    background-image: url('img/0.jpg');
+    background-image: url('img/3.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
     background-size: 100% 100%;
+}
+a:link {
+  color: green;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: white;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: blue;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+a:active {
+  color: yellow;
+  background-color: transparent;
+  text-decoration: underline;
 }
