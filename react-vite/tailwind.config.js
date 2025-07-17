@@ -5,8 +5,15 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
   },
   plugins: [],
-}
+};
 
