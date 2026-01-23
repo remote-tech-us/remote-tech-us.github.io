@@ -26,7 +26,7 @@ function App() {
         </video>
   */}
         <a href="https://cal.com/remote-tech.us"
-           className="mt-8 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition transform hover:scale-105"
+           className="mt-8 inline-block bg-white-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition transform hover:scale-105"
         >
           <h5 className="text-1xl font-bold font-center">Schedule a Meeting</h5>
         </a>
