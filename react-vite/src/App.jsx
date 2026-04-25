@@ -38,7 +38,14 @@ function App() {
             <motion.div
               key={contact.name || index} // Added unique key
               whileHover={{ y: -5 }}
-              className="lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500">
+              className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
+              >
+              {/* Tag Badge (Coming Soon, New, etc) */}
+              {contact.tag  && (
+                <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+                  {contact.tag}
+                </span>
+              )}
               {contact.logo && (
                 <img src={contact.logo} alt="Logo" className="w-20 mb-4" />
               )}
@@ -89,12 +96,14 @@ function App() {
                   </a>
                 )}
                 {/* New Download Contact Button */}
+                {contact.vcfPath  && (
                 <a 
                   href={contact.vcfPath} 
                   download 
                   className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
                   <FaAddressCard /> Save Contact
                 </a>
+                )}
               </div>
             </motion.div>
           ))}
@@ -104,9 +113,19 @@ function App() {
             {TOOLS.map((tool) => (
               <motion.a
                 key={tool.name}
-                href={tool.url}
+                //href={tool.url}
+                href={tool.locked ? "#" : tool.url} // Disable link if tool is locked 
                 whileHover={{ scale: 1.02 }}
-                className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+                //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+                className={`relative bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition 
+                  ${tool.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+                >
+                {/* Tag Badge (Coming Soon, New, etc) */}
+                {tool.tag  && (
+                  <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+                    {tool.tag}
+                  </span>
+                )}
                 <div className="text-3xl text-blue-400">
                   {tool.icon}
                 </div>
@@ -122,9 +141,19 @@ function App() {
             {SERVICES.map((service) => (
               <motion.a
                 key={service.name}
-                href={service.url}
+                //href={service.url}
+                href={service.locked ? "#" : service.url} // Disable link if service is locked 
                 whileHover={{ scale: 1.02 }}
-                className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+                //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+                className={`relative bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition 
+                  ${service.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+                >
+                {/* Coming Soon Badge */}
+                {service.tag  && (
+                  <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+                    {service.tag}
+                  </span>
+                )}
                 <div className="text-3xl text-blue-400">{service.icon}</div>
                 <div>
                   <h3 className="text-xl font-bold text-white">{service.name}</h3>

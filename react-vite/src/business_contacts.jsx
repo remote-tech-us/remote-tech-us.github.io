@@ -2,6 +2,8 @@
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
 export const CONTACTS = [
   {
+    tag: 'Founder',
+    locked: false,
     logo: "/remote-tech-us_v2.svg",
     name: "William Earnhardt",
     title: "Founder @ Remote Tech US",
