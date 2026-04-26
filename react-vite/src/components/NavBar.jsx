@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NavLink as RouterLink } from 'react-router-dom';
 
 function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +10,22 @@ function NavBar() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center text-white font-bold text-2xl">
             REMOTE TECH US 
+          </div>
+          <div className="ml-10 flex items-baseline space-x-6">
+            <RouterLink 
+              to="/" 
+              className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
+            >
+              Home
+            </RouterLink>
+            <RouterLink 
+              to="/contacts" 
+              className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
+            >
+              Our Team
+            </RouterLink>
+            {/* Keep specific high-value external tools below */}
+            <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-6">

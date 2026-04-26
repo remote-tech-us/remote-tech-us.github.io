@@ -6,9 +6,16 @@ import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 
 const ContactCard = ({ contact , index }) => {
+
+  // Use email prefix as ID if contact.id doesn't exist
+  const contactId = contact.id || contact.email?.split('@')[0] || index;
+  
+  // Construct URL for HashRouter: domain.com/#/contacts/id
+  const dynamicQrValue = `${window.location.origin}${window.location.pathname}#/contacts/${contactId}`;
+
   return (
     <motion.div
-        key={contact.name || index} // Added unique key
+        key={contact.id || contact.email || index} // Added unique key
         whileHover={{ y: -5 }}
         className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
       >
@@ -79,7 +86,7 @@ const ContactCard = ({ contact , index }) => {
         {/* QR Code Section */}
         {contact.qrValue  && (
           <div className="bg-gray-50 p-4 rounded-xl mb-6 border border-gray-100 shadow-inner">
-            <QRCodeSVG value={contact.qrValue} size={80} marginSize={2} className="mx-auto" />
+            <QRCodeSVG value={dynamicQrValue} size={80} marginSize={2} className="mx-auto" />
             <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Scan to Share</p>
           </div>
         )}

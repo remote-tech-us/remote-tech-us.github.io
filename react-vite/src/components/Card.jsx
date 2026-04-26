@@ -5,15 +5,18 @@ import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 
-const Card = ({ item }, { index }) => {
+const Card = ({ item ,  index }) => {
   return (
     <motion.a
       key={item.name}
       //href={item.url}
       href={item.locked ? "#" : item.url} // Disable link if item is locked
       whileHover={{ scale: 1.02 }}
+      /* 'w-72' or 'w-80' gives the card a consistent width in the carousel.
+         'shrink-0' is vital to prevent the flexbox from squishing the card.
+      */
       //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
-      className={`relative bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition
+      className={`relative w-72 shrink-0 bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition
         ${item.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
       >
       {/* Tag Badge (Coming Soon, New, etc) */}
@@ -37,5 +40,5 @@ const Card = ({ item }, { index }) => {
   );
 };
 
-export default ContactCard;
+export default Card;
 
