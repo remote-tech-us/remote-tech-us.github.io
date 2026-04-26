@@ -20,10 +20,10 @@ export const CONTACTS = [
     qrValue: "https://remote-tech.us/#/card" // Link for the QR code
   },
   {
-    //logo: "/remote-tech-us_v2.svg",
-    name: "Frank Earnhardt",
+    logo: "/remote-tech-us_v2.svg"
+    ,name: "Frank Earnhardt"
     //title: "Founder @ Remote Tech US",
-    //phone: "+1 (502) 509-4553",
+    ,phone: "+1 (502) 509-4553"
     //phone_sms: "yes",
     //email: "frank@remote-tech.us",
     //address: "Sellersburg, IN, USA",
@@ -33,7 +33,7 @@ export const CONTACTS = [
     //github: "https://github.com/remote-tech-us",
     //vcfPath: "/william-earnhardt.vcf",
     //calcom:"https://cal.com/remote-tech.us",
-    qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+    //qrValue: "https://remote-tech.us/#/card" // Link for the QR code
   },
   {
     logo: "/remote-tech-us_v2.svg",
@@ -51,4 +51,10 @@ export const CONTACTS = [
     calcom:"https://cal.com/remote-tech.us",
     qrValue: "https://remote-tech.us/#/card" // Link for the QR code
   }
-];
+].map((contact, index) => ({
+  ...contact,
+  // Use email prefix if it exists, otherwise fall back to a slugified name or index
+  id: contact.email 
+    ? contact.email.split('@')[0] 
+    : (contact.name?.toLowerCase().replace(/\s+/g, '-') || `member-${index}`)
+}));
