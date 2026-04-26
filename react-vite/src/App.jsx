@@ -13,12 +13,51 @@ import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAd
 import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
 
 function App() {
   const [count, setCount] = useState(0)
 
   // Debugging should happen here, not in the JSX
   console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let scrollAmount = 0;
+    const step = 1; // Pixels per interval
+    const intervalTime = 30; // Milliseconds (lower is smoother)
+
+    const startScrolling = () => {
+      return setInterval(() => {
+        container.scrollLeft += step;
+        
+        // Reset to start if we've reached the end for infinite loop feel
+        if (container.scrollLeft >= container.scrollWidth - container.clientWidth) {
+          container.scrollLeft = 0;
+        }
+      }, intervalTime);
+    };
+
+    let autoScroll = startScrolling();
+
+    // Pause on hover
+    const pause = () => clearInterval(autoScroll);
+    const resume = () => { autoScroll = startScrolling(); };
+
+    container.addEventListener('mouseenter', pause);
+    container.addEventListener('mouseleave', resume);
+
+    return () => {
+      clearInterval(autoScroll);
+      container.removeEventListener('mouseenter', pause);
+      container.removeEventListener('mouseleave', resume);
+    };
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
@@ -49,7 +88,7 @@ function App() {
             2. 'flex-nowrap' prevents items from wrapping/squeezing.
             3. 'snap-x' enables the snap-to-item behavior.
         */}
-        <div className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
           {SERVICES.map((service) => (
             <Card key={service.name} item={service} />
           ))}
