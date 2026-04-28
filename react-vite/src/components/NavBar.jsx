@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { NavLink as RouterLink } from 'react-router-dom';
+import { GLOBALS } from '../data/app__globals.jsx';
 
 function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-black bg-opacity=60 backdrop-blur-md fixed w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="bg-black/60 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-10">
           <div className="flex items-center text-white font-bold text-2xl">
-            REMOTE TECH US 
+            <img src={ GLOBALS.app_logo } width='25px'/>
+             &nbsp;{ GLOBALS.app_title }
           </div>
-          <div className="ml-10 flex items-baseline space-x-6">
+          {/*<div className="ml-10 flex items-baseline space-x-6">*/}
+          <div className="hidden md:flex ml-4 lg:ml-10 items-baseline space-x-4 lg:space-x-6">
             <RouterLink 
               to="/" 
               className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
@@ -24,8 +27,12 @@ function NavBar() {
             >
               Our Team
             </RouterLink>
-            {/* Keep specific high-value external tools below */}
-            <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
+            <RouterLink 
+              to="/clients" 
+              className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
+            >
+              Clients 
+            </RouterLink>
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-6">

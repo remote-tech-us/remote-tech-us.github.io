@@ -1,49 +1,82 @@
 // src/business_services.jsx
-import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
-import { SiBroadcom } from "react-icons/si";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
 import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
 
 export const SERVICES = [
   { 
-    name: 'Broadcom',
-    url: 'https://broadcom.com',
+    name: 'Architecture',
+    url: '',
     icon: <SiBroadcom />,
-    tag: 'Acquired CA Technologies',
-    locked: false,
-    desc: 'CA Service Desk Manager Suite!'
-  },
-  { 
-    name: 'Gitea', 
-    url: 'https://gitea.remote-tech.us', 
-    icon: <FaCode />,
     tag: '',
     locked: false,
-    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+    desc: 'CA Service Desk Manager Suite'
   },
   { 
-    name: 'OpenProject', 
-    url: 'https://pm.remote-tech.us', 
-    icon: <FaProjectDiagram />,
+    name: 'Implementation', 
+    url: '', 
+    icon: <VscSymbolClass />,
     tag: '',
     locked: false,
-    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+    desc: 'CA Service Desk Manager Suite'
   },
   { 
-    name: 'Kanboard', 
-    url: 'https://kanboard.remote-tech.us/board/1', 
-    icon: <FaProjectDiagram />,
+    name: 'Configuration', 
+    url: '', 
+    icon: <VscSettingsGear />,
     tag: '',
     locked: false,
-    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+    desc: 'CA Service Desk Manager Suite'
   },
   { 
-    name: 'Dashy', 
-    url: 'https://dashy.remote-tech.us', 
-    icon: <FaHdd />, 
-    tag: 'needs update',
+    name: 'Integrations', 
+    url: '', 
+    icon: <VscTypeHierarchy />,
+    tag: '',
+    locked: false,
+    desc: 'PeopleSoft, Workday, BigFix, Spectrum, AutomationPoint, IT PAM'
+  },
+  { 
+    name: 'Development', 
+    url: '', 
+    icon: <VscCode />, 
+    tag: '',
     locked: true,
-    desc: 'Many years of Research Collectively Orchestrating'
+    desc: 'HTMPL/PDM_MACRO, SPEL, PERL, ANSI C, REST/SOAP'
+  },
+  { 
+    name: 'Best Practices', 
+    url: '', 
+    icon: <VscWand />, 
+    tag: '',
+    locked: true,
+    desc: 'Self-Healing Server Configurations, CI/CD Pipeline, Release Management'
+  },
+  { 
+    name: 'Upgrades', 
+    url: '', 
+    icon: <VscThumbsup />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Support', 
+    url: '',
+    icon: <VscTelescope />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Training', 
+    url: '', 
+    icon: <VscCopilot />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
   }
 ];

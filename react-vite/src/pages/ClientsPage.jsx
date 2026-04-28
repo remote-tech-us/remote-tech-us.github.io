@@ -1,15 +1,12 @@
-import { GLOBALS } from './data/app__globals.jsx';
-import { CONTACTS } from './data/business_contacts.jsx';
-import { SERVICES } from './data/business_services.jsx';
-import { PROJECTS } from './data/business_projects.jsx';
-import { TOOLS } from './data/business_tools.jsx';
-import { TECH  } from './data/business_tech.jsx';
-//import NavBar from './components/NavBar.jsx';
-import Card from './components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_CLIENTS } from '../data/featured_clients.jsx';
+import { BUSINESS_CLIENTS } from '../data/business_clients.jsx';
+//import NavBar from '../components/NavBar.jsx';
+import Card from '../components/Card.jsx';
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
+import reactLogo from '../assets/react.svg';
 import viteLogo from '/vite.svg';
-import './App.css';
+import '../App.css';
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
@@ -17,17 +14,17 @@ import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 import { useEffect, useRef } from 'react';
 
-function App() {
+function ClientsPage() {
   const [count, setCount] = useState(0)
 
   // Debugging should happen here, not in the JSX
   console.log("Background Image URL:", GLOBALS.bg_img);
 
   // ADD Scrolling 
-  const scrollRef = useRef(null);
+  const scrollClient = useRef(null);
 
   useEffect(() => {
-    const container = scrollRef.current;
+    const container = scrollClient.current;
     if (!container) return;
 
     let scrollAmount = 0;
@@ -63,7 +60,7 @@ function App() {
 
 
   return (
-    <div className="relative min-h-screen bg-cover bg-center bg-fixed" 
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
       style={{ 
         // If bg_override_color exists, use it. Otherwise, let index.css handle it.
         // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
@@ -77,72 +74,45 @@ function App() {
       }}
     >
     {/* Main Container */}
-    <div className="pt-24 px-6 max-w-7xl mx-auto">
+    <main className="pt-24 px-6 max-w-7xl mx-auto">
       <header className="mb-12 text-center lg:text-left">
         {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
         <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
       </header>
 
       {/* Section: Services Carousel */}
-      <section className="mb-16 w-full max-w-full overflow-hidden">
+      <section className="mb-16 w-full overflow-hidden">
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Clients
         </h2>
         {/* 1. 'overflow-x-auto' enables the scroll.
             2. 'flex-nowrap' prevents items from wrapping/squeezing.
             3. 'snap-x' enables the snap-to-item behavior.
         */}
-        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide w-full">
-          {SERVICES.map((service) => (
-            <Card key={service.name} item={service} />
+        <div ref={scrollClient} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+          {FEATURED_CLIENTS.map((fclient) => (
+            <Card key={fclient.name} item={fclient} />
           ))}
         </div>
       </section>
 
-      {/* Section: Projects Carousel */}
-      <section className="mb-16 w-full overflow-hidden">
-        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <span className="w-8 h-1 bg-purple-500 rounded-full" /> Projects 
-        </h2>
-        <div className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
-          {PROJECTS.map((project) => (
-            <Card key={project.name} item={project} />
-          ))}
-        </div>
-      </section>
       <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
           {/*  CARDS GRID */}
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Internal Tools
+            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Clients
           </h2>
-          <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
+          <p></p>
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {TOOLS.map((tool) => (
-              <Card key={tool.name} item={tool} />
+            {BUSINESS_CLIENTS.map((bclient) => (
+              <Card  item={bclient} />
             ))}
           </div>
         </div>
       </div>
-      {/*<hr className="w-full border-gray-800 my-10" />*/}
-      <hr className="w-8 w-full max-w-6xl" />
-      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
-          {/*  CARDS GRID */}
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Supporting Technologies
-          </h2>
-          <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {TECH.map((tech) => (
-              <Card key={tech.name} item={tech} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    </main>
   </div>
 )
 }
 
-export default App
+export default ClientsPage
