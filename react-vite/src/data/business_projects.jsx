@@ -1,4 +1,4 @@
-// src/business_projects.jsx
+// src/data/business_projects.jsx
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";

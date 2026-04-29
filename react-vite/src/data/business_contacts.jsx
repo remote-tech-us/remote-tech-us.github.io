@@ -1,4 +1,4 @@
-// src/business_contacts.js
+// src/data/business_contacts.js
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
 export const CONTACTS = [
   {

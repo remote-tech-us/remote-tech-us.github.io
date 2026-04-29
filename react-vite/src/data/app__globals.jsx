@@ -1,4 +1,4 @@
-//app_globals.jsx
+// src/data/app_globals.jsx
 export const GLOBALS = {
   bg_img:"/img/0.jpg"
   ,app_company: 'REMOTE TECH US, LLC'
