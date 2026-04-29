@@ -99,7 +99,7 @@ function App() {
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
             <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Supporting Technologies
           </h2>
-          <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
+          <p>These technologies are the underpinning of modern workflows and tool chains.</p>
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
             {TECH.map((tech) => (
               <Card key={tech.name} item={tech} />
