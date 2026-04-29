@@ -42,7 +42,7 @@ export default function ContactsPage() {
         {CONTACTS.map((contact, index) => (
           <div 
             key={contact.email || index }
-            id={contact.id || contact.email?.split('@')[0]} key={contact.email}
+            id={contact.id || contact.email?.split('@')[0]} 
           >
             <ContactCard contact={contact} index={index} />
           </div>

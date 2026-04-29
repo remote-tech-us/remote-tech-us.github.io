@@ -17,6 +17,7 @@ import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 import { useEffect, useRef } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useAutoScroll } from './hooks/useAutoScroll.js';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -25,43 +26,7 @@ function App() {
   console.log("Background Image URL:", GLOBALS.bg_img);
 
   // ADD Scrolling 
-  const scrollRef = useRef(null);
-
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    let scrollAmount = 0;
-    const step = 1; // Pixels per interval
-    const intervalTime = 30; // Milliseconds (lower is smoother)
-
-    const startScrolling = () => {
-      return setInterval(() => {
-        container.scrollLeft += step;
-        
-        // Reset to start if we've reached the end for infinite loop feel
-        if (container.scrollLeft >= container.scrollWidth - container.clientWidth) {
-          container.scrollLeft = 0;
-        }
-      }, intervalTime);
-    };
-
-    let autoScroll = startScrolling();
-
-    // Pause on hover
-    const pause = () => clearInterval(autoScroll);
-    const resume = () => { autoScroll = startScrolling(); };
-
-    container.addEventListener('mouseenter', pause);
-    container.addEventListener('mouseleave', resume);
-
-    return () => {
-      clearInterval(autoScroll);
-      container.removeEventListener('mouseenter', pause);
-      container.removeEventListener('mouseleave', resume);
-    };
-  }, []);
-
+  const scrollRef = useAutoScroll(1, 30);
 
   return (
     <div className="relative min-h-screen bg-cover bg-center bg-fixed" 
@@ -92,8 +57,9 @@ function App() {
         {/* 1. 'overflow-x-auto' enables the scroll.
             2. 'flex-nowrap' prevents items from wrapping/squeezing.
             3. 'snap-x' enables the snap-to-item behavior.
+            4. replace snap-mandatory with snap-proximity
         */}
-        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide w-full">
+        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full">
           {SERVICES.map((service) => (
             <Card key={service.name} item={service} />
           ))}

@@ -14,6 +14,7 @@ import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 import { useEffect, useRef } from 'react';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
 
 function ClientsPage() {
   const [count, setCount] = useState(0)
@@ -22,43 +23,7 @@ function ClientsPage() {
   console.log("Background Image URL:", GLOBALS.bg_img);
 
   // ADD Scrolling 
-  const scrollClient = useRef(null);
-
-  useEffect(() => {
-    const container = scrollClient.current;
-    if (!container) return;
-
-    let scrollAmount = 0;
-    const step = 1; // Pixels per interval
-    const intervalTime = 30; // Milliseconds (lower is smoother)
-
-    const startScrolling = () => {
-      return setInterval(() => {
-        container.scrollLeft += step;
-        
-        // Reset to start if we've reached the end for infinite loop feel
-        if (container.scrollLeft >= container.scrollWidth - container.clientWidth) {
-          container.scrollLeft = 0;
-        }
-      }, intervalTime);
-    };
-
-    let autoScroll = startScrolling();
-
-    // Pause on hover
-    const pause = () => clearInterval(autoScroll);
-    const resume = () => { autoScroll = startScrolling(); };
-
-    container.addEventListener('mouseenter', pause);
-    container.addEventListener('mouseleave', resume);
-
-    return () => {
-      clearInterval(autoScroll);
-      container.removeEventListener('mouseenter', pause);
-      container.removeEventListener('mouseleave', resume);
-    };
-  }, []);
-
+  const scrollClient = useAutoScroll(1, 30);
 
   return (
     <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
@@ -74,47 +39,47 @@ function ClientsPage() {
         backgroundAttachment: 'fixed'
       }}
     >
-    {/* Main Container */}
-    <main className="pt-24 px-6 max-w-7xl mx-auto">
-      <header className="mb-12 text-center lg:text-left">
-        {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
-        <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
-      </header>
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
 
-      {/* Section: Services Carousel */}
-      <section className="mb-16 w-full overflow-hidden">
-        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Clients
-        </h2>
-        {/* 1. 'overflow-x-auto' enables the scroll.
-            2. 'flex-nowrap' prevents items from wrapping/squeezing.
-            3. 'snap-x' enables the snap-to-item behavior.
-            4. replace snap-mandatory with snap-proximity
-        */}
-        <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
-          {FEATURED_CLIENTS.map((fclient) => (
-            <Card key={fclient.name} item={fclient} />
-          ))}
-        </div>
-      </section>
-
-      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
-          {/*  CARDS GRID */}
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Clients
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Clients
           </h2>
-          <p></p>
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {BUSINESS_CLIENTS.map((bclient) => (
-              <Card  key={bclient.name} item={bclient} />
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_CLIENTS.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
             ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Clients
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_CLIENTS.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </main>
-  </div>
-)
+    </div>
+  )
 }
 
 export default ClientsPage
