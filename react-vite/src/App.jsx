@@ -16,6 +16,7 @@ import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 import { useEffect, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -117,7 +118,7 @@ function App() {
             <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Internal Tools
           </h2>
           <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
             {TOOLS.map((tool) => (
               <Card key={tool.name} item={tool} />
             ))}
@@ -133,7 +134,7 @@ function App() {
             <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Supporting Technologies
           </h2>
           <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
             {TECH.map((tech) => (
               <Card key={tech.name} item={tech} />
             ))}

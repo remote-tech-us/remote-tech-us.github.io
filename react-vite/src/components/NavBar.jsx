@@ -15,24 +15,9 @@ function NavBar() {
           </div>
           {/*<div className="ml-10 flex items-baseline space-x-6">*/}
           <div className="hidden md:flex ml-4 lg:ml-10 items-baseline space-x-4 lg:space-x-6">
-            <RouterLink 
-              to="/" 
-              className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
-            >
-              Home
-            </RouterLink>
-            <RouterLink 
-              to="/contacts" 
-              className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
-            >
-              Our Team
-            </RouterLink>
-            <RouterLink 
-              to="/clients" 
-              className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}
-            >
-              Clients 
-            </RouterLink>
+            <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Home </RouterLink>
+            <RouterLink to="/contacts" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Team </RouterLink>
+            <RouterLink to="/clients" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Clients </RouterLink>
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-6">
@@ -44,7 +29,7 @@ function NavBar() {
             </div>
           </div>
           <div className="mr-2 flex md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-black focus:outline-none">
               ☰
             </button>
           </div>
@@ -53,6 +38,9 @@ function NavBar() {
 
       {isOpen && (
         <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Home </RouterLink><br />
+          <RouterLink to="/contacts" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Our Team </RouterLink><br />
+          <RouterLink to="/clients" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Clients </RouterLink><br />
           <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
           <NavLink href="https://kanboard.remote-tech.us" label="Kanboard Project Management" mobile />
           <NavLink href="https://gitea.remote-tech.us" label="Gitea Code Management" mobile />

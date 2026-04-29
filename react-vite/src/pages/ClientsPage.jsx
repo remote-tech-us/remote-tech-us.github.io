@@ -1,3 +1,4 @@
+// src/pages/ClientsPage.jsx
 import { GLOBALS } from '../data/app__globals.jsx';
 import { FEATURED_CLIENTS } from '../data/featured_clients.jsx';
 import { BUSINESS_CLIENTS } from '../data/business_clients.jsx';
@@ -88,8 +89,9 @@ function ClientsPage() {
         {/* 1. 'overflow-x-auto' enables the scroll.
             2. 'flex-nowrap' prevents items from wrapping/squeezing.
             3. 'snap-x' enables the snap-to-item behavior.
+            4. replace snap-mandatory with snap-proximity
         */}
-        <div ref={scrollClient} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+        <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
           {FEATURED_CLIENTS.map((fclient) => (
             <Card key={fclient.name} item={fclient} />
           ))}
@@ -105,7 +107,7 @@ function ClientsPage() {
           <p></p>
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
             {BUSINESS_CLIENTS.map((bclient) => (
-              <Card  item={bclient} />
+              <Card  key={bclient.name} item={bclient} />
             ))}
           </div>
         </div>
