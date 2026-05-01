@@ -1,4 +1,4 @@
-// src/components/Card.jsx
+// src/components/card.jsx
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";

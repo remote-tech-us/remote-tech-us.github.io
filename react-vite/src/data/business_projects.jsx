@@ -4,7 +4,7 @@ import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
 
-export const PROJECTS = [
+export const BUSINESS_PROJECTS = [
   { 
     name: 'Sheetz',
     url: '',

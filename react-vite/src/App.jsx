@@ -1,15 +1,15 @@
 import { GLOBALS } from './data/app__globals.jsx';
 import { CONTACTS } from './data/business_contacts.jsx';
-import { SERVICES } from './data/business_services.jsx';
-import { PROJECTS } from './data/business_projects.jsx';
-import { TOOLS } from './data/business_tools.jsx';
-import { TECH  } from './data/business_tech.jsx';
-//import NavBar from './components/NavBar.jsx';
+import { BUSINESS_SERVICES } from './data/business_services.jsx';
+import { BUSINESS_PROJECTS } from './data/business_projects.jsx';
+import { BUSINESS_TOOLS } from './data/business_tools.jsx';
+import { BUSINESS_TECH  } from './data/business_tech.jsx';
 import Card from './components/Card.jsx';
+import './App.css';
+
 import { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
-import './App.css';
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
@@ -60,7 +60,7 @@ function App() {
             4. replace snap-mandatory with snap-proximity
         */}
         <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full">
-          {SERVICES.map((service) => (
+          {BUSINESS_SERVICES.map((service) => (
             <Card key={service.name} item={service} />
           ))}
         </div>
@@ -72,7 +72,7 @@ function App() {
           <span className="w-8 h-1 bg-purple-500 rounded-full" /> Projects 
         </h2>
         <div className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
-          {PROJECTS.map((project) => (
+          {BUSINESS_PROJECTS.map((project) => (
             <Card key={project.name} item={project} />
           ))}
         </div>
@@ -85,7 +85,7 @@ function App() {
           </h2>
           <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
-            {TOOLS.map((tool) => (
+            {BUSINESS_TOOLS.map((tool) => (
               <Card key={tool.name} item={tool} />
             ))}
           </div>
@@ -101,7 +101,7 @@ function App() {
           </h2>
           <p>These technologies are the underpinning of modern workflows and tool chains.</p>
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
-            {TECH.map((tech) => (
+            {BUSINESS_TECH.map((tech) => (
               <Card key={tech.name} item={tech} />
             ))}
           </div>

@@ -6,77 +6,45 @@ import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, S
 import { SiGitea } from "react-icons/si";
 import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
 
-export const SERVICES = [
+export const BUSINESS_SERVICES = [
   { 
-    name: 'Architecture',
+    name: 'CA Service Desk Manager',
+    url: 'https://www.broadcom.com/products/software/service-management/service-desk-manager',
+    icon: <SiBroadcom />,
+    tag: '',
+    locked: false,
+    desc: 'CA SDM Suite'
+  },
+  { 
+    name: 'CA Automation Point ',
     url: '',
     icon: <SiBroadcom />,
     tag: '',
     locked: false,
-    desc: 'CA Service Desk Manager Suite'
+    desc: 'CA AP Suite'
   },
   { 
-    name: 'Implementation', 
-    url: '', 
-    icon: <VscSymbolClass />,
+    name: 'CA IT Process Automation Manager',
+    url: 'https://www.broadcom.com/products/software/service-management/it-process-automation-manager',
+    icon: <SiBroadcom />,
     tag: '',
     locked: false,
-    desc: 'CA Service Desk Manager Suite'
+    desc: 'CA IT PAM Suite'
   },
   { 
-    name: 'Configuration', 
-    url: '', 
-    icon: <VscSettingsGear />,
+    name: 'CA Service Catalog',
+    url: 'https://www.broadcom.com/products/software/service-management/service-catalog',
+    icon: <SiBroadcom />,
     tag: '',
     locked: false,
-    desc: 'CA Service Desk Manager Suite'
+    desc: 'CA Service Desk Manager - Catalog Component'
   },
   { 
-    name: 'Integrations', 
-    url: '', 
-    icon: <VscTypeHierarchy />,
+    name: 'CA Embedded Entitlements Manager',
+    url: 'https://techdocs.broadcom.com/us/en/ca-enterprise-software/other/Embedded-Entitlements-Manager/12-7.html',
+    icon: <SiBroadcom />,
     tag: '',
     locked: false,
-    desc: 'PeopleSoft, Workday, BigFix, Spectrum, AutomationPoint, IT PAM'
-  },
-  { 
-    name: 'Development', 
-    url: '', 
-    icon: <VscCode />, 
-    tag: '',
-    locked: true,
-    desc: 'HTMPL/PDM_MACRO, SPEL, PERL, ANSI C, REST/SOAP'
-  },
-  { 
-    name: 'Best Practices', 
-    url: '', 
-    icon: <VscWand />, 
-    tag: '',
-    locked: true,
-    desc: 'Self-Healing Server Configurations, CI/CD Pipeline, Release Management'
-  },
-  { 
-    name: 'Upgrades', 
-    url: '', 
-    icon: <VscThumbsup />, 
-    tag: '',
-    locked: true,
-    desc: 'CA Service Desk Manager Suite'
-  },
-  { 
-    name: 'Support', 
-    url: '',
-    icon: <VscTelescope />, 
-    tag: '',
-    locked: true,
-    desc: 'CA Service Desk Manager Suite'
-  },
-  { 
-    name: 'Training', 
-    url: '', 
-    icon: <VscCopilot />, 
-    tag: '',
-    locked: true,
-    desc: 'CA Service Desk Manager Suite'
+    desc: 'CA EEM - Security Component'
   }
 ];

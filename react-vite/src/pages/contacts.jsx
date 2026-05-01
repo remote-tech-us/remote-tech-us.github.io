@@ -1,10 +1,12 @@
-// src/pages/ContactsPage.jsx
+// src/pages/contacts.jsx
 import { useEffect } from 'react'; // Add this for scrolling
 import { useParams } from 'react-router-dom'; // Fixes the ReferenceError
+import { QRCodeSVG } from 'qrcode.react';
+
+{/* Begin Application Files */}
 import { GLOBALS } from '../data/app__globals';
 import { CONTACTS } from '../data/business_contacts';
 import ContactCard from '../components/ContactCard.jsx';
-import { QRCodeSVG } from 'qrcode.react';
 
 export default function ContactsPage() {
 

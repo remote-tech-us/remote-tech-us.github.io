@@ -1,4 +1,4 @@
-// src/data/business_tools.jsx
+// src/data/business_tech.jsx
 import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
@@ -6,7 +6,7 @@ import { SiDocker, SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, Si
 import { SiGitea } from "react-icons/si";
 import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
 
-export const TECH = [
+export const BUSINESS_TECH = [
   { 
     name: 'Git',
     url: 'https://github.com',

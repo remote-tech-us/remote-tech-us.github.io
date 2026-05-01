@@ -1,22 +1,22 @@
-// src/pages/ClientsPage.jsx
-import { GLOBALS } from '../data/app__globals.jsx';
-import { FEATURED_CLIENTS } from '../data/featured_clients.jsx';
-import { BUSINESS_CLIENTS } from '../data/business_clients.jsx';
-//import NavBar from '../components/NavBar.jsx';
-import Card from '../components/Card.jsx';
+// src/pages/products.jsx
 import { useState } from 'react';
-import reactLogo from '../assets/react.svg';
-import viteLogo from '/vite.svg';
-import '../App.css';
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 import { useEffect, useRef } from 'react';
-import { useAutoScroll } from '../hooks/useAutoScroll.js';
 
-function ClientsPage() {
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_PRODUCTS } from '../data/featured_products.jsx';
+import { BUSINESS_PRODUCTS } from '../data/business_products.jsx';
+
+function ProductsPage() {
   const [count, setCount] = useState(0)
 
   // Debugging should happen here, not in the JSX
@@ -49,7 +49,7 @@ function ClientsPage() {
         {/* Section: Services Carousel */}
         <section className="mb-16 w-full overflow-hidden">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Clients
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Products
           </h2>
           {/* 1. 'overflow-x-auto' enables the scroll.
               2. 'flex-nowrap' prevents items from wrapping/squeezing.
@@ -57,7 +57,7 @@ function ClientsPage() {
               4. replace snap-mandatory with snap-proximity
           */}
           <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
-            {FEATURED_CLIENTS.map((fclient) => (
+            {FEATURED_PRODUCTS.map((fclient) => (
               <Card key={fclient.name} item={fclient} />
             ))}
           </div>
@@ -67,11 +67,11 @@ function ClientsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
             {/*  CARDS GRID */}
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Clients
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Products
             </h2>
             <p></p>
             <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {BUSINESS_CLIENTS.map((bclient) => (
+              {BUSINESS_PRODUCTS.map((bclient) => (
                 <Card  key={bclient.name} item={bclient} />
               ))}
             </div>
@@ -82,4 +82,4 @@ function ClientsPage() {
   )
 }
 
-export default ClientsPage
+export default ProductsPage

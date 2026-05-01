@@ -4,7 +4,7 @@ import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
 import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
 
-export const TOOLS = [
+export const BUSINESS_TOOLS = [
   { 
     name: 'Chat',
     url: 'https://chat.remote-tech.us',
