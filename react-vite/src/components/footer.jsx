@@ -42,13 +42,25 @@ const Footer = () => {
           </p>
         </div>
         */}
-        {/* Links Group 1 */}
+        {/* Links Group 1 - Reimagined Resources */}
         <div>
-          <h3 className="text-white font-semibold mb-4">Resources</h3>
+          <h3 className="text-white font-semibold mb-4">Technical Resources</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:text-white transition">Documentation</a></li>
-            <li><a href="#" className="hover:text-white transition">Templates</a></li>
-            <li><a href="#" className="hover:text-white transition">Components</a></li>
+            <li>
+              <a href="#/dev-docs" className="hover:text-white transition flex items-center gap-2">
+                <FaCode className="text-blue-400" /> Dev Documentation
+              </a>
+            </li>
+            <li>
+              <a href="#/tech-stack" className="hover:text-white transition flex items-center gap-2">
+                <FaHdd className="text-purple-400" /> Our Tech Stack
+              </a>
+            </li>
+            <li>
+              <a href="#/case-studies" className="hover:text-white transition flex items-center gap-2">
+                <FaProjectDiagram className="text-yellow-400" /> Case Studies
+              </a>
+            </li>
           </ul>
         </div>
 

@@ -8,6 +8,7 @@ import ScrollToTop from './hooks/ScrollToTop.jsx';
 import './index.css'
 import App from './App.jsx'
 import AboutPage from './pages/about.jsx';
+import TechStackPage from './pages/tech-stack.jsx';
 import CareersPage from './pages/careers.jsx';
 import ContactsPage from './pages/contacts.jsx';
 import PrivacyPage from './pages/privacy-policy.jsx';
@@ -15,6 +16,8 @@ import TermsPage from './pages/terms-of-service.jsx';
 import ClientsPage from './pages/clients.jsx';
 import ProductsPage from './pages/Products.jsx';
 import ServicesPage from './pages/Services.jsx';
+import CaseStudiesPage from './pages/case-studies.jsx';
+import DevDocsPage from './pages/dev-docs.jsx';
 
 {/* Notes 
     Use HashRouter if:
@@ -40,11 +43,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/privacy-policy" element={<PrivacyPage />} />
           <Route path="/terms-of-service" element={<TermsPage />} />
+          <Route path="/tech-stack" element={<TechStackPage />} />
           {/* Dynamic route for specific contacts */}
           <Route path="/contacts/:id" element={<ContactsPage />} />
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/case-studies" element={<CaseStudiesPage />} />
+          <Route path="/dev-docs" element={<DevDocsPage />} />
         </Routes>
       </main>
       <Footer />
