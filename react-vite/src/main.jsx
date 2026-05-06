@@ -14,8 +14,8 @@ import ContactsPage from './pages/contacts.jsx';
 import PrivacyPage from './pages/privacy-policy.jsx';
 import TermsPage from './pages/terms-of-service.jsx';
 import ClientsPage from './pages/clients.jsx';
-import ProductsPage from './pages/Products.jsx';
-import ServicesPage from './pages/Services.jsx';
+import ProductsPage from './pages/products.jsx';
+import ServicesPage from './pages/services.jsx';
 import CaseStudiesPage from './pages/case-studies.jsx';
 import DevDocsPage from './pages/dev-docs.jsx';
 
