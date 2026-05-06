@@ -5,7 +5,8 @@ on:
     branches:
       - react-build/feature/card
   workflow_dispatch:
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 permissions:
   contents: write
   pages: write
