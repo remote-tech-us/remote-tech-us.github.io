@@ -3,8 +3,8 @@ name: Deploy React App to GitHub Pages
 on:
   push:
     branches:
-      - react-rebuild
-
+      - react-build
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest
