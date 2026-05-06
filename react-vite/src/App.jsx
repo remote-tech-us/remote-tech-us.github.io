@@ -26,8 +26,25 @@ function App() {
   console.log("Background Image URL:", GLOBALS.bg_img);
 
   // ADD Scrolling 
-  const scrollRef = useAutoScroll(1, 30);
-
+  // const scrollRef = useAutoScroll(1, 30);
+  // Horizontal Marquee
+  const scrollLeft = useAutoScroll({ 
+    direction: 'left', 
+    step: 1, 
+    intervalTime: 50, // higher number slows
+    pauseOnHover: true 
+  });
+  // const scrollPef = useAutoScroll(1, 30);
+  const scrollRight = useAutoScroll({ 
+    direction: 'right', 
+    step: 1, 
+    pauseOnHover: true 
+  });
+  // Vertical News Ticker
+  const tickerRef = useAutoScroll({ 
+    direction: 'top', 
+    intervalTime: 50 
+  });
   return (
     <div className="relative min-h-screen bg-cover bg-center bg-fixed" 
       style={{ 
@@ -59,7 +76,7 @@ function App() {
             3. 'snap-x' enables the snap-to-item behavior.
             4. replace snap-mandatory with snap-proximity
         */}
-        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full">
+        <div ref={scrollLeft} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full">
           {BUSINESS_SERVICES.map((service) => (
             <Card key={service.name} item={service} />
           ))}
@@ -71,7 +88,7 @@ function App() {
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
           <span className="w-8 h-1 bg-purple-500 rounded-full" /> Projects 
         </h2>
-        <div className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+        <div ref={scrollRight} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
           {BUSINESS_PROJECTS.map((project) => (
             <Card key={project.name} item={project} />
           ))}
@@ -84,7 +101,10 @@ function App() {
             <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Internal Tools
           </h2>
           <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
+          <br />
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
+          {/* This worked but not for this layout*/}
+          {/* <div ref={tickerRef} className="flex flex-col overflow-y-auto gap-6 h-[400px] scrollbar-hide"> */}
             {BUSINESS_TOOLS.map((tool) => (
               <Card key={tool.name} item={tool} />
             ))}
