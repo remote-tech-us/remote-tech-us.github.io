@@ -1,9 +1,6 @@
 name: Deploy React App to GitHub Pages
 
 on:
-  push:
-    branches:
-      - react-build
   workflow_dispatch:
 jobs:
   deploy:
