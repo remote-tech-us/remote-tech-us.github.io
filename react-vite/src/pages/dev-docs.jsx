@@ -3,18 +3,20 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GLOBALS } from '../data/app__globals.jsx';
 import { DEV_DOCS_CATEGORIES } from '../data/business_dev_docs.jsx';
-import { FaCopy, FaBook, FaChevronRight, FaTerminal } from 'react-icons/fa';
+import { FaCheck, FaCopy, FaBook, FaChevronRight, FaTerminal } from 'react-icons/fa';
 import parse from 'html-react-parser';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; // Choose your theme
 
 export default function DocsPage() {
   const [activePage, setActivePage] = useState(DEV_DOCS_CATEGORIES[0].pages[0]);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    // If example is a string, use it. If it's a JSX function, 
+    // If code is a string, use it. If it's a JSX function, 
     // you might want to add a 'copyText' string field to your data object.
-    const textToCopy = typeof activePage.example === 'string' 
-      ? activePage.example 
+    const textToCopy = typeof activePage.code === 'string' 
+      ? activePage.code 
       : activePage.copyText || ""; 
 
     if (textToCopy) {
@@ -82,52 +84,46 @@ export default function DocsPage() {
               {/* Decorative Code Block Placeholder */}
               <div className="bg-black/60 rounded-2xl border border-white/10 overflow-hidden mb-8">
                 <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex justify-between items-center">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                    {/* THIS DOESN'T COPY ANYTHING AND IS TOO BIG AND MISALIGNED */}
-                    {/*
-                    <button 
-                      onClick={handleCopy}
-                      className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors"
-                    >
-                      {copied ? (
-                        <>
-                          <FaCheck className="text-green-500" /> 
-                          <span className="text-green-500">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <FaCopy />
-                          <span>Copy</span>
-                        </>
-                      )}
-                    </button>
-                    */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    </div>
                   </div>
                   <FaTerminal className="text-gray-600 text-xs" />
                 </div>
+                  {/* Dynamic Language Label */}
+                  <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-2">
+                    {activePage.language || 'text'}
+                  </span>
+                {/* Syntax Highlighter renders the code exactly as typed in data file */}
+                <SyntaxHighlighter 
+                  language={activePage.language || 'javascript'} 
+                  style={atomDark}
+                  customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
+                >
+                  {activePage.code}
+                </SyntaxHighlighter>
                 <div className="p-6 font-mono text-sm text-blue-300">
                   {/* Add the () to execute the function */}
-                  {/* {typeof activePage.example === 'function' ? activePage.example() : activePage.example}  */}
+                  {/* {typeof activePage.code === 'function' ? activePage.code() : activePage.code}  */}
                   {/* 1. If it's a function (the JSX approach), call it */}
-                  {typeof activePage.example === 'function' && activePage.example()}
+                  {/* {typeof activePage.code === 'function' && activePage.code()} */}
 
                   {/* 2. If it's a string, render it inside a div that preserves whitespace */}
-                  {typeof activePage.example === 'string' && (
-                    <div style={{ whiteSpace: "pre-wrap" }}>{activePage.example}</div>
-                  )}
                   {/*
-                  <div style={{ whiteSpace: "pre-wrap" }}>{activePage.example}</div>
-                  <p>// Example logic for {parse(content)}</p>
-                  <p className="text-purple-400">const</p> config = {"{"} 
-                  <br /> &nbsp;&nbsp;engine: <span className="text-yellow-200">"self-hosted"</span>,
-                  <br /> &nbsp;&nbsp;uptime: <span className="text-yellow-200">"99.9%"</span>
-                  <br /> {"}"};
+                  {typeof activePage.code === 'string' && (
+                    <div style={{ whiteSpace: "pre-wrap" }}>{activePage.code}</div>
+                  )}
                   */}
                 </div>
               </div>
+              {activePage.code && (
+                  <button onClick={handleCopy} className="text-gray-400 hover:text-white transition-all">
+                    {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
+                  </button>
+              )}
             </div>
           </motion.div>
         </main>
