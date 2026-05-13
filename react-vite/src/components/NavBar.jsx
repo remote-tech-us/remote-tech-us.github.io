@@ -69,11 +69,24 @@ export default function NavBar() {
       </div>
 
       {/* Mobile Drawer Block Execution */}
+      {/* Inside Mobile Drawer Block Execution layout boundary loop in NavBar.jsx */}
       {isOpen && (
         <div className="md:hidden absolute top-10 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 px-2 pt-2 pb-3 space-y-1">
           <MobileNavLink item={{ label: 'Home', path: '/' }} onClose={() => setIsOpen(false)} />
-          <MobileNavLink item={{ label: 'Products', path: '#' }} subItems={productSubmenu} onClose={() => setIsOpen(false)} />
-          <MobileNavLink item={{ label: 'Services', path: '#' }} subItems={serviceSubmenu} onClose={() => setIsOpen(false)} />
+          
+          <MobileNavLink 
+            item={{ label: 'Products', path: '#' }} 
+            subItems={productSubmenu} 
+            basePath="/products" 
+            onClose={() => setIsOpen(false)} 
+          />
+          
+          <MobileNavLink 
+            item={{ label: 'Services', path: '#' }} 
+            subItems={serviceSubmenu} 
+            basePath="/services" 
+            onClose={() => setIsOpen(false)} 
+          />
         </div>
       )}
     </nav>

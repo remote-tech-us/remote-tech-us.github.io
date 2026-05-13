@@ -6,12 +6,41 @@ import { GLOBALS } from '../data/app__globals.jsx'; // FIX: Added missing import
 export default function NavDropdown({ label, items, basePath }) {
   const [isHovered, setIsHovered] = useState(false);
   const location = useLocation();
+  
+  // 1. Split path sections cleanly into individual array strings
+  const pathParts = location.pathname.split('/').filter(Boolean); // e.g. ["services", "0001-casdm"]
+  console.log('location:' + location.pathname + ' ==>[split]==> ' + location.pathname.split('/'));
+  // HIGHLIGHTING FIX: Split path parts to accurately verify base directories
+  //const pathParts = location.pathname.split('/').filter(Boolean); // e.g. ["services", "00"]
+  // COPY AND PASTE THIS TEMP DEBUGGER LOG
+  console.log(`[Dropdown Debug: ${label}]`, {
+    rawPathname: location.pathname,
+    parsedParts: pathParts,
+    firstDirectory: pathParts[0],
+    configuredBasePath: basePath,
+    dropdownLabel: label
+  });
+  //alert(pathParts);
 
   // Check if current route is part of this drop section
+  // const isDropdownActive =
+  //  items.some(item => location.pathname === item.path) ||
+  //  (basePath && location.pathname.startsWith(basePath));
+  
+  // BULLETPROOF MATCHING LOGIC FOR MIXED HASH/BROWSER URLS:
   const isDropdownActive =
+    // Check 1: Does the current URL path string exactly match one of your submenu child item paths?
     items.some(item => location.pathname === item.path) ||
-    (basePath && location.pathname.startsWith(basePath));
+    // Check 2: Clean base path check
+    (basePath && location.pathname.startsWith(basePath)) ||
+    // Check 3: Read window location directly if React Router parameters shift via HashRouter
+    window.location.hash.toLowerCase().includes(label.toLowerCase()) ||
+    location.pathname.toLowerCase().includes(label.toLowerCase());
 
+  // Safely extract theme colors with clean, definitive fallbacks
+  const activeColorClass = GLOBALS.theme?.textActive || "text-blue-400 font-bold";
+  const inactiveColorClass = `text-red ${GLOBALS.theme?.textHover || "hover:text-blue-300"}`;
+  console.log('label:' + label + '  isDropdownActive:' + isDropdownActive + '  activeColorClass:' + activeColorClass + '  inactiveColorClass:' + inactiveColorClass);
   return (
     <div
       className="relative flex items-center h-10" // Force layout tracking boundary
@@ -20,11 +49,20 @@ export default function NavDropdown({ label, items, basePath }) {
     >
       <button
         type="button"
-        style={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', padding: 0 }}
+        // BULLETPROOF RESET: Completely flattens the global #1a1a1a / #e50707 styles and padding rules
+        style={{ 
+          color: '#646cff',
+          background: 'transparent', 
+          backgroundColor: 'transparent', 
+          border: 'none', 
+          borderWidth: '0px',
+          outline: 'none',
+          padding: 0, 
+          margin: 0,
+          borderRadius: 0 
+        }}
         className={`flex items-center gap-1 text-base transition-colors cursor-pointer focus:outline-none ${
-          isDropdownActive
-            ? `${GLOBALS.theme?.textActive || "text-blue-400 font-bold"}`
-            : `text-white ${GLOBALS.theme?.textHover || "hover:text-blue-300"}`
+          isDropdownActive ? activeColorClass : inactiveColorClass
         }`}
       >
         {label}
