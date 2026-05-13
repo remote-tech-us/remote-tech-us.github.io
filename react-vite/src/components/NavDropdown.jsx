@@ -12,7 +12,13 @@ export default function NavDropdown({ label, items }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/*<button className={`!bg-transparent !p-0 !border-0 flex items-center gap-1 py-2 text-white hover:text-blue-300 transition-colors`}>*/}
-      <button className="bg-transparent p-0 border-0 flex items-center gap-1 text-base font-normal text-white hover:text-blue-300 transition-colors cursor-pointer focus:outline-none">
+      {/*<button className="bg-transparent p-0 border-0 flex items-center gap-1 text-base font-normal text-white hover:text-blue-300 transition-colors cursor-pointer focus:outline-none">*/}
+      <button 
+        type="button"
+        // Inline styles take absolute priority over standard CSS sheets
+        style={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', padding: 0 }}
+        className="flex items-center gap-1 text-base font-normal text-white hover:text-blue-600 transition-colors cursor-pointer focus:outline-none"
+      >
         {label}
         <span className={`text-[10px] transition-transform duration-200 ${isHovered ? 'rotate-180' : ''}`}>
           ▼
