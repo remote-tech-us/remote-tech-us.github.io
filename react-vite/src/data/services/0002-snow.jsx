@@ -1,77 +1,143 @@
-// src/data/services_snow.jsx
-import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
-import { TbWorldWww } from "react-icons/tb";
-import { BsKanban } from "react-icons/bs";
-import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
-import { SiGitea } from "react-icons/si";
-import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+// src/data/services/0002-snow.jsx
+import { SiServicenow, SiJavascript } from "react-icons/si";
+import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot } from "react-icons/vsc";
 
-// 1. Add metadata for the page to use
 export const CONFIG = {
-  label: "Service Now", // This is what shows in the NavBar
-  title: "Service Now",
-  subtitle: "Enterprise IT Service Management Solutions",
-  section_title: "Administration",
-  bg_color: "rgba(30, 41, 59, 0.8)",
-  accentColor: "bg-red-600" // Custom color for this specific service
+  label: "ServiceNow Suite",
+  title: "ServiceNow ITSM & Custom Workflows",
+  subtitle: "Enterprise Workflow Automation and Service Management Optimization",
+  seo: {
+    title: "ServiceNow Integration & Implementation - Remote Tech",
+    description: "Expert ServiceNow development, configuration, ITSM scaling, and integration solutions.",
+    keywords: ["ServiceNow", "ITSM", "Workflow Automation", "JavaScript Scripting", "Service Portal"]
+  },
+  section_title: "Core ServiceNow Services",
+  bg_color: "rgba(15, 32, 39, 0.8)",
+  accentColor: "bg-green-600",
+  sections: [
+    {
+      id: "featured-modules",
+      title: "Featured Software Modules",
+      accentColor: "bg-green-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "left",
+        intervalTime: 40,
+        step: 1
+      },
+      items: [
+        {
+          name: 'IT Service Management',
+          desc: 'ITSM Core Suite',
+          icon: <SiServicenow />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        },
+        {
+          name: 'IT Operations Management',
+          desc: 'ITOM Operations Suite',
+          icon: <SiServicenow />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        },
+        {
+          name: 'IT Asset Management',
+          desc: 'ITAM Asset Management',
+          icon: <SiServicenow />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        },
+        {
+          name: 'Strategic Portfolio Mgmt',
+          desc: 'SPM Project Planning',
+          icon: <SiServicenow />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        }
+      ]
+    },
+    {
+      id: "snow-core",
+      title: "Core Capabilities",
+      accentColor: "bg-green-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "right",
+        intervalTime: 50
+      },
+      items: [
+        {
+          name: 'Architecture',
+          desc: 'ServiceNow Platform Instance Design',
+          icon: <SiServicenow />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Implementation',
+          desc: 'Out-of-box setup and configuration workflows',
+          icon: <VscSymbolClass />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Custom App Engine',
+          desc: 'Scoped Applications & Custom Studio Tables',
+          icon: <VscSettingsGear />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Integrations',
+          desc: 'REST/SOAP, IntegrationHub, Mid Server Pipelines',
+          icon: <VscTypeHierarchy />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Development',
+          desc: 'Business Rules, Client Scripts, Script Includes',
+          icon: <VscCode />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Service Portal',
+          desc: 'Widget Customization, HTML/CSS, Angular Frameworks',
+          icon: <VscWand />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Upgrades',
+          desc: 'Instance family patches and skip-log remediations',
+          icon: <VscThumbsup />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'CMDB & Discovery',
+          desc: 'CI Class Managers, Identification & Reconciliation',
+          icon: <VscTelescope />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Flow Designer',
+          desc: 'Low-code execution logic and action engine builds',
+          icon: <VscCopilot />,
+          locked: false,
+          url: ''
+        }
+      ]
+    }
+  ]
 };
 
-// 2. Your existing array (keeping the name for compatibility or renaming to DATA)
-export const DATA = [
-  { 
-    name: 'Setup',
-    desc: 'Basic system configuration encompasses changes made to the platform as well as supporting applications. These changes can affect global settings as well as settings for particular applications.',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://www.servicenow.com/docs/r/yokohama/platform-administration/p_CoreConfigurationOverview.html',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA Automation Point ',
-    desc: 'CA AP Suite',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: '',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA IT Process Automation Manager',
-    desc: 'CA IT PAM Suite',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://www.broadcom.com/products/software/service-management/it-process-automation-manager',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA Service Catalog',
-    desc: 'CA Service Desk Manager - Catalog Component',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://www.broadcom.com/products/software/service-management/service-catalog',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA Embedded Entitlements Manager',
-    desc: 'CA EEM - Security Component',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://techdocs.broadcom.com/us/en/ca-enterprise-software/other/Embedded-Entitlements-Manager/12-7.html',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  }
-];
+// Map legacy array structure targeting Check 2 requirements smoothly
+export const DATA = CONFIG.sections[1].items;
 
