@@ -9,4 +9,10 @@ export const GLOBALS = {
   ,app_logo: '/remote-tech-us_v2.svg'
   //, bg_override_color: "#0f172a" // Tailwind's slate-900
   //, bg_override_color: "blue" // Tailwind's slate-900
+  ,theme: {
+    textActive: "text-blue-400"
+    ,textHover: "hover:text-blue-300"
+    ,bgActiveHover: "hover:bg-blue-600/20"
+    ,bgHighlight: "bg-blue-600/10"
+  }
 };

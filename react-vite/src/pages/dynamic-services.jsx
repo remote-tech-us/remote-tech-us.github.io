@@ -1,29 +1,43 @@
-// src/pages/DynamicServicePage.jsx
-
 import { useParams } from 'react-router-dom';
-// Dynamic import of all data files in the services folder
-const serviceDataFiles = import.meta.glob('../data/services/*.js', { eager: true });
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+
+// Load all service data files
+const serviceDataFiles = import.meta.glob('../data/services/*.jsx', { eager: true });
 
 export default function DynamicServicesPage() {
-  const { serviceId } = useParams(); // e.g., 'snow'
-  
-  // Find the data file that matches the URL param
-  const dataPath = `../data/services/${serviceId}.js`;
-  const serviceData = serviceDataFiles[dataPath]?.DATA;
+  const { serviceId } = useParams();
+  const filePath = `../data/services/${serviceId}.jsx`;
+  const module = serviceDataFiles[filePath];
 
-  if (!serviceData) return <div>Service not found</div>;
+  if (!module) return <div className="pt-24 text-white">Service not found.</div>;
+
+  const { CONFIG, DATA } = module;
 
   return (
-    <div style={{ backgroundImage: `linear-gradient(${serviceData.bg_color}, ...)` }}>
-      {/* Use the dynamic titles from the data file */}
-      {serviceData.sections.map(section => (
-        <section key={section.label}>
-          <h2 className="text-xl font-bold">
-             <span className="w-8 h-1 bg-blue-500 rounded-full" /> {section.label}
+    <div className="min-h-screen bg-cover bg-fixed"
+      style={{
+        backgroundImage: `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})`
+      }}
+    >
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12">
+          <h1 className="text-4xl font-bold text-white">{CONFIG.title}</h1>
+          <p className="text-gray-400">{CONFIG.subtitle}</p>
+        </header>
+
+        <section>
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+            <span className={`w-8 h-1 ${CONFIG.accentColor || 'bg-blue-500'} rounded-full`} />
+            {CONFIG.section_title}
           </h2>
-          {/* Render your Cards here */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {DATA.map((item) => (
+              <Card key={item.name} item={item} />
+            ))}
+          </div>
         </section>
-      ))}
+      </div>
     </div>
   );
 }

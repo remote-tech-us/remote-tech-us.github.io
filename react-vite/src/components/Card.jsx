@@ -6,11 +6,30 @@ import { BsKanban } from "react-icons/bs";
 import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
 
 const Card = ({ item ,  index }) => {
+  // Destructure attributes with sensible defaults if necessary
+  const { 
+    url, 
+    locked, 
+    target, 
+    rel, 
+    download, 
+    name, 
+    icon, 
+    desc, 
+    tag 
+  } = item;
+
   return (
     <motion.a
       key={item.name}
       //href={item.url}
       href={item.locked ? "#" : item.url} // Disable link if item is locked
+
+      // Dynamic Settings
+      target={target} 
+      rel={target === "_blank" ? (rel || "noopener noreferrer") : rel}
+      download={download} // Useful if the link is a file/PDF
+
       whileHover={{ scale: 1.02 }}
       /* 'w-72' or 'w-80' gives the card a consistent width in the carousel.
          'shrink-0' is vital to prevent the flexbox from squishing the card.

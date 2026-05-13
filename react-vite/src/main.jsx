@@ -18,6 +18,7 @@ import ProductsPage from './pages/products.jsx';
 import ServicesPage from './pages/services.jsx';
 import CaseStudiesPage from './pages/case-studies.jsx';
 import DevDocsPage from './pages/dev-docs.jsx';
+import DynamicServicesPage from './pages/dynamic-services.jsx';
 
 {/* Notes 
     Use HashRouter if:
@@ -51,6 +52,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/case-studies" element={<CaseStudiesPage />} />
           <Route path="/dev-docs" element={<DevDocsPage />} />
+          <Route path="/services/:serviceId" element={<DynamicServicesPage />} />
         </Routes>
       </main>
       <Footer />

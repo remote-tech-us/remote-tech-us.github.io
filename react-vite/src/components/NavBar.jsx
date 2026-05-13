@@ -1,9 +1,36 @@
 import { useState } from 'react';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { GLOBALS } from '../data/app__globals.jsx';
+import NavDropdown from './NavDropdown.jsx';
+import MobileNavLink from './MobileNavLink.jsx';
+
+// 1. Scan for service files
+// Ensure this path correctly points from NavBar.jsx to your data folder
+const productFiles = import.meta.glob('../data/products/*.jsx', { eager: true });
+const serviceFiles = import.meta.glob('../data/services/*.jsx', { eager: true });
 
 function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
+
+  // 1. Build the Submenu Array for Products
+  const productSubmenu = Object.entries(productFiles).map(([path, module]) => {
+    const id = path.split('/').pop().replace('.jsx', '');
+    return {
+      label: module.CONFIG?.label || id.toUpperCase(),
+      path: `/products/${id}`,
+      icon: module.DATA?.[0]?.icon // Grabs icon from first item in that file
+    };
+  });
+
+  // 2. Build the Submenu Array for Services
+  const serviceSubmenu = Object.entries(serviceFiles).map(([path, module]) => {
+    const id = path.split('/').pop().replace('.jsx', '');
+    return {
+      label: module.CONFIG?.label || id.toUpperCase(),
+      path: `/services/${id}`,
+      icon: module.DATA?.[0]?.icon // Grabs icon from first item in that file
+    };
+  });
 
   return (
     <nav className="bg-black/60 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
@@ -16,8 +43,28 @@ function NavBar() {
           {/*<div className="ml-10 flex items-baseline space-x-6">*/}
           <div className="hidden md:flex ml-4 lg:ml-10 items-baseline space-x-4 lg:space-x-6">
             <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Home </RouterLink>
-            <RouterLink to="/products" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Products </RouterLink>
-            <RouterLink to="/services" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Services </RouterLink>
+            {/*<RouterLink to="/products" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Products </RouterLink>*/}
+            {/*<RouterLink to="/services" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Services </RouterLink> */}
+            {/* Submenu Example */}
+            <NavDropdown 
+              label="NavDropdown" 
+              items={[
+                { label: 'Software', path: '/products/software' },
+                { label: 'Hardware', path: '/products/hardware' },
+              ]} 
+            />
+            {/* Dynamic Products Dropdown */}
+            <NavDropdown 
+              label="Products" 
+              items={productSubmenu} 
+              basePath="/products" 
+            />
+            {/* DYNAMIC DROPDOWN */}
+            <NavDropdown 
+              label="Services" 
+              items={serviceSubmenu} 
+              basePath="/services" 
+            />
             {/*
             <RouterLink to="/contacts" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Team </RouterLink>
             <RouterLink to="/clients" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Clients </RouterLink>
@@ -41,13 +88,20 @@ function NavBar() {
           </div>
         </div>
       </div>
-
       {isOpen && (
-        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3"> 
+          <MobileNavLink item={{ label: 'Home', path: '/' }} onClose={() => setIsOpen(false)} />
+          
+          <MobileNavLink 
+            item={{ label: 'Services', path: '#', hasSubmenu: true }} 
+            subItems={serviceSubmenu} 
+            onClose={() => setIsOpen(false)} 
+          />
+
           <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Home </RouterLink><br />
           <RouterLink to="/products" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Products </RouterLink><br />
-          <RouterLink to="/services" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Services </RouterLink><br />
           {/*
+          <RouterLink to="/services" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Services </RouterLink><br />
           <RouterLink to="/contacts" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Our Team </RouterLink><br />
           <RouterLink to="/clients" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Clients </RouterLink><br />
           <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
