@@ -2,9 +2,8 @@
 import fs from 'fs';
 import path from 'path';
 
-// CONFIGURATION: Set your input and output paths
 const INPUT_SVG_PATH = './public/remote-tech-us_v2.svg';
-const OUTPUT_JSX_PATH = './src/components/remote-tech-icon.jsx';
+const OUTPUT_JSX_PATH = './src/assets/remote-tech-icon.jsx';
 
 function convertSvgToReact() {
   try {
@@ -15,7 +14,7 @@ function convertSvgToReact() {
 
     let svgRaw = fs.readFileSync(INPUT_SVG_PATH, 'utf8');
 
-    // 1. Extract only the inner contents of <g inkscape:label="Layer 1" ...>
+    // 1. Isolate the core Inkscape graphic layers block smoothly
     const layerRegex = /<g[^>]*inkscape:groupmode="layer"[^>]*>([\s\S]*?)<\/g>/;
     const match = svgRaw.match(layerRegex);
     
@@ -26,26 +25,62 @@ function convertSvgToReact() {
 
     let innerContent = match[1].trim();
 
-    // 2. Convert standard HTML attributes to React camelCase attributes
+    // 2. Parse raw inline CSS strings into secure React Objects style properties
+    // This finds style="content" blocks and builds style={{content}} maps dynamically
+    const styleRegex = /style="([^"]*)"/g;
+    innerContent = innerContent.replace(styleRegex, (match, styleString) => {
+      // Split entries like 'display:inline;fill:none;'
+      const pairs = styleString.split(';').filter(Boolean);
+      const objectProperties = pairs.map(pair => {
+        let [key, val] = pair.split(':');
+        if (!key || !val) return '';
+        
+        // Sanitize trailing quotes or structural formatting anomalies from values
+        key = key.trim();
+        val = val.trim().replace(/['"]/g, '');
+
+        // Convert key format: stroke-width -> strokeWidth
+        const camelKey = key.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+        
+        // If Inkscape hardcoded a reference to a missing local linearGradient, force cascade colors
+        if (val.startsWith('url(#')) {
+          return `${camelKey}: 'currentColor'`;
+        }
+        
+        return `${camelKey}: '${val}'`;
+      }).filter(Boolean);
+
+      return `style={{ ${objectProperties.join(', ')} }}`;
+    });
+
+    // 3. Fix structural inline properties that exist outside style attributes
     innerContent = innerContent
       .replace(/stroke-width=/g, 'strokeWidth=')
-      .replace(/stroke-miterlimit=/g, 'strokeMiterlimit=')
-      .replace(/stroke-opacity=/g, 'strokeOpacity=')
-      .replace(/fill-opacity=/g, 'fillOpacity=');
+      .replace(/stroke-linecap=/g, 'strokeLinecap=')
+      .replace(/stroke-dasharray=/g, 'strokeDasharray=')
+      .replace(/fill-opacity=/g, 'fillOpacity=')
+      .replace(/fill-rule=/g, 'fillRule=')
+      .replace(/stroke-opacity=/g, 'strokeOpacity=');
 
-    // 3. Strip out inkscape/sodipodi specific node selectors from individual paths
+    // 4. Remove missing gradient nodes or raw stroke hooks that clash with Babel tokens
+    innerContent = innerContent.replace(/stroke="currentColor"/g, '');
+
+    // 5. Clean up specialized vector nodes from layout boundaries
     innerContent = innerContent
       .replace(/inkscape:[a-z]+="[^"]*"/g, '')
       .replace(/sodipodi:[a-z]+="[^"]*"/g, '');
 
-    // 4. Force links to map to currentColor instead of the missing linearGradients
-    innerContent = innerContent.replace(/stroke:url\([^)]+\)/g, 'stroke="currentColor"');
+    // 6. Fix open-ended XML element nodes to comply with JSX strict standards
+    // This guarantees all trailing path strings wrap with " />" properly
+    innerContent = innerContent.replace(/([^> ]+)\s*>/g, (m, p1) => {
+      if (p1.endsWith('/') || p1.includes('<') || p1.includes('!--')) return m;
+      return `${p1} />`;
+    });
 
-    // 5. Build the complete, clean React component string
     const componentTemplate = `// Generated automatically from raw Inkscape SVG geometry vectors
 import React from 'react';
 
-export default function MyCustomIcon({ width = "1.2em", height = "1.2em", className = "" }) {
+export default function RemoteTechIcon({ width = "1.2em", height = "1.2em", className = "" }) {
   return (
     <svg
       viewBox="0 0 41.798294 41.744888"
@@ -57,22 +92,16 @@ export default function MyCustomIcon({ width = "1.2em", height = "1.2em", classN
     >
       {/* Retain Inkscape's exact original structural placement matrix transform */}
       <g transform="translate(-65.4537, -102.595)">
-        ${innerContent.split('\n').map(line => '        ' + line.trim()).join('\n')}
+${innerContent.split('\n').map(line => '        ' + line.trim()).join('\n')}
       </g>
     </svg>
   );
 }
 `;
 
-    // 6. Write the finalized clean file out to the components directory
-    const outputDir = path.dirname(OUTPUT_JSX_PATH);
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
     fs.writeFileSync(OUTPUT_JSX_PATH, componentTemplate, 'utf8');
-    console.log(`\nGAINDED CLEAN COMPILE WORK 🚀`);
-    console.log(`✅ React Component successfully generated at: ${OUTPUT_JSX_PATH}\n`);
+    console.log(`\nCOMPILER ALIGNMENT SUCCESSFUL 🚀`);
+    console.log(`✅ Clean React component generated at: ${OUTPUT_JSX_PATH}\n`);
 
   } catch (error) {
     console.error("❌ An error occurred during the conversion process:", error);
