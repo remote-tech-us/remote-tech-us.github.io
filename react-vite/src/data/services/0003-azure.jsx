@@ -11,6 +11,7 @@ export const CONFIG = {
   label: "Microsoft Azure", // This is what shows in the NavBar
   title: "Azure Cloud",
   subtitle: "Enterprise IT Service Management Solutions",
+  section_title: "Featured",
   bg_color: "rgba(30, 41, 59, 0.8)",
   accentColor: "bg-red-600" // Custom color for this specific service
 };
@@ -18,56 +19,12 @@ export const CONFIG = {
 // 2. Your existing array (keeping the name for compatibility or renaming to DATA)
 export const DATA = [
   { 
-    name: 'CA Service Desk Manager',
-    desc: 'CA SDM Suite',
-    icon: <SiBroadcom />,
+    name: 'Azure',
+    desc: 'Microsoft',
+    icon: <VscTools />,
     locked: false,
     tag: '',
-    url: 'https://www.broadcom.com/products/software/service-management/service-desk-manager',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA Automation Point ',
-    desc: 'CA AP Suite',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: '',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA IT Process Automation Manager',
-    desc: 'CA IT PAM Suite',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://www.broadcom.com/products/software/service-management/it-process-automation-manager',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA Service Catalog',
-    desc: 'CA Service Desk Manager - Catalog Component',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://www.broadcom.com/products/software/service-management/service-catalog',
-    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
-    rel: '',
-    download: ''
-  },
-  { 
-    name: 'CA Embedded Entitlements Manager',
-    desc: 'CA EEM - Security Component',
-    icon: <SiBroadcom />,
-    locked: false,
-    tag: '',
-    url: 'https://techdocs.broadcom.com/us/en/ca-enterprise-software/other/Embedded-Entitlements-Manager/12-7.html',
+    url: 'https://azure.microsoft.com',
     target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
     rel: '',
     download: ''
