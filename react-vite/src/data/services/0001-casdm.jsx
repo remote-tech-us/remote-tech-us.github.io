@@ -11,6 +11,11 @@ export const CONFIG = {
   label: "CA SDM Suite", // This is what shows in the NavBar
   title: "CA Service Management",
   subtitle: "Enterprise IT Service Management Solutions",
+  seo: {
+    title: "CA Service Desk Suite Management - Remote Tech",
+    description: "Enterprise level CA SDM, automation point and process engineering solutions.",
+    keywords: ["CA SDM", "Service Management", "Automation Point", "ITIL"]
+  },
   section_title: "Core Services",
   bg_color: "rgba(30, 41, 59, 0.8)",
   accentColor: "bg-red-600", // Custom color for this specific service

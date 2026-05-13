@@ -1,4 +1,7 @@
+// src/main.jsx
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+
 import NavBar from './components/NavBar.jsx';
 import Footer from './components/footer.jsx';
 import React from 'react'
@@ -34,6 +37,7 @@ import DynamicServicesPage from './pages/dynamic-services.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <HelmetProvider>
     <HashRouter>
       <NavBar /> {/* NavBar is now inside the Router context! */}
       <main>
@@ -59,5 +63,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </main>
       <Footer />
     </HashRouter>
+    </HelmetProvider>
   </React.StrictMode>
 );
