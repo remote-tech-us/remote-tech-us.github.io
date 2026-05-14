@@ -1,5 +1,5 @@
 // src/data/services/0003-azure.jsx
-import { SiMicrosoftazure, SiTerraform, SiAnsible, SiDocker, SiKubernetes } from "react-icons/si";
+import { SiTerraform, SiAnsible, SiDocker, SiKubernetes } from "react-icons/si";
 import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot } from "react-icons/vsc";
 
 export const CONFIG = {
@@ -29,7 +29,7 @@ export const CONFIG = {
         {
           name: 'Azure DevOps Pipelines',
           desc: 'Continuous Integration / Deployment Engines',
-          icon: <SiMicrosoftazure />,
+          icon: '',
           locked: false,
           url: 'microsoft.com',
           target: '_blank'
