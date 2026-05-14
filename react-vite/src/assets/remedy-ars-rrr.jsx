@@ -4,9 +4,9 @@ import React from 'react';
 export default function RemedyARSRRR({ className = "" }) {
   return (
     <svg
-      viewBox="30 70 150 140" /* Fits the actual path coordinates (36 to 182) */
-      preserveAspectRatio="xMinYMid meet" /* Removes left padding, aligns left */
-      className={`w-full h-full ${className}`}
+      viewBox="20 50 200 160" /* Exact pixel boundary wrapping all coordinate arrays */
+      preserveAspectRatio="xMidYMid meet" /* Centers the vector structure completely */
+      className={`inline-block align-middle max-w-full max-h-full ${className}`}
     >
       <g>
         <path
