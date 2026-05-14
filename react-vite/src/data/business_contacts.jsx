@@ -2,6 +2,13 @@
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
 export const CONTACTS = [
   {
+    id: "main-office",
+    name: "Corporate Headquarters",
+    logo: "/remote-tech-us_v2.svg",
+    email: "info@remote-tech.us",
+    type: "company" // Matches the default filter string rule
+  },
+  {
     tag: 'Founder',
     locked: false,
     logo: "/remote-tech-us_v2.svg",
@@ -24,7 +31,8 @@ export const CONTACTS = [
     name: "Support",
     email: "support@remote-tech.us",
     chat: "https://chat.remote-tech.us/group/Support",
-    qrValue: false
+    qrValue: false,
+    type: "company"
   }
 ].map((contact, index) => ({
   ...contact,
