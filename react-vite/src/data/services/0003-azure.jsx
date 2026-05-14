@@ -12,7 +12,7 @@ export const CONFIG = {
     description: "Professional Microsoft Azure cloud setup, automation scripts, Terraform optimization, and CI/CD pipelines.",
     keywords: ["Microsoft Azure", "DevOps", "Terraform IaC", "Cloud Architecture", "Azure Pipelines"]
   },
-  section_title: "Core Azure Capabilities",
+  section_title: "Core Azure Capabilities", // ONLY USED WHEN DATA[] IS POPULATED
   bg_color: "rgba(23, 37, 42, 0.8)",
   accentColor: "bg-blue-600",
   sections: [
@@ -132,6 +132,7 @@ export const CONFIG = {
   ]
 };
 
-// Map legacy array structure targeting Check 2 requirements smoothly
-export const DATA = CONFIG.sections[1].items;
+// LEGACY WAY TO POPULATE CARDS USING DATA[]
+// Note: CONFIG.section_title is required with DATA is populated
+export const DATA = [];
 

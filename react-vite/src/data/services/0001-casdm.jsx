@@ -177,5 +177,7 @@ export const CONFIG = {
     } 
   ]
 };
-// Extract and combine the items arrays from all sections safely
-export const DATA = CONFIG.sections.flatMap(section => section.items || []);
+
+// LEGACY WAY TO POPULATE CARDS USING DATA[]
+// Note: CONFIG.section_title is required with DATA is populated
+export const DATA = [];

@@ -31,7 +31,7 @@ export const CONFIG = {
     description: "Expert BMC Remedy ARS development, Dev Studio workflow customizations, Mid-Tier server setups, and legacy migration tools.",
     keywords: ["BMC Remedy", "Action Request System", "ARS Dev Studio", "On-Premises ITSM", "Mid-Tier Server"]
   },
-  section_title: "Core Remedy Frameworks",
+  section_title: "Core Remedy Frameworks",  // ONLY NEEDED IF DATA[] IS POPULATED
   bg_color: "rgba(30, 41, 59, 0.85)",
   accentColor: "bg-orange-600",
   sections: [
@@ -57,7 +57,7 @@ export const CONFIG = {
         {
           name: 'Change Management',
           desc: 'Forward Schedule of Changes & Approval Engines',
-          icon: <RemedyARSRRR />,
+          icon: <RemedyARSRRR className="h-36 w-36" />,
           locked: false,
           url: '',
           target: '_self'
@@ -65,7 +65,7 @@ export const CONFIG = {
         {
           name: 'Asset Management',
           desc: 'On-Premises CMDB & Asset Inventory Trackers',
-          icon: <RemedyARSRRR />,
+          icon: <RemedyARSRRR className="h-36 w-36" />,
           locked: false,
           url: '',
           target: '_self'
@@ -73,7 +73,7 @@ export const CONFIG = {
         {
           name: 'Problem Management',
           desc: 'Root Cause Analysis and Known Error Databases',
-          icon: <RemedyARSRRR />,
+          icon: <RemedyARSRRR className="h-36 w-36" />,
           locked: false,
           url: '',
           target: '_self'
@@ -151,6 +151,7 @@ export const CONFIG = {
   ]
 };
 
-// Flatten all multi-section items arrays to guarantee seamless backward grid loops mapping support
-export const DATA = CONFIG.sections.flatMap(section => section.items || []);
+// Populating DATA will trigger display after above section
+// - Note: DATA section_title will be pulled from CONFIG.section_title
+export const DATA = [];
 

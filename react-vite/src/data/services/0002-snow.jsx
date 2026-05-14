@@ -27,7 +27,7 @@ export const CONFIG = {
     description: "Expert ServiceNow development, configuration, ITSM scaling, and integration solutions.",
     keywords: ["ServiceNow", "ITSM", "Workflow Automation", "JavaScript Scripting", "Service Portal"]
   },
-  section_title: "Core ServiceNow Services",
+  section_title: "Core ServiceNow Services", // ONLY USED WEHN DATA[] IS POPULATED
   bg_color: "rgba(15, 32, 39, 0.8)",
   accentColor: "bg-green-600",
   sections: [
@@ -100,6 +100,6 @@ export const CONFIG = {
   ]
 };
 
-// Extract and combine the items arrays from all sections safely
-export const DATA = CONFIG.sections.flatMap(section => section.items || []);
-
+// LEGACY WAY TO POPULATE CARDS USING DATA[]
+// Note: CONFIG.section_title is required with DATA is populated
+export const DATA = [];

@@ -45,20 +45,22 @@ export default function DynamicPageTemplate({ filesDict, fallbackType }) {
             section={section} 
           />
         ))}
-        <section>
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
-            <span className={`w-8 h-1 ${CONFIG.accentColor || 'bg-blue-500'} rounded-full`} />
-              {CONFIG.section_title}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DATA.map((item, index) => (
-              <Card 
-                key={`${item.name.replace(/\s+/g, '-').toLowerCase()}-${index}`} 
-                item={item} 
-              />
-            ))}
-          </div>
-        </section>
+        {DATA && DATA.length > 0 && (
+          <section>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+              <span className={`w-8 h-1 ${CONFIG.accentColor || 'bg-blue-500'} rounded-full`} />
+                {CONFIG.section_title}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {DATA.map((item, index) => (
+                <Card 
+                  key={`${item.name.replace(/\s+/g, '-').toLowerCase()}-${index}`} 
+                  item={item} 
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
