@@ -39,7 +39,7 @@ export default function MobileNavLink({ item, subItems, onClose, basePath }) {
         onClick={() => setIsOpen(!isOpen)}
         // Force complete isolation away from browser form button backgrounds
         style={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', padding: '12px 16px' }}
-        className={`w-full flex justify-between items-center transition-colors cursor-pointer focus:outline-none ${
+        className={`nav-menu-btn w-full flex justify-between items-center transition-colors cursor-pointer focus:outline-none ${
           isMobileHeaderActive
             ? `${GLOBALS.theme?.textActive || "text-blue-400 font-bold"}`
             : "text-white hover:bg-white/5"
