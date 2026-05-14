@@ -17,7 +17,7 @@ export default function NavBar() {
     return {
       label: module.CONFIG?.label || id.toUpperCase(),
       path: `/products/${id}`,
-      icon: module.DATA?.[0]?.icon
+      icon: module.CONFIG?.icon
     };
   });
 
@@ -27,7 +27,7 @@ export default function NavBar() {
     return {
       label: module.CONFIG?.label || id.toUpperCase(),
       path: `/services/${id}`,
-      icon: module.DATA?.[0]?.icon
+      icon: module.CONFIG?.icon
     };
   });
 
