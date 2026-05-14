@@ -1,18 +1,39 @@
 // convert-svg-2-icon.js
 import fs from 'fs';
 import path from 'path';
+import { promptFileSelection } from './select-files.js';
 
-const INPUT_SVG_PATH = './public/remote-tech-us_v2.svg';
-const OUTPUT_JSX_PATH = './src/assets/remote-tech-icon.jsx';
+const INPUT_SRC_PATH = './public';
+const OUTPUT_JSX_PATH = './src/assets';
 
-function convertSvgToReact() {
+async function main() {
+    try {
+        const defaultPath = './public';
+        const targetExtension = 'svg'; // Can easily change to 'png', 'js', etc.
+
+        // Executes the module with your configurations
+        const selectedFiles = await promptFileSelection(defaultPath, targetExtension);
+        
+        console.log(`\nReady to convert ${selectedFiles.length} file(s):`);
+        selectedFiles.forEach(filePath => {
+            console.log(`<- Processing: ${filePath}`);
+            convertSvgToReact(filePath);
+            // Your icon processing code goes here
+        });
+
+    } catch (error) {
+        console.error('\nExecution stopped:', error.message);
+    }
+}
+
+function convertSvgToReact(svgFile) {
   try {
-    if (!fs.existsSync(INPUT_SVG_PATH)) {
-      console.error(`❌ Input SVG file not found at: ${INPUT_SVG_PATH}`);
+    if (!fs.existsSync(svgFile)) {
+      console.error(`❌ Input SVG file not found at: ${INPUT_SRC_PATH}`);
       return;
     }
 
-    let svgRaw = fs.readFileSync(INPUT_SVG_PATH, 'utf8');
+    let svgRaw = fs.readFileSync(svgFile, 'utf8');
 
     const layerRegex = /<g[^>]*inkscape:groupmode="layer"[^>]*>([\s\S]*?)<\/g>/;
     const match = svgRaw.match(layerRegex);
@@ -24,27 +45,19 @@ function convertSvgToReact() {
 
     let innerContent = match[1].trim();
 
-    // Parse raw inline CSS strings into secure React Objects style properties
+    // Parse style attributes safely
     const styleRegex = /style="([^"]*)"/g;
     innerContent = innerContent.replace(styleRegex, (m, styleString) => {
       const pairs = styleString.split(';').filter(Boolean);
       const objectProperties = pairs.map(pair => {
         let [key, val] = pair.split(':');
         if (!key || !val) return '';
-        
         key = key.trim();
         val = val.trim().replace(/['"]/g, '');
-
         const camelKey = key.replace(/-([a-z])/g, (m, letter) => letter.toUpperCase());
-        
-        // FIX: If a path references a missing gradient, let it fall back to currentColor instead of crashing
-        if (val.startsWith('url(#')) {
-          return `${camelKey}: 'currentColor'`;
-        }
-        
+        if (val.startsWith('url(#')) return `${camelKey}: 'currentColor'`;
         return `${camelKey}: '${val}'`;
       }).filter(Boolean);
-
       return `style={{ ${objectProperties.join(', ')} }}`;
     });
 
@@ -57,43 +70,45 @@ function convertSvgToReact() {
       .replace(/stroke-opacity=/g, 'strokeOpacity=');
 
     innerContent = innerContent.replace(/stroke="currentColor"/g, '');
-
-    innerContent = innerContent
-      .replace(/inkscape:[a-z]+="[^"]*"/g, '')
-      .replace(/sodipodi:[a-z]+="[^"]*"/g, '');
+    innerContent = innerContent.replace(/inkscape:[a-z]+="[^"]*"/g, '').replace(/sodipodi:[a-z]+="[^"]*"/g, '');
 
     innerContent = innerContent.replace(/([^> ]+)\s*>/g, (m, p1) => {
       if (p1.endsWith('/') || p1.includes('<') || p1.includes('!--')) return m;
       return `${p1} />`;
     });
 
-    const componentTemplate = `// Generated automatically from raw Inkscape SVG geometry vectors
-import React from 'react';
+    // Formatting multi-line indentations safely
+    const formattedContent = innerContent.split('\n').map(line => '        ' + line.trim()).join('\n');
 
-export default function RemoteTechIcon({ width = "1.5em", height = "1.5em", className = "" }) {
-  return (
-    <svg
-      viewBox="-2 -2 46 46"
-      width={width}
-      height={height}
-      className={\`inline-block align-middle \${className}\`}
-    >
-      {/* FIX: Removed group-level stroke/fill overrides so individual path styles can render */}
-      <g transform="translate(-65.4537, -102.595)">
-        \${innerContent.split('\\n').map(line => '        ' + line.trim()).join('\\n')}
-      </g>
-    </svg>
-  );
-}
-`;
-
-    fs.writeFileSync(OUTPUT_JSX_PATH, componentTemplate, 'utf8');
-    console.log(`\n✅ Clean React component generated at: ${OUTPUT_JSX_PATH}\n`);
+    // FIX: Using regular string concatenation instead of a nested literal slice avoids string interpolation crashes
+    const componentTemplate = 
+"// Generated automatically from raw Inkscape SVG geometry vectors\n" +
+"import React from 'react';\n\n" +
+"export default function RemoteTechIcon({ width = \"1.5em\", height = \"1.5em\", className = \"\" }) {\n" +
+"  return (\n" +
+"    <svg\n" +
+"      viewBox=\"-2 -2 46 46\"\n" +
+"      width={width}\n" +
+"      height={height}\n" +
+"      className={`inline-block align-middle ${className}`}\n" +
+"    >\n" +
+"      {/* Retain Inkscape's exact original structural placement matrix transform */}\n" +
+"      <g transform=\"translate(-65.4537, -102.595)\">\n" + 
+       formattedContent + "\n" +
+"      </g>\n" +
+"    </svg>\n" +
+"  );\n" +
+"}\n";
+    
+    jsxOutFile = path.basename(svgFile, '.svg');
+    
+    //fs.writeFileSync(jsxOutFile, componentTemplate, 'utf8');
+    console.log(`\n✅ Clean React component generated at: ${jsxOutFile}\n`);
 
   } catch (error) {
     console.error("❌ An error occurred during the conversion process:", error);
   }
 }
 
-convertSvgToReact();
+main();
 
