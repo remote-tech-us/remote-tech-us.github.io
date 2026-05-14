@@ -61,7 +61,20 @@ export default function NavBar() {
 
           {/* Hamburger Mobile Toggle */}
           <div className="mr-2 flex md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
+            <button 
+              type="button"
+              onClick={() => setIsOpen(!isOpen)} 
+              style={{ 
+                color: '#646cff', // Matches your desktop font layout color directly
+                background: 'transparent', 
+                backgroundColor: 'transparent', 
+                border: 'none', 
+                padding: '4px 8px', 
+                margin: 0,
+                cursor: 'pointer'
+              }}
+              className="focus:outline-none text-xl"
+            >
               ☰
             </button>
           </div>
