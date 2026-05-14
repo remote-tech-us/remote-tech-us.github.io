@@ -14,7 +14,6 @@ function convertSvgToReact() {
 
     let svgRaw = fs.readFileSync(INPUT_SVG_PATH, 'utf8');
 
-    // 1. Isolate the core Inkscape graphic layers block smoothly
     const layerRegex = /<g[^>]*inkscape:groupmode="layer"[^>]*>([\s\S]*?)<\/g>/;
     const match = svgRaw.match(layerRegex);
     
@@ -23,10 +22,9 @@ function convertSvgToReact() {
       return;
     }
 
-    // FIX: Read array capture index [1] explicitly before calling trim configurations
     let innerContent = match[1].trim();
 
-    // 2. Parse raw inline CSS strings into secure React Objects style properties
+    // Parse raw inline CSS strings into secure React Objects style properties
     const styleRegex = /style="([^"]*)"/g;
     innerContent = innerContent.replace(styleRegex, (m, styleString) => {
       const pairs = styleString.split(';').filter(Boolean);
@@ -37,10 +35,9 @@ function convertSvgToReact() {
         key = key.trim();
         val = val.trim().replace(/['"]/g, '');
 
-        // FIX: Extract inner boundary array match index offset cleanly (e.g. stroke-width -> strokeWidth)
-        const camelKey = key.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+        const camelKey = key.replace(/-([a-z])/g, (m, letter) => letter.toUpperCase());
         
-        // If Inkscape hardcoded a reference to a missing local linearGradient, force cascade colors
+        // FIX: If a path references a missing gradient, let it fall back to currentColor instead of crashing
         if (val.startsWith('url(#')) {
           return `${camelKey}: 'currentColor'`;
         }
@@ -51,7 +48,6 @@ function convertSvgToReact() {
       return `style={{ ${objectProperties.join(', ')} }}`;
     });
 
-    // 3. Fix structural inline properties that exist outside style attributes
     innerContent = innerContent
       .replace(/stroke-width=/g, 'strokeWidth=')
       .replace(/stroke-linecap=/g, 'strokeLinecap=')
@@ -60,15 +56,12 @@ function convertSvgToReact() {
       .replace(/fill-rule=/g, 'fillRule=')
       .replace(/stroke-opacity=/g, 'strokeOpacity=');
 
-    // 4. Remove missing gradient nodes or raw stroke hooks that clash with Babel tokens
     innerContent = innerContent.replace(/stroke="currentColor"/g, '');
 
-    // 5. Clean up specialized vector nodes from layout boundaries
     innerContent = innerContent
       .replace(/inkscape:[a-z]+="[^"]*"/g, '')
       .replace(/sodipodi:[a-z]+="[^"]*"/g, '');
 
-    // 6. Fix open-ended XML element nodes to comply with JSX strict standards
     innerContent = innerContent.replace(/([^> ]+)\s*>/g, (m, p1) => {
       if (p1.endsWith('/') || p1.includes('<') || p1.includes('!--')) return m;
       return `${p1} />`;
@@ -80,15 +73,14 @@ import React from 'react';
 export default function RemoteTechIcon({ width = "1.5em", height = "1.5em", className = "" }) {
   return (
     <svg
-      // FIXED BOUNDS: Canvas dimensions slightly widened to prevent right edge chopping
       viewBox="-2 -2 46 46"
       width={width}
       height={height}
       className={\`inline-block align-middle \${className}\`}
     >
-      {/* Retain Inkscape's exact original structural placement matrix transform */}
-      <g transform="translate(-65.4537, -102.595)" stroke="currentColor" fill="none">
-${innerContent.split('\n').map(line => '        ' + line.trim()).join('\n')}
+      {/* FIX: Removed group-level stroke/fill overrides so individual path styles can render */}
+      <g transform="translate(-65.4537, -102.595)">
+        \${innerContent.split('\\n').map(line => '        ' + line.trim()).join('\\n')}
       </g>
     </svg>
   );
@@ -96,8 +88,7 @@ ${innerContent.split('\n').map(line => '        ' + line.trim()).join('\n')}
 `;
 
     fs.writeFileSync(OUTPUT_JSX_PATH, componentTemplate, 'utf8');
-    console.log(`\nCOMPILER ALIGNMENT SUCCESSFUL 🚀`);
-    console.log(`✅ Clean React component generated at: ${OUTPUT_JSX_PATH}\n`);
+    console.log(`\n✅ Clean React component generated at: ${OUTPUT_JSX_PATH}\n`);
 
   } catch (error) {
     console.error("❌ An error occurred during the conversion process:", error);
