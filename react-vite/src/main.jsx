@@ -13,7 +13,7 @@ import App from './App.jsx'
 import AboutPage from './pages/about.jsx';
 import TechStackPage from './pages/tech-stack.jsx';
 import CareersPage from './pages/careers.jsx';
-import ContactsPage from './pages/contacts.jsx';
+import ContactUsPage from './pages/contact-us.jsx';
 import PrivacyPage from './pages/privacy-policy.jsx';
 import TermsPage from './pages/terms-of-service.jsx';
 import ClientsPage from './pages/clients.jsx';
@@ -46,12 +46,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/" element={<App />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/careers" element={<CareersPage />} />
-          <Route path="/contacts" element={<ContactsPage />} />
+          <Route path="/contact-us" element={<ContactUsPage />} />
           <Route path="/privacy-policy" element={<PrivacyPage />} />
           <Route path="/terms-of-service" element={<TermsPage />} />
           <Route path="/tech-stack" element={<TechStackPage />} />
-          {/* Dynamic route for specific contacts */}
-          <Route path="/contacts/:id" element={<ContactsPage />} />
+          {/* Dynamic route for specific contact-us */}
+          <Route path="/contact-us/:id" element={<ContactUsPage />} />
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/services" element={<ServicesPage />} />
