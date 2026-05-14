@@ -4,6 +4,7 @@ import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, Vs
 
 export const CONFIG = {
   label: "Microsoft Azure",
+  icon: <SiAnsible />,
   title: "Azure Cloud & Infrastructure DevOps",
   subtitle: "Cloud Automation, Hybrid Solutions, and Infrastructure as Code",
   seo: {

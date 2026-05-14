@@ -23,6 +23,7 @@ const RemedySuiteIcon = () => (
 
 export const CONFIG = {
   label: "Remedy ARS", // Displays neatly in the sorted dropdown list
+  icon: <RemedyARSRRR className="h-6 w-6" />,
   title: "BMC Remedy AR System Suite",
   subtitle: "Legacy On-Premises Action Request System & ITIL Service Management Development",
   seo: {
@@ -48,7 +49,7 @@ export const CONFIG = {
         {
           name: 'Incident Management',
           desc: 'Classic ARS Incident Lifecycle Systems',
-          icon: <RemedyARSRRR  />,
+          icon: <RemedyARSRRR className="h-36 w-36" />,
           locked: false,
           url: '',
           target: '_self'
@@ -56,7 +57,7 @@ export const CONFIG = {
         {
           name: 'Change Management',
           desc: 'Forward Schedule of Changes & Approval Engines',
-          icon: <RemedySuiteIcon />,
+          icon: <RemedyARSRRR />,
           locked: false,
           url: '',
           target: '_self'
@@ -64,7 +65,7 @@ export const CONFIG = {
         {
           name: 'Asset Management',
           desc: 'On-Premises CMDB & Asset Inventory Trackers',
-          icon: <RemedySuiteIcon />,
+          icon: <RemedyARSRRR />,
           locked: false,
           url: '',
           target: '_self'
@@ -72,7 +73,7 @@ export const CONFIG = {
         {
           name: 'Problem Management',
           desc: 'Root Cause Analysis and Known Error Databases',
-          icon: <RemedySuiteIcon />,
+          icon: <RemedyARSRRR />,
           locked: false,
           url: '',
           target: '_self'
