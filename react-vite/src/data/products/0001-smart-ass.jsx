@@ -10,6 +10,7 @@ import RemoteTechIcon from "../../assets/remote-tech-icon.jsx";
 // 1. Add metadata for the page to use
 export const CONFIG = {
   label: "Remote Tech US", // This is what shows in the NavBar
+  icon: <RemoteTechIcon className="h-4 w-4" />,
   title: "Products Developed by Remote Tech US",
   subtitle: "Secure, scalable, and transparent software",
   section_title: "Coming Soon",
