@@ -49,19 +49,7 @@ export default function NavDropdown({ label, items, basePath }) {
     >
       <button
         type="button"
-        // BULLETPROOF RESET: Completely flattens the global #1a1a1a / #e50707 styles and padding rules
-        style={{ 
-          color: '#646cff',
-          background: 'transparent', 
-          backgroundColor: 'transparent', 
-          border: 'none', 
-          borderWidth: '0px',
-          outline: 'none',
-          padding: 0, 
-          margin: 0,
-          borderRadius: 0 
-        }}
-        className={`flex items-center gap-1 text-base transition-colors cursor-pointer focus:outline-none ${
+        className={`nav-menu-btn flex items-center gap-1 text-base transition-colors cursor-pointer focus:outline-none ${
           isDropdownActive ? activeColorClass : inactiveColorClass
         }`}
       >
