@@ -8,10 +8,14 @@ export default function MobileNavLink({ item, subItems, onClose, basePath }) {
   const location = useLocation();
 
   // Evaluate active text highlighting paths for mobile headers
-  const isMobileHeaderActive = 
+  const isMobileHeaderActive =
     (subItems && subItems.some(sub => location.pathname === sub.path)) ||
     (basePath && location.pathname.startsWith(basePath)) ||
     location.pathname === item.path;
+
+  // Global Theme Highlighting Fallbacks
+  const activeColorClass = GLOBALS.theme?.textActive || "text-blue-400 font-bold";
+  const hoverTextClass = GLOBALS.theme?.textHover || "hover:text-blue-300";
 
   // If no submenu items exist, render a standard link layout row block
   if (!subItems || subItems.length === 0) {
@@ -21,9 +25,9 @@ export default function MobileNavLink({ item, subItems, onClose, basePath }) {
         onClick={onClose}
         className={({ isActive }) =>
           `block px-4 py-3 border-b border-white/5 transition-colors ${
-            isActive 
-              ? `${GLOBALS.theme?.textActive || "text-blue-400 font-bold"}` 
-              : "text-white hover:bg-white/5"
+            isActive
+              ? activeColorClass
+              : `text-white ${hoverTextClass} hover:bg-white/5`
           }`
         }
       >
@@ -37,19 +41,18 @@ export default function MobileNavLink({ item, subItems, onClose, basePath }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        // Force complete isolation away from browser form button backgrounds
         style={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', padding: '12px 16px' }}
         className={`nav-menu-btn w-full flex justify-between items-center transition-colors cursor-pointer focus:outline-none ${
           isMobileHeaderActive
-            ? `${GLOBALS.theme?.textActive || "text-blue-400 font-bold"}`
-            : "text-white hover:bg-white/5"
+            ? activeColorClass
+            : `text-white ${hoverTextClass} hover:bg-white/5`
         }`}
       >
         <div className="flex items-center gap-2">
           {item.icon} {item.label}
         </div>
-        <span 
-          className="text-xs transition-transform duration-200" 
+        <span
+          className="text-xs transition-transform duration-200"
           style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
         >
           ▼
@@ -67,8 +70,8 @@ export default function MobileNavLink({ item, subItems, onClose, basePath }) {
               className={({ isActive: isSubActive }) =>
                 `flex items-center gap-3 pl-8 pr-4 py-2 text-sm transition-all ${
                   isSubActive
-                    ? "text-blue-400 font-bold bg-blue-600/10"
-                    : "text-white/70 hover:text-white hover:bg-white/5"
+                    ? `${activeColorClass} bg-blue-600/10`
+                    : `text-gray-300 ${hoverTextClass} hover:bg-blue-600/20`
                 }`
               }
             >
