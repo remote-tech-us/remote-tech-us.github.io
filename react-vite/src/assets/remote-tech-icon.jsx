@@ -1,14 +1,12 @@
 // Generated automatically from raw Inkscape SVG geometry vectors
 import React from 'react';
 
-export default function RemoteTechIcon({ width = "1.2em", height = "1.2em", className = "" }) {
+export default function RemoteTechIcon({ width = "1.5em", height = "1.5em", className = "" }) {
   return (
     <svg
-      viewBox="0 0 41.798294 41.744888"
+      viewBox="-2 -2 46 46"
       width={width}
       height={height}
-      fill="none"
-      stroke="currentColor"
       className={`inline-block align-middle ${className}`}
     >
       {/* Retain Inkscape's exact original structural placement matrix transform */}

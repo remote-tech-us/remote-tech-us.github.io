@@ -1,5 +1,6 @@
 // src/data/services/0004-remedy-ars.jsx
 import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot, VscTools, VscTerminal } from "react-icons/vsc";
+import RemedyARSRRR from '../../assets/remedy-ars-rrr.jsx';
 
 // Custom inline SVG rendering a classic server/database stack to represent On-Prem architecture
 const RemedySuiteIcon = () => (
@@ -47,7 +48,7 @@ export const CONFIG = {
         {
           name: 'Incident Management',
           desc: 'Classic ARS Incident Lifecycle Systems',
-          icon: <RemedySuiteIcon />,
+          icon: <RemedyARSRRR  />,
           locked: false,
           url: '',
           target: '_self'

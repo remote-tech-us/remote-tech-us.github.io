@@ -1,9 +1,10 @@
 // src/data/services/0002-snow.jsx
 import { SiJavascript } from "react-icons/si";
 import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot } from "react-icons/vsc";
+import ServiceNowIcon from "../../assets/service-now-icon.jsx";
 
 // Native Inline Custom SVG Component
-const ServiceNowIcon = () => (
+const hardServiceNowIcon = () => (
   <svg 
     viewBox="0 0 24 24" 
     width="1em" 
