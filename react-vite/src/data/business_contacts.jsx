@@ -3,9 +3,10 @@ import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAd
 export const CONTACTS = [
   {
     id: "main-office",
-    name: "Corporate Headquarters",
+    name: "Information",
     logo: "/remote-tech-us_v2.svg",
     email: "info@remote-tech.us",
+    showQR: false,
     type: "company" // Matches the default filter string rule
   },
   {
@@ -19,19 +20,18 @@ export const CONTACTS = [
     email: "william@remote-tech.us",
     address: "Sellersburg, IN, USA",
     web: "https://remote-tech.us",
-    chat: "https://chat.remote-tech.us",
+    //chat: "https://chat.remote-tech.us",
     linkedin: "https://www.linkedin.com/in/earnhardt",
     github: "https://github.com/remote-tech-us",
     vcfPath: "/william-earnhardt.vcf",
-    calcom:"https://cal.com/remote-tech.us",
-    qrValue: true
+    //calcom:"https://cal.com/remote-tech.us",
   }
   ,{
     logo: "/remote-tech-us_v2.svg",
     name: "Support",
     email: "support@remote-tech.us",
-    chat: "https://chat.remote-tech.us/group/Support",
-    qrValue: false,
+    //chat: "https://chat.remote-tech.us/group/Support",
+    showQR: false,
     type: "company"
   }
 ].map((contact, index) => ({

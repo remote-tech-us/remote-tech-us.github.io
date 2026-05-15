@@ -33,6 +33,7 @@ export default function ContactsPage() {
     if (filterMode === 'all') return true;
     return contact.type === filterMode; // e.g. matches 'company', 'partner', or 'vendor'
   });
+  // src/pages/contact-us.jsx
 
   return (
     <div className="flex min-h-screen bg-cover bg-center bg-fixed"
@@ -47,30 +48,22 @@ export default function ContactsPage() {
     >
       <div className="flex flex-col items-center w-full px-6 pt-24 pb-12">
         
-        {/* Interactive Dynamic Filtering Tabs Row Panel */}
-        <div className="flex gap-4 mb-8 bg-black/40 backdrop-blur-md p-1.5 border border-white/10 rounded-lg z-10">
+        {/* Single Dynamic Smart Toggle Button */}
+        <div className="mb-8 z-10">
           <button
-            onClick={() => setFilterMode('company')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer ${
-              filterMode === 'company' 
-                ? 'bg-blue-600 text-white shadow' 
-                : 'text-gray-400 hover:text-white'
+            onClick={() => setFilterMode(prev => prev === 'company' ? 'all' : 'company')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold shadow-xl border transition-all cursor-pointer ${
+              filterMode === 'company'
+                ? 'bg-slate-900/90 text-blue-400 border-blue-500/30 hover:border-blue-400 bg-gradient-to-r from-blue-600/10 to-transparent'
+                : 'bg-slate-900/90 text-blue-400 border-blue-500/30 hover:border-blue-400 bg-gradient-to-r from-blue-600/10 to-transparent'
             }`}
           >
-            Company Contacts
-          </button>
-          <button
-            onClick={() => setFilterMode('all')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer ${
-              filterMode === 'all' 
-                ? 'bg-blue-600 text-white shadow' 
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            Show All
+            <span>
+              {filterMode === 'company' ? '🔍 Showing: Company Only (Click to Show All)' : '🌐 Showing: All Contacts (Click to Filter Corporate)'}
+            </span>
           </button>
         </div>
-
+  
         {/* Contacts Cards Display Grid Frame */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
           {filteredContacts.map((contact, index) => {
