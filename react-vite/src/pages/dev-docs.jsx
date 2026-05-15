@@ -8,9 +8,12 @@ import ReactMarkdown from 'react-markdown'; // Ensure this is installed
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import SafeMarkdown from '../components/SafeMarkdown.jsx';
+import { getDevDocs } from '../utils/docsLoader.js';
+
+const DOCS_DATA = getDevDocs();
 
 export default function DocsPage() {
-  const [activePage, setActivePage] = useState(DEV_DOCS_CATEGORIES[0].pages[0]);
+  const [activePage, setActivePage] = useState(DOCS_DATA[0].pages[0]);
   const [activeView, setActiveView] = useState('console'); // console, html, markdown
   const [copied, setCopied] = useState(false);
 
