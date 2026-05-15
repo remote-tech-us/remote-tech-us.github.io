@@ -121,31 +121,37 @@ export default function DocsPage() {
                 
                 {/* Header Control Toolbar */}
                 <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-
-                  {/* Left: Mac Window Controls & Interactive Script Tabs */}
-                  <div className="flex items-center gap-3 overflow-x-auto max-w-full">
+                  {/* Left: Mac Window Controls & Interactive Dropdown Selection */}
+                  <div className="flex items-center gap-3">
                     <div className="flex gap-1.5 flex-shrink-0">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
                     </div>
                     
-                    {/* Render dynamic sub-file switches if looking at console view */}
+                    {/* Render dynamic sub-file dropdown if looking at console view */}
                     {activeView === 'console' && hasConsoleFiles ? (
-                      <div className="flex gap-1 ml-2 border-l border-white/10 pl-2">
-                        {activePage.files.map((file, idx) => (
-                          <button
-                            key={file.name}
-                            onClick={() => setActiveFileIndex(idx)}
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono tracking-wide uppercase font-bold transition-all ${
-                              activeFileIndex === idx 
-                                ? 'bg-white/10 text-blue-400 border border-white/10' 
-                                : 'text-gray-500 hover:text-gray-300'
-                            }`}
-                          >
-                            {file.name}
-                          </button>
-                        ))}
+                      <div className="flex items-center gap-2 ml-2 border-l border-white/10 pl-3">
+                        <label htmlFor="file-selector" className="text-[10px] uppercase font-black text-gray-500 tracking-widest">
+                          File:
+                        </label>
+                        <select
+                          id="file-selector"
+                          value={activeFileIndex}
+                          onChange={(e) => setActiveFileIndex(Number(e.target.value))}
+                          className="bg-black/40 text-blue-400 font-mono text-xs px-2.5 py-1 rounded-md border border-white/10 focus:outline-none focus:border-blue-500 cursor-pointer transition-all appearance-none pr-6 relative bg-no-repeat"
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2360A5FA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>")`,
+                            backgroundPosition: 'right 6px center',
+                            backgroundSize: '12px',
+                          }}
+                        >
+                          {activePage.files.map((file, idx) => (
+                            <option key={file.name} value={idx} className="bg-slate-900 text-gray-300 font-mono">
+                              {file.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     ) : (
                       <span className="text-[10px] uppercase font-black text-gray-500 tracking-widest ml-2">

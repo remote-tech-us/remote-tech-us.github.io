@@ -1,113 +1,83 @@
-// src/utils/data-loader.js
-
-import fs from 'fs';
-import path from 'path';
+// scr/utils/data-loader.js
 
 /**
- * Safely parses JSON configuration files and provides detailed 
- * console errors if structural malformations are discovered.
+ * Vite Client-Side Folder Data Loader
+ * Uses import.meta.glob to read files at compile-time safely for the browser.
  */
-function parseFileIntoObject(filePath) {
-  try {
-    // Check if the file path is completely invalid or doesn't exist
-    if (!fs.existsSync(filePath)) {
-      return null;
-    }
+export function loadFolderData() {
+  // 1. Eagerly grab all markdown, json, and asset code profiles in the directory
+  const files = import.meta.glob('/src/data/dev-docs/**/*.{json,md,html,sh,js,yml,yaml}', {
+    query: '?raw',
+    eager: true,
+  });
 
-    const fileContent = fs.readFileSync(filePath, 'utf-8').trim();
+  const categoriesMap = {};
 
-    // Skip parsing and log a warning if the file is completely blank
-    if (!fileContent) {
-      console.warn(`⚠️ [Data Loader Warning]: Skipped empty file at "${filePath}"`);
-      return null;
-    }
+  // 2. Parse out file paths and match them structural-wise
+  Object.entries(files).forEach(([filePath, module]) => {
+    const rawContent = module.default || '';
+    
+    // Split paths: /src/data/dev-docs/01-getting-started/intro/content.json
+    const parts = filePath.split('/');
+    const categoryDir = parts[4]; // "01-getting-started"
+    const pageDir = parts[5];     // "intro"
+    const fileName = parts[6];    // "content.json"
 
-    return JSON.parse(fileContent);
-  } catch (error) {
-    // Intercept parsing exceptions, log a clean readout, and skip execution without crashing
-    console.error(`❌ [Data Loader Error]: Malformed content or syntax issue in "${filePath}"`);
-    console.error(`🔧 Reason: ${error.message}`);
-    return null;
-  }
-}
+    if (!categoryDir || !pageDir || !fileName) return;
 
-/**
- * Core loop function used to safely map individual items 
- * inside your documentation directories.
- */
-export function loadFolderData(folderName) {
-  const baseDir = path.join(process.cwd(), 'src', 'data', folderName);
-  
-  if (!fs.existsSync(baseDir)) {
-    console.error(`❌ [Data Loader Error]: Target root directory "${baseDir}" does not exist.`);
-    return [];
-  }
-
-  const categories = fs.readdirSync(baseDir);
-
-  return categories.map((categoryDir) => {
-    const categoryPath = path.join(baseDir, categoryDir);
-    if (!fs.statSync(categoryPath).isDirectory()) return null;
-
-    const pages = fs.readdirSync(categoryPath).map((pageDir) => {
-      const pagePath = path.join(categoryPath, pageDir);
-      if (!fs.statSync(pagePath).isDirectory()) return null;
-
-      // Safe evaluation of the metadata block
-      const contentJsonPath = path.join(pagePath, 'content.json');
-      const meta = parseFileIntoObject(contentJsonPath);
-
-      // If the JSON didn't parse correctly or was empty, provide a sensible fallback array item
-      if (!meta) {
-        return {
-          id: pageDir,
-          title: pageDir.replace(/-/g, ' '),
-          content: "⚠️ Documentation content could not be parsed.",
-          supportedViews: ["console"],
-          files: []
-        };
-      }
-
-      // Collect optional supplementary template sheets dynamically
-      const files = [];
-      const potentialFiles = fs.readdirSync(pagePath);
-
-      potentialFiles.forEach((file) => {
-        if (file === 'content.json') return;
-        
-        const filePath = path.join(pagePath, file);
-        const codeContent = fs.readFileSync(filePath, 'utf-8');
-
-        // Capture separate view blocks depending on standard file extensions
-        if (file === 'layout.html') {
-          meta.htmlContent = codeContent;
-          meta.supportedViews = meta.supportedViews || [];
-          if (!meta.supportedViews.includes('html')) meta.supportedViews.push('html');
-        } else if (file === 'workflow.md') {
-          meta.markdownContent = codeContent;
-          meta.supportedViews = meta.supportedViews || [];
-          if (!meta.supportedViews.includes('markdown')) meta.supportedViews.push('markdown');
-        } else {
-          // General setup files (.sh, .yml, .js, etc.) go to the multi-file console tab bar
-          files.push({
-            name: file,
-            code: codeContent,
-            language: path.extname(file).substring(1) || 'bash'
-          });
-        }
-      });
-
-      return {
-        id: pageDir,
-        ...meta,
-        files
+    // Initialize map structures
+    if (!categoriesMap[categoryDir]) {
+      categoriesMap[categoryDir] = {
+        id: categoryDir,
+        title: categoryDir.replace(/^\d+-/, '').replace(/-/g, ' '),
+        pagesMap: {}
       };
-    }).filter(Boolean);
+    }
 
-    return {
-      id: categoryDir,
-      title: categoryDir.replace(/^\d+-/, '').replace(/-/g, ' '),
-      pages
-    };
-  }).filter(Boolean);
+    if (!categoriesMap[categoryDir].pagesMap[pageDir]) {
+      categoriesMap[categoryDir].pagesMap[pageDir] = {
+        id: pageDir,
+        title: pageDir.replace(/-/g, ' '),
+        content: '',
+        supportedViews: ['console'],
+        files: []
+      };
+    }
+
+    const currentPage = categoriesMap[categoryDir].pagesMap[pageDir];
+
+    // 3. Populate matching page blocks based on raw structural text extensions
+    if (fileName === 'content.json') {
+      try {
+        if (rawContent.trim()) {
+          const meta = JSON.parse(rawContent);
+          Object.assign(currentPage, meta);
+        } else {
+          console.warn(`⚠️ [Vite Loader]: Empty meta file at "${filePath}"`);
+        }
+      } catch (err) {
+        console.error(`❌ [Vite Loader]: JSON Syntax error in "${filePath}":`, err.message);
+      }
+    } else if (fileName === 'layout.html') {
+      currentPage.htmlContent = rawContent;
+      if (!currentPage.supportedViews.includes('html')) currentPage.supportedViews.push('html');
+    } else if (fileName === 'workflow.md') {
+      currentPage.markdownContent = rawContent;
+      if (!currentPage.supportedViews.includes('markdown')) currentPage.supportedViews.push('markdown');
+    } else {
+      // Shove standard terminal scripts directly to the interactive console array tabs
+      currentPage.files.push({
+        name: fileName,
+        code: rawContent,
+        language: fileName.split('.').pop() || 'bash'
+      });
+    }
+  });
+
+  // 4. Flatten mapping objects out to clean arrays for sidebar loops
+  return Object.values(categoriesMap).map(category => ({
+    id: category.id,
+    title: category.title,
+    pages: Object.values(category.pagesMap)
+  }));
 }
