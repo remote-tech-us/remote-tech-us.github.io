@@ -3,19 +3,19 @@ import { motion } from 'framer-motion';
 import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
 import { TbWorldWww } from "react-icons/tb";
 import { BsKanban } from "react-icons/bs";
-import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { QRCodeSVG } from 'qrcode.react'; 
 
 const ContactCard = ({ contact , index }) => {
 
   // Use email prefix as ID if contact.id doesn't exist
   const contactId = contact.id || contact.email?.split('@')[0] || index;
-  
-  // Construct URL for HashRouter: domain.com/#/contacts/id
-  const dynamicQrValue = `${window.location.origin}${window.location.pathname}#/contacts/${contactId}`;
+
+  // FIX 1: Aligned hash path string exactly to match "/contact-us/:id" route from main.jsx
+  const dynamicQrValue = `${window.location.origin}${window.location.pathname}#/contact-us/${contactId}`;
 
   return (
     <motion.div
-        key={contact.id || contact.email || index} // Added unique key
+        key={contact.id || contact.email || index} 
         whileHover={{ y: -5 }}
         className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
       >
@@ -69,7 +69,6 @@ const ContactCard = ({ contact , index }) => {
         {contact.calcom && (
           <a
             href={contact.calcom}
-            //className="w-full bg-black/40 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
             className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
             <FaRegCalendarAlt /> Schedule Meeting
           </a>
@@ -83,10 +82,10 @@ const ContactCard = ({ contact , index }) => {
             <FaAddressCard /> Save Contact
           </a>
         )}
-        {/* QR Code Section */}
-        {contact.qrValue  && (
+        {/* FIX 2: Wrapped block logic checking to verify target data generation options safely */}
+        {contact.showQR !== false && (
           <div className="bg-gray-50 p-4 rounded-xl mb-6 border border-gray-100 shadow-inner">
-            <QRCodeSVG value={dynamicQrValue} size={80} marginSize={2} className="mx-auto" />
+            <QRCodeSVG value={dynamicQrValue} size={100} marginSize={2} className="mx-auto" />
             <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Scan to Share</p>
           </div>
         )}
