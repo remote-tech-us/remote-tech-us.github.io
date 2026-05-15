@@ -9,9 +9,10 @@ export default {
       colors: {
         'corporate-blue': '#0070f3',
       },
+      // tailwind automatically appends animation-<name> i.e. animation-spin-slow
       animation: {
         'fade-in': 'fade-in 2s ease-out',
-        'spin-slow': 'spin 3s linear infinite',
+        'spin-slow': 'spin 3s linear infinite',  
       },
     },
   },
