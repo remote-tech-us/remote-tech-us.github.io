@@ -11,8 +11,8 @@ export const DEV_DOCS_CATEGORIES = [
       ,supportedViews: ["console", "html", "markdown"]
       ,allowCopy: false
       ,copyText: false
-      ,language: "world"
-      ,code: `Hello World `
+      ,language: "bash"
+      ,code: `echo 'Hello World' `
       ,htmlContent: `<div class="p-4 bg-blue-900/30 border border-blue-500 rounded-lg">
                         <h4 class="text-blue-400 font-bold">HTML Preview Mode</h4>
                         <p class="text-sm">This is raw parsed HTML.</p>

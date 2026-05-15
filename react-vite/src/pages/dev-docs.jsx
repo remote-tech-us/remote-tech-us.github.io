@@ -96,6 +96,7 @@ export default function DocsPage() {
               <h1 className="text-4xl font-black text-white">{activePage.title}</h1>
               
               {/* Tab Switcher */}
+              {/* NOT LONGER NEEDED 
               {supportedViews.length > 1 && (
                 <div className="flex bg-black/40 p-1 rounded-xl border border-white/10 self-start sm:self-center">
                   {supportedViews.includes('console') && (
@@ -123,7 +124,7 @@ export default function DocsPage() {
                     </button>
                   )}
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="prose prose-invert max-w-none">
@@ -133,26 +134,76 @@ export default function DocsPage() {
 
               {/* Dynamic Content Display Card */}
               <div className="bg-black/60 rounded-2xl border border-white/10 overflow-hidden mb-4 relative group">
-                
                 {/* Header bar */}
-                <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex justify-between items-center">
+                <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  
+                  {/* Left: Mac Dots & Active Language Indicator */}
                   <div className="flex items-center gap-3">
                     <div className="flex gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
                     </div>
-                    <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-2">
+                    <span className="text-[10px] uppercase font-black text-gray-500 tracking-widest ml-2">
                       {activeView === 'console' ? (activePage.language || 'text') : activeView}
                     </span>
                   </div>
-                  {/* Render the copy icon only if allowCopy isn't explicitly set to false */}
-                  {activePage.allowCopy !== false && ( 
-                    <button onClick={handleCopy} className="text-gray-400 hover:text-white transition-all p-1">
-                      {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
-                    </button>
-                )}
-                </div>
+                
+                  {/* Right: Controls Toolbar (Radio Toggles + Copy Action) */}
+                  <div className="flex items-center gap-4 self-end sm:self-auto">
+                    
+                    {/* Accessible Radio Button Group styled as modern toolbar tabs */}
+                    {supportedViews.length > 1 && (
+                      <fieldset className="flex bg-black/40 p-0.5 rounded-lg border border-white/10">
+                        <legend className="sr-only">Choose a documentation view mode</legend>
+                        
+                        {supportedViews.map((view) => {
+                          const isSelected = activeView === view;
+                          return (
+                            <label 
+                              key={view} 
+                              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide cursor-pointer transition-all uppercase ${
+                                isSelected 
+                                  ? 'bg-blue-600 text-white shadow-sm' 
+                                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                              }`}
+                            >
+                              {/* Native hidden radio input for accessibility and state engine */}
+                              <input
+                                type="radio"
+                                name="viewMode"
+                                value={view}
+                                checked={isSelected}
+                                onChange={() => setActiveView(view)}
+                                className="sr-only" 
+                              />
+                              {view === 'console' && <FaTerminal className="text-[10px]" />}
+                              {view === 'html' && <FaCode className="text-[10px]" />}
+                              {view === 'markdown' && <FaEye className="text-[10px]" />}
+                              <span>{view}</span>
+                            </label>
+                          );
+                        })}
+                      </fieldset>
+                    )}
+                
+                    {/* Vertical divider line separating controls and the copy action */}
+                    {activePage.allowCopy !== false && supportedViews.length > 1 && (
+                      <div className="h-4 w-[1px] bg-white/10 hidden sm:block" />
+                    )}
+                
+                    {/* Copy Action Button */}
+                    {activePage.allowCopy !== false && (
+                      <button 
+                        onClick={handleCopy} 
+                        aria-label="Copy code to clipboard"
+                        className="text-gray-400 hover:text-white transition-all p-1 text-sm"
+                      >
+                        {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
+                      </button>
+                    )}
+                  </div>
+                </div> 
 
                 {/* Conditional Card Rendering */}
                 <div className="p-6">
