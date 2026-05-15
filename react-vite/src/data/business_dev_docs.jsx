@@ -17,7 +17,26 @@ export const DEV_DOCS_CATEGORIES = [
                         <h4 class="text-blue-400 font-bold">HTML Preview Mode</h4>
                         <p class="text-sm">This is raw parsed HTML.</p>
                       </div>`
-      ,markdownContent: `### Markdown Mode\n\n* Item 1\n* Item 2\n\nYou can use **bold text** here.`
+      ,markdownContent: `
+### Markdown Mode
+
+* Item 1
+* Item 2
+
+You can use **bold text** here.
+
+Below is the state workflow for routing active API requests:
+
+\`\`\`mermaid
+graph TD
+    A[Client Request] --> B{Is Token Valid?}
+    B -- Yes --> C[Proceed to Route Component]
+    B -- No --> D[Redirect to /login]
+    D --> E[Clear Cache Session]
+\`\`\`
+
+* Make sure your environment variables match before running this flow.
+`
     },
     { 
       id: "architecture", 

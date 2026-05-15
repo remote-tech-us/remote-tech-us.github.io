@@ -7,6 +7,7 @@ import parse from 'html-react-parser';
 import ReactMarkdown from 'react-markdown'; // Ensure this is installed
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import SafeMarkdown from '../components/SafeMarkdown.jsx';
 
 export default function DocsPage() {
   const [activePage, setActivePage] = useState(DEV_DOCS_CATEGORIES[0].pages[0]);
@@ -239,7 +240,7 @@ export default function DocsPage() {
 
                   {activeView === 'markdown' && activePage.markdownContent && (
                     <div className="markdown-preview-wrapper text-gray-200 prose prose-sm prose-invert max-w-none">
-                      <ReactMarkdown>{activePage.markdownContent}</ReactMarkdown>
+                      <SafeMarkdown content={activePage.markdownContent}/>
                     </div>
                   )}
                 </div>
