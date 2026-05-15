@@ -25,7 +25,7 @@ jobs:
           node-version: '24'
 
       - name: Install dependencies
-        run: cd react-vite && npm install
+        run: cd react-vite && npm ci
 
       - name: Build react-vite
         run: cd react-vite && npm run build
