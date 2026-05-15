@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 
 import NavBar from './components/NavBar.jsx';
 import Footer from './components/footer.jsx';
+import LoadingSpinner from './components/LoadingSpinner.jsx';
 import ScrollToTop from './hooks/ScrollToTop.jsx';
 import './index.css'
 
@@ -46,7 +47,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <ScrollToTop />
         {/* 2. Wrap Routes in Suspense */}
         {/* The fallback is what shows for a split second while the page loads */}
-        <Suspense fallback={<div className="loading-spinner">Loading...</div>}>
+        <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/about" element={<AboutPage />} />

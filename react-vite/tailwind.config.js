@@ -11,6 +11,7 @@ export default {
       },
       animation: {
         'fade-in': 'fade-in 2s ease-out',
+        'spin-slow': 'spin 3s linear infinite',
       },
     },
   },
