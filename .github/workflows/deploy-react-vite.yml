@@ -36,3 +36,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./react-vite/dist
           cname: remote-tech.us
+          force_orphan: true  # This wipes the history of gh-pages and starts fresh each build
