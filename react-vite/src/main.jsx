@@ -10,9 +10,29 @@ import LoadingSpinner from './components/LoadingSpinner.jsx';
 import ScrollToTop from './hooks/ScrollToTop.jsx';
 import './index.css'
 
+// A helper function to handle chunk load errors
+const lazyWithRetry = (componentImport) => 
+  lazy(async () => {
+    try {
+      return await componentImport();
+    } catch (error) {
+      // If the chunk fetch fails (404), refresh the page once to get the new manifest
+      console.error("Chunk load failed, refreshing...", error);
+      window.location.reload();
+      return { default: () => null }; // Return a empty component while reloading
+    }
+  });
+
 // Lazy imports:
+// With this delayed version:
+const AboutPage = lazyWithRetry(() => {
+  return Promise.all([
+    import('./pages/about.jsx'),
+    new Promise(resolve => setTimeout(resolve, 3000)) // Forces 3s delay
+  ]).then(([moduleExports]) => moduleExports);
+});
+//const AboutPage = lazy(() => import('./pages/about.jsx'));
 const App = lazy(() => import('./App.jsx'));
-const AboutPage = lazy(() => import('./pages/about.jsx'));
 const TechStackPage = lazy(() => import('./pages/tech-stack.jsx'));
 const CareersPage = lazy(() => import('./pages/careers.jsx'));
 const ContactUsPage = lazy(() => import('./pages/contact-us.jsx'));
