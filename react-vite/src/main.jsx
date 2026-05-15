@@ -1,29 +1,30 @@
 // src/main.jsx
+import React, { lazy, Suspense }  from 'react'
+import ReactDOM from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
 import NavBar from './components/NavBar.jsx';
 import Footer from './components/footer.jsx';
-import React from 'react'
-import ReactDOM from 'react-dom/client'
 import ScrollToTop from './hooks/ScrollToTop.jsx';
-
 import './index.css'
-import App from './App.jsx'
-import AboutPage from './pages/about.jsx';
-import TechStackPage from './pages/tech-stack.jsx';
-import CareersPage from './pages/careers.jsx';
-import ContactUsPage from './pages/contact-us.jsx';
-import PrivacyPage from './pages/privacy-policy.jsx';
-import TermsPage from './pages/terms-of-service.jsx';
-import ClientsPage from './pages/clients.jsx';
-import ProductsPage from './pages/products.jsx';
-import ServicesPage from './pages/services.jsx';
-import CaseStudiesPage from './pages/case-studies.jsx';
-import DevDocsPage from './pages/dev-docs.jsx';
-import DynamicProductsPage from './pages/dynamic-products.jsx';
-import DynamicServicesPage from './pages/dynamic-services.jsx';
-import MissionsPage from './pages/missions.jsx';
+
+// Lazy imports:
+const App = lazy(() => import('./App.jsx'));
+const AboutPage = lazy(() => import('./pages/about.jsx'));
+const TechStackPage = lazy(() => import('./pages/tech-stack.jsx'));
+const CareersPage = lazy(() => import('./pages/careers.jsx'));
+const ContactUsPage = lazy(() => import('./pages/contact-us.jsx'));
+const PrivacyPage = lazy(() => import('./pages/privacy-policy.jsx'));
+const TermsPage = lazy(() => import('./pages/terms-of-service.jsx'));
+const ClientsPage = lazy(() => import('./pages/clients.jsx'));
+const ProductsPage = lazy(() => import('./pages/products.jsx'));
+const ServicesPage = lazy(() => import('./pages/services.jsx'));
+const CaseStudiesPage = lazy(() => import('./pages/case-studies.jsx'));
+const DevDocsPage = lazy(() => import('./pages/dev-docs.jsx'));
+const DynamicProductsPage = lazy(() => import('./pages/dynamic-products.jsx'));
+const DynamicServicesPage = lazy(() => import('./pages/dynamic-services.jsx'));
+const MissionsPage = lazy(() => import('./pages/missions.jsx'));
 
 {/* Notes 
     Use HashRouter if:
@@ -43,25 +44,28 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <NavBar /> {/* NavBar is now inside the Router context! */}
       <main>
         <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/careers" element={<CareersPage />} />
-          <Route path="/contact-us" element={<ContactUsPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPage />} />
-          <Route path="/terms-of-service" element={<TermsPage />} />
-          <Route path="/tech-stack" element={<TechStackPage />} />
-          {/* Dynamic route for specific contact-us */}
-          <Route path="/contact-us/:id" element={<ContactUsPage />} />
-          <Route path="/clients" element={<ClientsPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/case-studies" element={<CaseStudiesPage />} />
-          <Route path="/dev-docs" element={<DevDocsPage />} />
-          <Route path="/products/:productId" element={<DynamicProductsPage />} />
-          <Route path="/services/:serviceId" element={<DynamicServicesPage />} />
-          <Route path="/mission" element={<MissionsPage />} />
-        </Routes>
+        {/* 2. Wrap Routes in Suspense */}
+        {/* The fallback is what shows for a split second while the page loads */}
+        <Suspense fallback={<div className="loading-spinner">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/contact-us" element={<ContactUsPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPage />} />
+            <Route path="/terms-of-service" element={<TermsPage />} />
+            <Route path="/tech-stack" element={<TechStackPage />} />
+            <Route path="/contact-us/:id" element={<ContactUsPage />} />
+            <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/case-studies" element={<CaseStudiesPage />} />
+            <Route path="/dev-docs" element={<DevDocsPage />} />
+            <Route path="/products/:productId" element={<DynamicProductsPage />} />
+            <Route path="/services/:serviceId" element={<DynamicServicesPage />} />
+            <Route path="/mission" element={<MissionsPage />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
     </HashRouter>
