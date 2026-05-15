@@ -1,0 +1,20 @@
+<div class="space-y-4">
+  <div class="p-5 bg-emerald-950/20 border border-emerald-500/30 rounded-xl">
+    <h4 class="text-emerald-400 font-bold flex items-center gap-2 mb-1">
+      <span>🚀</span> Core Architectural Principle
+    </h4>
+    <p class="text-sm text-gray-300 leading-relaxed">
+      Our services run completely stateless. State configurations, cache layers, and persistent volumes are decoupled from processing nodes to ensure instant failover orchestration.
+    </p>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="p-4 bg-white/5 border border-white/10 rounded-xl">
+      <span class="text-xs font-bold text-blue-400 block mb-1">Ingress Controller</span>
+      <p class="text-xs text-gray-400">Traefik edges incoming reverse-proxy requests, enforcing TLS terminations and routing pathways natively.</p>
+    </div>
+    <div class="p-4 bg-white/5 border border-white/10 rounded-xl">
+      <span class="text-xs font-bold text-purple-400 block mb-1">State Isolation</span>
+      <p class="text-xs text-gray-400">PostgreSQL and Redis instances operate inside dedicated internal mesh networks, locked out from public web access.</p>
+    </div>
+  </div>
+</div>

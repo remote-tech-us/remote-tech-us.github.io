@@ -1,0 +1,6 @@
+{
+  "title": "Introduction",
+  "content": "Welcome to the Remote Tech documentation platform. Our infrastructure is built on the principle of data sovereignty and open-source excellence.",
+  "supportedViews": ["console", "html", "markdown"],
+  "allowCopy": true
+}

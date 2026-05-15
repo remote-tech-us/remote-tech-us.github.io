@@ -1,6 +1,0 @@
-{
-  "title": "Introduction Setup",
-  "content": "Welcome to the Remote Tech documentation platform.",
-  "supportedViews": ["console", "html", "markdown"],
-  "allowCopy": true
-}

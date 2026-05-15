@@ -1,0 +1,6 @@
+{
+  "title": "Rocket.Chat Config",
+  "content": "To enable high availability, we deploy Rocket.Chat using a ReplicaSet in MongoDB for seamless chat synchronization.",
+  "supportedViews": ["console"],
+  "allowCopy": false
+}

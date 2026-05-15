@@ -1,0 +1,6 @@
+{
+  "title": "SPEL Optimization",
+  "content": "When writing SPEL, avoid heavy synchronous logic in triggers. Use web service calls for external integrations to prevent UI blocking.",
+  "supportedViews": ["console"],
+  "allowCopy": false
+}

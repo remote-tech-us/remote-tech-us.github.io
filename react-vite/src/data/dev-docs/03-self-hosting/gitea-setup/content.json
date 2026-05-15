@@ -1,0 +1,6 @@
+{
+  "title": "Gitea Deployment",
+  "content": "Our Gitea deployment utilizes Postgres as the backend for reliability. Ensure your SSH keys are managed via the Gitea web interface.",
+  "supportedViews": ["console"],
+  "allowCopy": false
+}
