@@ -6,11 +6,13 @@ import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, S
 import { SiGitea } from "react-icons/si";
 import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
 import RemoteTechIcon from "../../assets/remote-tech-icon.jsx";
+import RemoteTechUsV2 from "../../assets/RemoteTechUsV2.jsx";
+import RemoteTechUsV2SVGR from "../../assets/RemoteTechUsV2-SVGR.jsx";
 
 // 1. Add metadata for the page to use
 export const CONFIG = {
   label: "Remote Tech US", // This is what shows in the NavBar
-  icon: <RemoteTechIcon className="h-4 w-4" />,
+  icon: <RemoteTechUsV2SVGR className="h-4 w-4" />,
   title: "Products Developed by Remote Tech US",
   subtitle: "Secure, scalable, and transparent software",
   section_title: "Coming Soon",
@@ -23,7 +25,7 @@ export const DATA = [
   { 
     name: 'SMART-ASS',
     desc: "Smart - Autonomous Subscription Service",
-    icon: <RemoteTechIcon />,
+    icon: <RemoteTechUsV2SVGR className="h-16 w-16" />,
     locked: false,
     tag: '',
     url: 'https://sass.remote-tech.us',

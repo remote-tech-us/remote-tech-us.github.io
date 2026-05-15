@@ -1,10 +1,11 @@
 // src/data/services/0003-azure.jsx
 import { SiTerraform, SiAnsible, SiDocker, SiKubernetes } from "react-icons/si";
 import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot } from "react-icons/vsc";
+import AzureLogo from '../../assets/azure.jsx';
 
 export const CONFIG = {
   label: "Microsoft Azure",
-  icon: <SiAnsible />,
+  icon: <AzureLogo className="h-6 w-6" />,
   title: "Azure Cloud & Infrastructure DevOps",
   subtitle: "Cloud Automation, Hybrid Solutions, and Infrastructure as Code",
   seo: {

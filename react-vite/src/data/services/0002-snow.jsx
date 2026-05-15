@@ -19,7 +19,7 @@ const hardServiceNowIcon = () => (
 
 export const CONFIG = {
   label: "ServiceNow Suite",
-  icon: <ServiceNowIcon />,
+  icon: <ServiceNowIcon className="h-10 w-10" />,
   title: "ServiceNow ITSM & Custom Workflows",
   subtitle: "Enterprise Workflow Automation and Service Management Optimization",
   seo: {

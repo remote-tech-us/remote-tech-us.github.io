@@ -4,7 +4,7 @@ import React from 'react';
 export default function ServiceNowIcon({ width = "1.5em", height = "1.5em", className = "" }) {
   return (
     <svg
-      viewBox="20 0 120 60"
+      viewBox="20 0 80 60"
       width={width}
       height={height}
       className={`inline-block align-left ${className}`}
