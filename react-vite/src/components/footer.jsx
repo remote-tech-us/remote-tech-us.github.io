@@ -77,7 +77,7 @@ const Footer = () => {
         {/* Newsletter Section */}
         <div>
           {/* TODO: Need to install Linkmonk on unraid with reverse proxy */}
-          <h3 className="text-white font-semibold mb-4">The Future Is Here...</h3>
+          <h3 className="text-white font-semibold mb-4"><a href="#/mission">The Future Is Here...</a></h3>
           {/* 
           <form className="flex flex-col space-y-2">
             <input name="email" id="newsletter-email" 

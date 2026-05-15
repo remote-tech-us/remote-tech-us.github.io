@@ -15,11 +15,12 @@ export default function MissionsPage() {
       className="dynamic-bg-container relative w-full h-screen overflow-hidden flex items-center justify-center bg-black select-none"
       style={{
         backgroundImage: GLOBALS.app_missions_bg
-          ? `linear-gradient(rgba(7, 11, 22, 0.92), rgba(7, 11, 22, 0.95)), url(${GLOBALS.app_missions_bg})`
-          : 'none',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+         ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.app_missions_bg})` 
+         : 'none'
+        ,backgroundSize: 'cover'
+        ,backgroundPosition: 'center'
+        ,backgroundRepeat: 'no-repeat'
+        /* backgroundAttachment: 'fixed' */
       }}
     >
       {/* CSS Injected directly for seamless isolated crawl animation mechanics */}
