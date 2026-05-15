@@ -8,6 +8,16 @@ export const DEV_DOCS_CATEGORIES = [
       id: "intro", 
       title: "Introduction", 
       content: "Welcome to the Remote Tech documentation. Our infrastructure is built on the principle of data sovereignty and open-source excellence." 
+      ,supportedViews: ["console", "html", "markdown"]
+      ,allowCopy: false
+      ,copyText: false
+      ,language: "world"
+      ,code: `Hello World `
+      ,htmlContent: `<div class="p-4 bg-blue-900/30 border border-blue-500 rounded-lg">
+                        <h4 class="text-blue-400 font-bold">HTML Preview Mode</h4>
+                        <p class="text-sm">This is raw parsed HTML.</p>
+                      </div>`
+      ,markdownContent: `### Markdown Mode\n\n* Item 1\n* Item 2\n\nYou can use **bold text** here.`
     },
     { 
       id: "architecture", 

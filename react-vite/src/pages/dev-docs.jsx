@@ -1,23 +1,38 @@
-// src/pages/dev-docs.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GLOBALS } from '../data/app__globals.jsx';
 import { DEV_DOCS_CATEGORIES } from '../data/business_dev_docs.jsx';
-import { FaCheck, FaCopy, FaBook, FaChevronRight, FaTerminal } from 'react-icons/fa';
+import { FaCheck, FaCopy, FaBook, FaChevronRight, FaTerminal, FaCode, FaEye } from 'react-icons/fa';
 import parse from 'html-react-parser';
+import ReactMarkdown from 'react-markdown'; // Ensure this is installed
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; // Choose your theme
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export default function DocsPage() {
   const [activePage, setActivePage] = useState(DEV_DOCS_CATEGORIES[0].pages[0]);
+  const [activeView, setActiveView] = useState('console'); // console, html, markdown
   const [copied, setCopied] = useState(false);
 
+  // Fallback if the new page doesn't support the current active view mode
+  useEffect(() => {
+    const supported = activePage.supportedViews || ['console'];
+    if (!supported.includes(activeView)) {
+      setActiveView(supported[0]);
+    }
+  }, [activePage]);
+
   const handleCopy = () => {
-    // If code is a string, use it. If it's a JSX function, 
-    // you might want to add a 'copyText' string field to your data object.
-    const textToCopy = typeof activePage.code === 'string' 
-      ? activePage.code 
-      : activePage.copyText || ""; 
+    // Prevent execution if copying is explicitly disabled on this data item
+    if (activePage.allowCopy === false) return;
+
+    let textToCopy = "";
+    if (activeView === 'console') {
+      textToCopy = typeof activePage.code === 'string' ? activePage.code : activePage.copyText || "";
+    } else if (activeView === 'html') {
+      textToCopy = activePage.htmlContent || "";
+    } else if (activeView === 'markdown') {
+      textToCopy = activePage.markdownContent || "";
+    }
 
     if (textToCopy) {
       navigator.clipboard.writeText(textToCopy);
@@ -26,11 +41,13 @@ export default function DocsPage() {
     }
   };
 
+  const supportedViews = activePage.supportedViews || ['console'];
+
   return (
     <div className="flex min-h-screen bg-fixed bg-cover"
-      style={{ 
-        backgroundImage: GLOBALS.bg_img 
-        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+      style={{
+        backgroundImage: GLOBALS.bg_img
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})`
         : 'none',
       }}
     >
@@ -49,8 +66,8 @@ export default function DocsPage() {
                     <button
                       onClick={() => setActivePage(page)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
-                        activePage.id === page.id 
-                        ? '!bg-blue-600 text-white font-bold' 
+                        activePage.id === page.id
+                        ? '!bg-blue-600 text-white font-bold'
                         : 'text-gray-400 hover:text-blue-600 hover:bg-white/5'
                       }`}
                     >
@@ -74,15 +91,50 @@ export default function DocsPage() {
             <div className="flex items-center gap-2 text-blue-500 mb-4 text-sm font-bold">
               Docs <FaChevronRight className="text-[10px]" /> {activePage.title}
             </div>
-            <h1 className="text-4xl font-black mb-8 text-white">{activePage.title}</h1>
             
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <h1 className="text-4xl font-black text-white">{activePage.title}</h1>
+              
+              {/* Tab Switcher */}
+              {supportedViews.length > 1 && (
+                <div className="flex bg-black/40 p-1 rounded-xl border border-white/10 self-start sm:self-center">
+                  {supportedViews.includes('console') && (
+                    <button 
+                      onClick={() => setActiveView('console')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeView === 'console' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
+                    >
+                      <FaTerminal /> Console
+                    </button>
+                  )}
+                  {supportedViews.includes('html') && (
+                    <button 
+                      onClick={() => setActiveView('html')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeView === 'html' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
+                    >
+                      <FaCode /> HTML
+                    </button>
+                  )}
+                  {supportedViews.includes('markdown') && (
+                    <button 
+                      onClick={() => setActiveView('markdown')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeView === 'markdown' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
+                    >
+                      <FaEye /> Markdown
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="prose prose-invert max-w-none">
               <p className="text-lg text-gray-300 leading-relaxed mb-8">
                 {activePage.content}
               </p>
-              
-              {/* Decorative Code Block Placeholder */}
-              <div className="bg-black/60 rounded-2xl border border-white/10 overflow-hidden mb-8">
+
+              {/* Dynamic Content Display Card */}
+              <div className="bg-black/60 rounded-2xl border border-white/10 overflow-hidden mb-4 relative group">
+                
+                {/* Header bar */}
                 <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <div className="flex gap-1.5">
@@ -90,40 +142,58 @@ export default function DocsPage() {
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
                     </div>
+                    <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-2">
+                      {activeView === 'console' ? (activePage.language || 'text') : activeView}
+                    </span>
                   </div>
-                  <FaTerminal className="text-gray-600 text-xs" />
+                  {/* Render the copy icon only if allowCopy isn't explicitly set to false */}
+                  {activePage.allowCopy !== false && ( 
+                    <button onClick={handleCopy} className="text-gray-400 hover:text-white transition-all p-1">
+                      {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
+                    </button>
+                )}
                 </div>
-                  {/* Dynamic Language Label */}
-                  <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-2">
-                    {activePage.language || 'text'}
-                  </span>
-                {/* Syntax Highlighter renders the code exactly as typed in data file */}
-                <SyntaxHighlighter 
-                  language={activePage.language || 'javascript'} 
-                  style={atomDark}
-                  customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
-                >
-                  {activePage.code}
-                </SyntaxHighlighter>
-                <div className="p-6 font-mono text-sm text-blue-300">
-                  {/* Add the () to execute the function */}
-                  {/* {typeof activePage.code === 'function' ? activePage.code() : activePage.code}  */}
-                  {/* 1. If it's a function (the JSX approach), call it */}
-                  {/* {typeof activePage.code === 'function' && activePage.code()} */}
 
-                  {/* 2. If it's a string, render it inside a div that preserves whitespace */}
-                  {/*
-                  {typeof activePage.code === 'string' && (
-                    <div style={{ whiteSpace: "pre-wrap" }}>{activePage.code}</div>
+                {/* Conditional Card Rendering */}
+                <div className="p-6">
+                  {activeView === 'console' && activePage.code && (
+                    <SyntaxHighlighter
+                      language={activePage.language || 'javascript'}
+                      style={atomDark}
+                      customStyle={{ margin: 0, padding: 0, background: 'transparent', fontSize: '0.875rem' }}
+                    >
+                      {activePage.code}
+                    </SyntaxHighlighter>
                   )}
-                  */}
+
+                  {activeView === 'html' && activePage.htmlContent && (
+                    <div className="html-preview-wrapper text-white">
+                      {(() => {
+                        try {
+                          // Try parsing the HTML content cleanly
+                          return parse(activePage.htmlContent);
+                        } catch (error) {
+                          // Safe fallback text if the string is broken or malformed
+                          console.error("HTML Parsing Error:", error);
+                          return (
+                            <div className="p-4 bg-red-900/20 border border-red-500/40 text-red-400 rounded-xl text-sm font-mono">
+                              ⚠️ <strong>HTML Render Error:</strong> The provided HTML string is malformed. 
+                              Check your data file for unclosed tags or syntax errors.
+                            </div>
+                          );
+                        }
+                      })()}
+                    </div>
+                  )}
+
+                  {activeView === 'markdown' && activePage.markdownContent && (
+                    <div className="markdown-preview-wrapper text-gray-200 prose prose-sm prose-invert max-w-none">
+                      <ReactMarkdown>{activePage.markdownContent}</ReactMarkdown>
+                    </div>
+                  )}
                 </div>
+
               </div>
-              {activePage.code && (
-                  <button onClick={handleCopy} className="text-gray-400 hover:text-white transition-all">
-                    {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
-                  </button>
-              )}
             </div>
           </motion.div>
         </main>
