@@ -50,6 +50,8 @@ export default function DocsPage() {
   const [activeFileIndex, setActiveFileIndex] = useState(0); 
   const [copied, setCopied] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
+  const [externalContent, setExternalContent] = useState('');
+  const [loadingExternal, setLoadingExternal] = useState(false);
 
   useEffect(() => {
     if (!activePage) return;
@@ -73,6 +75,44 @@ export default function DocsPage() {
   useEffect(() => {
     setActiveFileIndex(0);
   }, [activeView]);
+  // 🚀 FIXED & ADDED: Hook 3 with an active clean state return/cleanup to handle external payloads safely
+  useEffect(() => {
+    // If it's not a decoupled/external asset, clear the slate and abort
+    if (!activePage?.isExternalAsset || !activePage?.assetPath) {
+      setExternalContent('');
+      setLoadingExternal(false);
+      return;
+    }
+
+    // Flag tracker to prevent race condition overrides if activePage flips mid-stream
+    let isCurrentFetchActive = true;
+
+    setLoadingExternal(true);
+    setExternalContent('Streaming external audit assets...');
+
+    fetch(activePage.assetPath)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP Error: Failed to find asset index status code ${res.status}`);
+        return res.text();
+      })
+      .then((textData) => {
+        if (isCurrentFetchActive) {
+          setExternalContent(textData);
+          setLoadingExternal(false);
+        }
+      })
+      .catch((err) => {
+        if (isCurrentFetchActive) {
+          setExternalContent(`❌ Network Fault: ${err.message}`);
+          setLoadingExternal(false);
+        }
+      });
+
+    // ✨ The useEffect Cleanup Return Function
+    return () => {
+      isCurrentFetchActive = false; // Discards incoming response updates if user switches pages
+    };
+  }, [activePage]);
 
   const getFilteredFiles = () => {
     if (!activePage || !activePage.files) return [];
@@ -233,7 +273,27 @@ export default function DocsPage() {
 
               {/* View Output Window Panel Canvas */}
               <div className="p-4 sm:p-6 overflow-x-auto w-full max-w-full scrollbar-thin">
-                {currentFile ? (
+                {loadingExternal ? (
+                  <div className="text-blue-400 font-mono text-xs animate-pulse flex items-center gap-2 py-8 justify-center">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                    Streaming raw asynchronous report matrix nodes...
+                  </div>
+                ) : activePage?.isExternalAsset ? (
+                  /* Render path for huge external standalone file payloads outside Vite bundle wrapper */
+                  <div className="html-preview-wrapper text-white w-full overflow-x-auto">
+                    {activeView === 'html' ? (
+                      <iframe 
+                        src={activePage.assetPath} 
+                        title={activePage.title}
+                        className="w-full h-full border-none bg-white overflow-x-auto max-w-full"
+                        sandbox="allow-scripts allow-same-origin"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <pre className="text-xs font-mono text-gray-400 whitespace-pre-wrap">{externalContent}</pre>
+                    )}
+                  </div>
+                ) : currentFile ? (
                   <>
                     {activeView === 'console' && (
                       <div className="w-full overflow-x-auto">
