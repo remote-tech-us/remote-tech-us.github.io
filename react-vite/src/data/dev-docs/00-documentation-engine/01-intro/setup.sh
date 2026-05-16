@@ -53,32 +53,38 @@ while true; do
   fi
 done
 
-# 2. Capture Specific Sub-Topic Info
-read -p "  Enter Topic/Page Title (e.g., API Rate Limiting): " raw_title
-if [ -z "$raw_title" ]; then
-    echo "  ❌ Error: Page title cannot be blank."
-    exit 1
-fi
+# 2. Capture Specific Sub-Topic Info with Duplicate Card Verification
+while true; do
+  read -p "  Enter Topic/Page Title (e.g., API Rate Limiting): " raw_title
+  if [ -z "$raw_title" ]; then
+      echo "  ❌ Error: Page title cannot be blank."
+      exit 1
+  fi
 
-# Clean and Format Title String to Safe System Path
-clean_title=$(echo "$raw_title" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')
+  # Clean and Format Title String to Safe System Path
+  clean_title=$(echo "$raw_title" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')
 
-# Define the full workspace directory path
-target_path="${final_cat_dir}/${clean_title}"
+  # Define the full workspace directory path
+  target_path="${final_cat_dir}/${clean_title}"
+
+  # Check if this target card already exists under the selected section
+  if [ -d "$target_path" ]; then
+      echo "  ⚠️  Error: The card '${clean_title}' already exists inside '${final_cat_dir}'!"
+      echo "  Please choose a different page title for this section."
+      echo "  ---------------------------------------------"
+  else
+      # Path is clean, safe to exit loop and create files
+      break
+  fi
+done
 
 echo "  ---------------------------------------------"
 echo "  ⚙️  Building Workspace Target: ${target_path}"
 echo "  ---------------------------------------------"
 
-# 3. Prevent Overwriting Existing Folders
-if [ -d "$target_path" ]; then
-    echo "  ⚠️  Target directory already exists! Aborting build safely."
-    exit 1
-fi
-
 mkdir -p "$target_path"
 
-# 4. Generate Template 1: content.json (The Registration Passport)
+# 3. Generate Template 1: content.json (The Registration Passport)
 cat <<EOF > "${target_path}/content.json"
 {
   "title": "${raw_title}",
@@ -89,7 +95,7 @@ cat <<EOF > "${target_path}/content.json"
 }
 EOF
 
-# 5. Generate Template 2: workflow.md (The Guide Content)
+# 4. Generate Template 2: workflow.md (The Guide Content)
 cat <<EOF > "${target_path}/workflow.md"
 ### ${raw_title} Overview
 
@@ -105,7 +111,7 @@ graph TD
 \`\`\`
 EOF
 
-# 6. Generate Template 3: layout.html (The Display Canvas)
+# 5. Generate Template 3: layout.html (The Display Canvas)
 cat <<EOF > "${target_path}/layout.html"
 <div class="p-6 bg-slate-900/50 border border-blue-500/20 rounded-2xl shadow-xl backdrop-blur-md">
   <h4 class="text-lg font-black text-white mb-2">${raw_title} Live Canvas</h4>
