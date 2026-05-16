@@ -96,7 +96,18 @@
     <span class="text-amber-500 text-base flex-shrink-0 mt-0.5">💡</span>
     <p class="text-xs text-gray-400 leading-relaxed font-sans">
       <strong class="text-amber-500/90 block mb-0.5 font-bold">Architecture Review Commentary:</strong>
-      Every single subdirectory located within the <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">/dev-docs/</code> pipeline framework requires a valid <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">content.json</code> file to serve as its validation checkpoint entry card. If this file is missing, the compile-time data compiler will treat the directory as unassigned space and drop it completely from the dynamic sidebar rendering loop.
+      Every single subdire/ctory located within the <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">/dev-docs/</code> pipeline framework requires a valid <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">content.json</code> file to serve as its validation checkpoint entry card. If this file is missing, the compile-time data compiler will treat the directory as unassigned space and drop it completely from the dynamic sidebar rendering loop.<br />The <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">Sidebar Stack Order</code> is derived from the folder names.<br />
+├── dev-docs&nbsp;&nbsp;&nbsp;<-- Document Root Folder<br />
+│   ├── 00-documentation-engine        <-- Document Sidebar Section Header<br />
+│   │   ├── 01-intro                   <-- Document Sidebar Section Button<br />
+│   │   │   ├── blueprint.md<br />
+│   │   │   ├── content-rules.html<br />
+│   │   │   ├── content.json<br />
+│   │   │   ├── setup.sh<br />
+│   │   │   └── workflow.md<br />
+<br /> 
+The default syntax is XX_Name where XX equals two digit integer.<br />
+If XX is missing, order is derived alphabetically.<br />
     </p>
   </div>
 

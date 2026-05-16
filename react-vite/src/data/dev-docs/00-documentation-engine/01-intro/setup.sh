@@ -1,54 +1,84 @@
 #!/bin/bash
-
 # ==============================================================================
 # Documentation Page Scaffolding Automation Tool
-# Target Location: Run this from inside your repository's /dev-docs folder workspace.
 # ==============================================================================
+echo "  ============================================="
+echo "   🚀 Remote Tech Documentation Scaffold Wizard"
+echo "  ============================================="
+DEV_DOCS=$(echo "${PWD%/*/*}"|sed s'!dev-docs/.*!dev-docs!')
 
-echo "============================================="
-echo "🚀 Remote Tech Documentation Scaffold Wizard"
-echo "============================================="
-
-# 1. Capture High-Level Category Info
-read -p "Enter Category Name (e.g., Advanced Architecture): " raw_category
-if [ -z "$raw_category" ]; then
-    echo "❌ Error: Category name cannot be blank."
-    exit 1
+if [[ "$DEV_DOCS" == *dev-docs* ]]; then
+  echo "   Found dev-docs root folder: $DEV_DOCS"
+else
+  read -p "  Enter output path:" DEV_DOCS
+  if [[ -d "$DEV_DOCS" ]]; then
+      echo "  ❌ Error: Invalid Path: $DEV_DOCS"
+      exit 1
+  fi
 fi
+cd "$DEV_DOCS" || exit 1
+
+# 1. Capture High-Level Category Info with Existence Verification
+while true; do
+  read -p "  Enter Category Name (e.g., Advanced Architecture): " raw_category
+  if [ -z "$raw_category" ]; then
+      echo "  ❌ Error: Category name cannot be blank."
+      exit 1
+  fi
+
+  # Clean and Format Category String to Safe System Path
+  clean_category=$(echo "$raw_category" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')
+
+  # Check if a section header folder with this cleaned name already exists
+  existing_cat_dir=$(ls -d [0-9][0-9]-"${clean_category}" 2>/dev/null | head -n 1)
+
+  if [ -n "$existing_cat_dir" ] && [ -d "$existing_cat_dir" ]; then
+      echo "  ℹ️  Section folder already exists: ${existing_cat_dir}"
+      read -p "  --> Add new card to this existing section? (y/n): " action_choice
+      case "$action_choice" in
+          [Yy]* )
+              final_cat_dir="$existing_cat_dir"
+              break
+              ;;
+          * )
+              echo "  Let's provide a different category name."
+              echo "  ---------------------------------------------"
+              ;;
+      esac
+  else
+      # Generate Order Prefixes Dynamically if it's a completely new section
+      next_cat_num=$(printf "%02d" $(ls -d [0-9][0-9]-* 2>/dev/null | wc -l))
+      final_cat_dir="${next_cat_num}-${clean_category}"
+      break
+  fi
+done
 
 # 2. Capture Specific Sub-Topic Info
-read -p "Enter Topic/Page Title (e.g., API Rate Limiting): " raw_title
+read -p "  Enter Topic/Page Title (e.g., API Rate Limiting): " raw_title
 if [ -z "$raw_title" ]; then
-    echo "❌ Error: Page title cannot be blank."
+    echo "  ❌ Error: Page title cannot be blank."
     exit 1
 fi
 
-# 3. Clean and Format Strings to Safe System Paths
-# Converts to lowercase, swaps spaces/symbols for dashes, and trims duplicates
-clean_category=$(echo "$raw_category" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')
+# Clean and Format Title String to Safe System Path
 clean_title=$(echo "$raw_title" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/-\+/-/g' -e 's/^-//' -e 's/-$//')
-
-# 4. Generate Order Prefixes Dynamically
-# Looks at existing folders to determine the next available index
-next_cat_num=$(printf "%02d" $(ls -d [0-9][0-9]-* 2>/dev/null | wc -l))
-final_cat_dir="${next_cat_num}-${clean_category}"
 
 # Define the full workspace directory path
 target_path="${final_cat_dir}/${clean_title}"
 
-echo "---------------------------------------------"
-echo "⚙️ Building Workspace Target: ./${target_path}"
-echo "---------------------------------------------"
+echo "  ---------------------------------------------"
+echo "  ⚙️  Building Workspace Target: ${target_path}"
+echo "  ---------------------------------------------"
 
-# 5. Prevent Overwriting Existing Folders
+# 3. Prevent Overwriting Existing Folders
 if [ -d "$target_path" ]; then
-    echo "⚠️ Target directory already exists! Aborting build safely."
+    echo "  ⚠️  Target directory already exists! Aborting build safely."
     exit 1
 fi
 
 mkdir -p "$target_path"
 
-# 6. Generate Template 1: content.json (The Registration Passport)
+# 4. Generate Template 1: content.json (The Registration Passport)
 cat <<EOF > "${target_path}/content.json"
 {
   "title": "${raw_title}",
@@ -59,7 +89,7 @@ cat <<EOF > "${target_path}/content.json"
 }
 EOF
 
-# 7. Generate Template 2: workflow.md (The Guide Content)
+# 5. Generate Template 2: workflow.md (The Guide Content)
 cat <<EOF > "${target_path}/workflow.md"
 ### ${raw_title} Overview
 
@@ -75,7 +105,7 @@ graph TD
 \`\`\`
 EOF
 
-# 8. Generate Template 3: layout.html (The Display Canvas)
+# 6. Generate Template 3: layout.html (The Display Canvas)
 cat <<EOF > "${target_path}/layout.html"
 <div class="p-6 bg-slate-900/50 border border-blue-500/20 rounded-2xl shadow-xl backdrop-blur-md">
   <h4 class="text-lg font-black text-white mb-2">${raw_title} Live Canvas</h4>
@@ -85,10 +115,10 @@ cat <<EOF > "${target_path}/layout.html"
 </div>
 EOF
 
-echo "============================================="
-echo "🎉 Scaffolding successfully generated!"
-echo "============================================="
-echo "📁 Your workspace directory is ready at: ./${target_path}"
-echo "📝 Files Created: content.json, workflow.md, layout.html"
-echo "👉 You can now tweak the content files and submit your PR!"
-echo "============================================="
+echo "  ============================================="
+echo "  🎉 Scaffolding successfully generated!"
+echo "  ============================================="
+echo "  📁 Your workspace directory is ready at: ${DEV_DOCS}/${target_path}"
+echo "  📝 Files Created: content.json, workflow.md, layout.html"
+echo "  👉 You can now tweak the content files and submit your PR!"
+echo "  ============================================="
