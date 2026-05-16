@@ -53,10 +53,14 @@ export default function DocsPage() {
   const [externalContent, setExternalContent] = useState('');
   const [loadingExternal, setLoadingExternal] = useState(false);
 
+  // 🚀 ADD THIS HOOK: Tracks if the iframe/code preview viewport is expanded
+  const [isViewportExpanded, setIsViewportExpanded] = useState(false);
+
   useEffect(() => {
     if (!activePage) return;
     setActiveFileIndex(0);
     setIsMobileMenuOpen(false); // Clean drawer trail on select
+    setIsViewportExpanded(false); // 🚀 ADD THIS LINE: Resets expansion state when navigating away
 
     const supported = activePage.supportedViews || ['console'];
     const explicitDefault = activePage.defaultView;
@@ -260,6 +264,26 @@ export default function DocsPage() {
                     </fieldset>
                   )}
 
+                  {/* 🚀 ADD THIS TOGGLE BUTTON CONTAINER BLOCK */}
+                  {activePage?.isExternalAsset && (
+                    <button 
+                      onClick={() => setIsViewportExpanded(!isViewportExpanded)}
+                      title={isViewportExpanded ? "Minimize viewport" : "Expand viewport layout"}
+                      className={`copy-btn text-sm p-1.5 rounded-md transition-all border shrink-0 flex items-center justify-center ${
+                        isViewportExpanded 
+                          ? 'bg-blue-600/20 border-blue-500/40 text-blue-400 hover:bg-blue-600/30' 
+                          : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        {isViewportExpanded ? (
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                        ) : (
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        )}
+                      </svg>
+                    </button>
+                  )}
                   {activePage.allowCopy !== false && currentFile && (
                     <button onClick={handleCopy} aria-label="Copy component value" 
                       className="copy-btn text-gray-400 hover:text-white p-2 sm:p-1 transition-all text-sm flex-shrink-0 h-[26px] w-[26px]"
@@ -279,8 +303,10 @@ export default function DocsPage() {
                     Streaming raw asynchronous report matrix nodes...
                   </div>
                 ) : activePage?.isExternalAsset ? (
-                  /* Render path for huge external standalone file payloads outside Vite bundle wrapper */
-                  <div className="html-preview-wrapper text-white w-full overflow-x-auto">
+                  /* 🚀 UPDATED CONTAINER WITH DYNAMIC HEIGHT EXPLICIT BINDINGS */
+                  <div className={`w-full rounded-xl overflow-hidden border border-white/5 bg-slate-950 transition-all duration-300 ease-in-out ${
+                    isViewportExpanded ? 'h-[120vh]' : 'h-[60vh]'
+                  }`}>
                     {activeView === 'html' ? (
                       <iframe 
                         src={activePage.assetPath} 

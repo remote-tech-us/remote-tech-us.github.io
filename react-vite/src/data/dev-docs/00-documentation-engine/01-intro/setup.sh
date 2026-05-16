@@ -17,6 +17,7 @@ else
   fi
 fi
 cd "$DEV_DOCS" || exit 1
+tree $DEV_DOCS
 
 # 1. Capture High-Level Category Info with Existence Verification
 while true; do
