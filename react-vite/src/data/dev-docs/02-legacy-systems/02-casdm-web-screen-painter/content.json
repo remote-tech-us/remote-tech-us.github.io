@@ -1,0 +1,6 @@
+{
+  "title": "Web Screen Painter",
+  "content": "Use the Schema Designer of Web Screen Painter to modify the database schema of CA SDM. Schema Designer provides a graphical user interface to review and modify this schema.",
+  "supportedViews": ["console"],
+  "allowCopy": false
+}

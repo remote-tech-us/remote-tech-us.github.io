@@ -1,0 +1,14 @@
+system:
+  engine: "Vite Asset Compile Macro"
+  strategy: "import.meta.glob"
+  capabilities:
+    - automatic-extension-detection
+    - contextual-dropdown-filtering
+    - sandboxed-html-parsing
+    - raw-source-inspection
+  supported-formats:
+    - .json
+    - .md
+    - .html
+    - .sh
+    - .yml

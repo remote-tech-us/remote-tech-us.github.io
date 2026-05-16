@@ -1,11 +1,7 @@
-// scr/utils/data-loader.js
-
 /**
- * Vite Client-Side Folder Data Loader
- * Uses import.meta.glob to read files at compile-time safely for the browser.
+ * Vite Client-Side Folder Data Loader (All-inclusive Raw Content Mapping)
  */
 export function loadFolderData() {
-  // 1. Eagerly grab all markdown, json, and asset code profiles in the directory
   const files = import.meta.glob('/src/data/dev-docs/**/*.{json,md,html,sh,js,yml,yaml}', {
     query: '?raw',
     eager: true,
@@ -13,19 +9,15 @@ export function loadFolderData() {
 
   const categoriesMap = {};
 
-  // 2. Parse out file paths and match them structural-wise
   Object.entries(files).forEach(([filePath, module]) => {
     const rawContent = module.default || '';
-    
-    // Split paths: /src/data/dev-docs/01-getting-started/intro/content.json
     const parts = filePath.split('/');
-    const categoryDir = parts[4]; // "01-getting-started"
-    const pageDir = parts[5];     // "intro"
-    const fileName = parts[6];    // "content.json"
+    const fileName = parts[parts.length - 1]; 
+    const pageDir = parts[parts.length - 2];     
+    const categoryDir = parts[parts.length - 3]; 
 
     if (!categoryDir || !pageDir || !fileName) return;
 
-    // Initialize map structures
     if (!categoriesMap[categoryDir]) {
       categoriesMap[categoryDir] = {
         id: categoryDir,
@@ -39,42 +31,52 @@ export function loadFolderData() {
         id: pageDir,
         title: pageDir.replace(/-/g, ' '),
         content: '',
-        supportedViews: ['console'],
+        supportedViews: ['console'], // Console is always a baseline option
         files: []
       };
     }
 
     const currentPage = categoriesMap[categoryDir].pagesMap[pageDir];
 
-    // 3. Populate matching page blocks based on raw structural text extensions
+    // 1. Process Metadata
     if (fileName === 'content.json') {
       try {
         if (rawContent.trim()) {
           const meta = JSON.parse(rawContent);
+          // Keep explicit supportedViews overrides if defined in json, otherwise append
           Object.assign(currentPage, meta);
-        } else {
-          console.warn(`⚠️ [Vite Loader]: Empty meta file at "${filePath}"`);
         }
       } catch (err) {
-        console.error(`❌ [Vite Loader]: JSON Syntax error in "${filePath}":`, err.message);
+        console.error(`❌ JSON Syntax error in "${filePath}":`, err.message);
       }
-    } else if (fileName === 'layout.html') {
-      currentPage.htmlContent = rawContent;
-      if (!currentPage.supportedViews.includes('html')) currentPage.supportedViews.push('html');
-    } else if (fileName === 'workflow.md') {
-      currentPage.markdownContent = rawContent;
-      if (!currentPage.supportedViews.includes('markdown')) currentPage.supportedViews.push('markdown');
-    } else {
-      // Shove standard terminal scripts directly to the interactive console array tabs
-      currentPage.files.push({
-        name: fileName,
-        code: rawContent,
-        language: fileName.split('.').pop() || 'bash'
-      });
+      return; // Skip adding content.json to selectable code files
     }
+
+    // 2. Extract File Information
+    const ext = fileName.split('.').pop() || 'text';
+    
+    // Determine file type category mapping
+    let fileType = 'text';
+    if (ext === 'html') fileType = 'html';
+    if (ext === 'md') fileType = 'markdown';
+
+    // Track which global view types are supported on this page dynamically
+    if (fileType === 'html' && !currentPage.supportedViews.includes('html')) {
+      currentPage.supportedViews.push('html');
+    }
+    if (fileType === 'markdown' && !currentPage.supportedViews.includes('markdown')) {
+      currentPage.supportedViews.push('markdown');
+    }
+
+    // Push EVERY asset into the universal files array
+    currentPage.files.push({
+      name: fileName,
+      code: rawContent,
+      language: ext === 'yml' || ext === 'yaml' ? 'yaml' : ext,
+      type: fileType // Store the type so the UI can filter it later
+    });
   });
 
-  // 4. Flatten mapping objects out to clean arrays for sidebar loops
   return Object.values(categoriesMap).map(category => ({
     id: category.id,
     title: category.title,
