@@ -1,5 +1,5 @@
 {
-  "title": "Customizations Warnings",
+  "title": "CASDM - Customizations Warnings",
   "content": "Anything to do with SPEL code will not be supported regardless of who completed the work.",
   "supportedViews": ["console"],
   "allowCopy": false

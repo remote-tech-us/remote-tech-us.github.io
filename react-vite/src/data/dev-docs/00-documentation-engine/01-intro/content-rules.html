@@ -1,0 +1,103 @@
+<!-- Save this exact code block as content-rules.html inside your target folder -->
+<div class="p-6 bg-slate-900/40 border border-white/10 rounded-2xl shadow-xl backdrop-blur-md">
+  
+  <!-- Header Block Section -->
+  <div class="flex items-center gap-3 mb-6">
+    <div class="p-2.5 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+    </div>
+    <div>
+      <h3 class="text-lg font-black text-white tracking-wide">Validation Rules & Parameters Matrix</h3>
+      <p class="text-xs text-gray-400 font-mono">Target Blueprint Filter: content.json Parsing Engine</p>
+    </div>
+  </div>
+
+  <!-- Responsive Table Wrapper Layer -->
+  <div class="overflow-x-auto rounded-xl border border-white/5 bg-black/20">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-white/10 bg-white/5 text-[11px] font-black uppercase tracking-wider text-gray-400 font-sans">
+          <th class="py-3 px-4">Parameter Name</th>
+          <th class="py-3 px-4">Data Type</th>
+          <th class="py-3 px-4 text-center">Status</th>
+          <th class="py-3 px-4">Definition & Operational Purpose</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/5 font-sans text-sm text-gray-300">
+        
+        <!-- Parameter 1: title -->
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="py-3.5 px-4 font-mono font-bold text-blue-400">title</td>
+          <td class="py-3.5 px-4 text-xs font-mono text-purple-400">String</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wide uppercase bg-red-500/10 text-red-400 border border-red-500/20">Required</span>
+          </td>
+          <td class="py-3.5 px-4 leading-relaxed text-gray-300">
+            The explicit presentation name of the documentation page. It directly hydrates the primary workspace <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">&lt;h1&gt;</code> element header and breadcrumb nav trails.
+          </td>
+        </tr>
+
+        <!-- Parameter 2: content -->
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="py-3.5 px-4 font-mono font-bold text-blue-400">content</td>
+          <td class="py-3.5 px-4 text-xs font-mono text-purple-400">String</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wide uppercase bg-red-500/10 text-red-400 border border-red-500/20">Required</span>
+          </td>
+          <td class="py-3.5 px-4 leading-relaxed text-gray-300">
+            A high-level text overview or summary block. This raw text string is placed right underneath your main title text as an opening paragraph section.
+          </td>
+        </tr>
+
+        <!-- Parameter 3: supportedViews -->
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="py-3.5 px-4 font-mono font-bold text-blue-400">supportedViews</td>
+          <td class="py-3.5 px-4 text-xs font-mono text-purple-400">Array</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wide uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">Optional</span>
+          </td>
+          <td class="py-3.5 px-4 leading-relaxed text-gray-300">
+            Explicitly controls which view mode selector buttons are rendered. Acceptable values within the array wrapper are: <code class="text-xs font-mono text-yellow-400">"console"</code>, <code class="text-xs font-mono text-yellow-400">"html"</code>, or <code class="text-xs font-mono text-yellow-400">"markdown"</code>.
+          </td>
+        </tr>
+
+        <!-- Parameter 4: defaultView -->
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="py-3.5 px-4 font-mono font-bold text-blue-400">defaultView</td>
+          <td class="py-3.5 px-4 text-xs font-mono text-purple-400">String</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wide uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">Optional</span>
+          </td>
+          <td class="py-3.5 px-4 leading-relaxed text-gray-300">
+            Forcefully dictates which view interface is chosen by default during the initial folder mount. This overrides the automatic state engine logic waterfall checklist loop (<code class="text-xs font-mono text-gray-400">html ➔ markdown ➔ console</code>).
+          </td>
+        </tr>
+
+        <!-- Parameter 5: allowCopy -->
+        <tr class="hover:bg-white/[0.02] transition-colors">
+          <td class="py-3.5 px-4 font-mono font-bold text-blue-400">allowCopy</td>
+          <td class="py-3.5 px-4 text-xs font-mono text-purple-400">Boolean</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wide uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">Optional</span>
+          </td>
+          <td class="py-3.5 px-4 leading-relaxed text-gray-300">
+            Enables or disables visibility for the copy action control icon button on the terminal sub-header layout strip. Defaults internally to <code class="text-xs font-mono text-emerald-400">true</code> if left completely undefined.
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Commentary / System Footer Alerts -->
+  <div class="mt-4 p-3.5 bg-amber-500/5 border border-amber-500/20 rounded-xl flex gap-3">
+    <span class="text-amber-500 text-base flex-shrink-0 mt-0.5">💡</span>
+    <p class="text-xs text-gray-400 leading-relaxed font-sans">
+      <strong class="text-amber-500/90 block mb-0.5 font-bold">Architecture Review Commentary:</strong>
+      Every single subdirectory located within the <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">/dev-docs/</code> pipeline framework requires a valid <code class="text-xs text-white font-mono bg-white/5 px-1 rounded">content.json</code> file to serve as its validation checkpoint entry card. If this file is missing, the compile-time data compiler will treat the directory as unassigned space and drop it completely from the dynamic sidebar rendering loop.
+    </p>
+  </div>
+
+</div>

@@ -1,6 +1,7 @@
 {
-  "title": "Core Architecture & Capabilities",
+  "title": "Core Features",
   "content": "An executive analysis of the unified data-loader subsystem. This layout breaks down how a reactive front-end maps flat files directly into contextual view layers dynamically.",
   "supportedViews": ["console", "html", "markdown"],
-  "allowCopy": true
+  "allowCopy": true,
+  "defaultView": "markdown"
 }
