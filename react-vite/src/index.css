@@ -141,3 +141,32 @@ button:focus-visible {
 .animate-spin-slow {
   animation: spin 3s linear infinite !important;
 }
+
+/* Scoped global layout overrides for responsive Mermaid SVGs */
+.mermaid-graph-clean svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.copy-btn {
+  color: #646cff !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  font-size: 1em !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+.copy-btn:hover {
+  border-color: #646cff;
+}
+.copy-btn:focus,
+.copy-btn:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
