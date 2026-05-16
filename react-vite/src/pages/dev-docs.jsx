@@ -99,41 +99,43 @@ export default function DocsPage() {
       className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-fixed bg-cover"
       style={{ backgroundImage: GLOBALS.bg_img ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` : 'none' }}
     >
-      {/* MOBILE TRIGGER ACTION FLOATING BUTTON */}
-      <button 
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl transition-transform active:scale-95 flex items-center justify-center border border-white/10"
-        aria-label="Toggle menu"
-      >
-        {isMobileMenuOpen ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
-      </button>
+      {/* 🚀 FIXED: Toggle Moved to Left side & Changed to a clean, small menu icon */}
+      <div className="lg:hidden fixed top-10 left-0 right-0 h-6 bg-slate-950/80 backdrop-blur-md border-b border-white/10 z-40 flex items-center gap-4 px-6">
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="copy-btn text-gray-400 hover:text-white text-lg transition-all p-1 flex items-center justify-center focus:outline-none"
+          aria-label="Toggle navigation menu"
+        >
+          {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+        <div className="flex items-center gap-2 text-blue-400 font-bold text-sm select-none">
+          <FaBook /> <span>Docs Navigation</span>
+        </div>
+      </div>
 
-      {/* DRAWER LAYERING FRAMEWORK */}
+      {/* MOBILE DRAWER MODAL OVERLAYS */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Backdrop: Set to Standard z-30 */}
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="lg:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm h-screen w-screen"
+              className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm h-screen w-screen"
             />
-            {/* Sidebar Shell: 🚀 FIX 2: Set to Standard z-40 so it displays OVER the backdrop canvas */}
             <motion.aside 
               initial={{ x: '-100%' }} 
               animate={{ x: 0 }} 
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.2 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-40 w-72 h-screen bg-slate-950 border-r border-white/10 p-6 overflow-y-auto pt-20"
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-72 h-screen bg-slate-950 border-r border-white/10 p-6 overflow-y-auto pt-24"
             >
               <NavigationMenu activePage={activePage} setActivePage={setActivePage} />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
-
       <div className="flex w-full pt-20 lg:pt-24 min-w-0 max-w-full">
         
         {/* DESKTOP SIDEBAR NAVIGATION */}
