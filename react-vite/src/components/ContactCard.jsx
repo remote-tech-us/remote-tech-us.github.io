@@ -26,7 +26,7 @@ const ContactCard = ({ contact , index }) => {
         </span>
       )}
       {contact.logo && (
-        <img src={contact.logo} alt="Logo" className="w-20 mb-4" />
+        <img src={contact.logo} alt="logo" width='25px' height='25px' className="w-20 mb-4" />
       )}
       <h2 className="text-3xl font-black mb-1">{contact.name}</h2>
       {contact.title && (

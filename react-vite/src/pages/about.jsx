@@ -36,7 +36,7 @@ export default function AboutPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <img src={GLOBALS.app_logo} alt="Logo" className="w-24 mx-auto mb-6" />
+          <img src={GLOBALS.app_logo} alt="logo" width='25px' height='25px' className="w-24 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-black mb-4">{GLOBALS.app_title}</h1>
           <p className="text-xl text-blue-400 font-medium max-w-2xl mx-auto">
             Professional Open-Source Infrastructure & Services

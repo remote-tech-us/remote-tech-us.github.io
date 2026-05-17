@@ -8,7 +8,7 @@ const Footer = () => {
         {/* Brand Section */}
         <div className="space-y-4 lg:col-span-2 text-left"> {/* text-left to align <p> below */}
           <div className="flex items-center text-white font-bold text-2xl justify-start">
-            <img src={ GLOBALS.app_logo } width='25px'/> &nbsp;{ GLOBALS.app_title }
+            <img src={ GLOBALS.app_logo } alt="logo" width='25px' height='25px'/> &nbsp;{ GLOBALS.app_title }
           </div>
           <p className="text-sm max-w-xs"> {/* max-w-xs keeps the text from stretching too far right */}
             A React, Vite, and Tailwind CSS design.
@@ -35,7 +35,7 @@ const Footer = () => {
         {/*
         <div className="space-y-4">
           <h2 className="text-white text-2xl font-bold">
-            <img src={ GLOBALS.app_logo } width='25px'/> { GLOBALS.app_title }
+            <img src={ GLOBALS.app_logo } alt="logo" width='25px' height='25px'/> { GLOBALS.app_title }
           </h2>
           <p className="text-sm">
             A React, Vite, and Tailwind CSS web design.
