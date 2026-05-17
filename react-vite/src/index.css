@@ -46,10 +46,19 @@ body {
   min-height: 100vh;
 }
 */
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Global base styles - completely safe for your footer */
+h1, h2, h3, h4 { line-height: 1.1; }
+
+/* Specific class for auto-scaling main headers */
+.fluid-h1 { 
+  /* clamp() function requires units (like rem, em, px, or %) for all three values */
+  font-size: clamp(1.8rem, 6vw, 5rem); 
+  /* Uses em units so line-height scales relative to the current font size */
+  line-height: clamp(1.1em, 1.2em, 1.4em); 
 }
+.fluid-h2 { font-size: clamp(1.6rem, 5vw, 4rem); }
+.fluid-h3 { font-size: clamp(1.4rem, 4vw, 3rem); }
+.fluid-h4 { font-size: clamp(1.2rem, 3vw, 2rem); }
 
 button {
   border-radius: 6px;
@@ -91,7 +100,34 @@ button:focus-visible {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* --- NEW REUSABLE FLUID HEADERS --- */
+  .text-fluid-h1 {
+    /* Tamed: Min 20px, Scaler 2.5vw, Max 32px to fit dashboard layouts */
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+    line-height: 1.2;
+    @apply font-black text-white tracking-wide;
+  }
+
+  .text-fluid-h2 {
+    font-size: clamp(1.15rem, 2.2vw, 1.65rem);
+    line-height: 1.2;
+    @apply font-bold text-white tracking-wide;
+  }
+
+  .text-fluid-h3 {
+    font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+    line-height: 1.2;
+    @apply font-semibold text-white tracking-wide;
+  }
+
+  .text-fluid-h4 {
+    font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+    line-height: 1.2;
+    @apply font-medium text-white tracking-wide;
+  }
 }
+
 /* CUSTOM NAV BUTTON OVERRIDE CLASS */
 .nav-menu-btn {
   color: #646cff !important;
