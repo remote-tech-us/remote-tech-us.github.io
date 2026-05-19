@@ -39,11 +39,11 @@ export const BUSINESS_TOOLS = [
   },
   { 
     name: 'Jupyter Lab', 
-    url: '', 
+    url: 'https://jupyter.org/', 
     icon: <SiJupyter />,
-    tag: "",
-    locked: false,
-    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+    tag: "No Longer Public Facing",
+    locked: true,
+    desc: 'a web-based, next-generation interactive development environment (IDE) used primarily for data science, scientific computing, and machine learning'
   },
   { 
     name: 'Dashy', 
