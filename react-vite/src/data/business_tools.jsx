@@ -39,7 +39,7 @@ export const BUSINESS_TOOLS = [
   },
   { 
     name: 'Jupyter Lab', 
-    url: 'https://jlab.remote-tech.us/board/1', 
+    url: '', 
     icon: <SiJupyter />,
     tag: "",
     locked: false,
