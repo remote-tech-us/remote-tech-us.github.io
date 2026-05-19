@@ -43,7 +43,7 @@ function ServicesPage() {
       {/* Main Container */}
       <div className="pt-24 px-6 max-w-7xl mx-auto">
         <header className="mb-12 text-center lg:text-left">
-          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          {/*<h1 className="text-fluid-h1 text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
           <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
         </header>
 

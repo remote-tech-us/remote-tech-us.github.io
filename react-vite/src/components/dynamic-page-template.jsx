@@ -35,7 +35,7 @@ export default function DynamicPageTemplate({ filesDict, fallbackType }) {
 
       <div className="pt-24 px-6 max-w-7xl mx-auto">
         <header className="mb-12 text-center lg:text-left">
-          <h1 className="text-4xl font-bold text-white">{CONFIG.title}</h1>
+          <h1 className="text-fluid-h1 text-4xl font-bold text-white">{CONFIG.title}</h1>
           <p className="text-gray-400 mt-2">{CONFIG.subtitle}</p>
         </header>
 
