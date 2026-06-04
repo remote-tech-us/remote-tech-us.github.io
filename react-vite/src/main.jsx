@@ -46,6 +46,7 @@ const DevDocsPage = lazy(() => import('./pages/dev-docs.jsx'));
 const DynamicProductsPage = lazy(() => import('./pages/dynamic-products.jsx'));
 const DynamicServicesPage = lazy(() => import('./pages/dynamic-services.jsx'));
 const MissionsPage = lazy(() => import('./pages/missions.jsx'));
+const InquiryPage = lazy(() => import('./pages/inquiry.jsx'));
 
 {/* Notes 
     Use HashRouter if:
@@ -85,6 +86,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/products/:productId" element={<DynamicProductsPage />} />
             <Route path="/services/:serviceId" element={<DynamicServicesPage />} />
             <Route path="/mission" element={<MissionsPage />} />
+            <Route path="/inquiry" element={<InquiryPage />} />
           </Routes>
         </Suspense>
       </main>
