@@ -1,76 +1,32 @@
-// src/pages/inquiry.jsx
+// src/pages/request.jsx
 import { useState, useEffect } from 'react';
 import { GLOBALS } from '../data/app__globals.jsx';
-import { INQUIRY_OPTIONS } from '../data/business_inquiries.jsx';
+import { REQUEST_OPTIONS } from '../data/business_requests.jsx';
+import { useBaserowForm } from '../hooks/useBaserowForm.js'; // 👈 Your new hook
 import { FaEnvelope, FaSpinner, FaCheckCircle, FaServer, FaShieldAlt } from 'react-icons/fa';
 
 export default function InquiryPage() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [product, setProduct] = useState('');
   const [projectType, setProjectType] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | loading | success | error
 
-  // Spam protection states
-  const [honeypot, setHoneypot] = useState('');
-  const [loadTime, setLoadTime] = useState(0);
-
-  useEffect(() => {
-    setLoadTime(Date.now());
-  }, []);
+  // 🛠️ Consume your clean standalone hook (Pass your unique Baserow public Form ID string here)
+  const { status, honeypot, setHoneypot, submitForm } = useBaserowForm('-fvyYPZMBZ0gRZF1_4NzBS7wM9_QFWEICjhdQJnbfeU');
 
   // Reset secondary dropdown if primary product selection changes
   useEffect(() => {
     setProjectType('');
   }, [product]);
 
-  const handleSubmit = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
     
-    // 🛡️ SPAM CHECK 1: Honeypot field triggered
-    if (honeypot !== '') {
-      console.warn("Spam bot detected via honeypot trap.");
-      setStatus('success'); // Fake a success state to trick the bot
-      return;
-    }
-
-    // 🛡️ SPAM CHECK 2: Velocity check (sub-2.5 second bot submission)
-    const activeDuration = (Date.now() - loadTime) / 1000;
-    if (activeDuration < 2.5) {
-      console.warn("Spam bot detected via velocity test.");
-      setStatus('success');
-      return;
-    }
-
-    setStatus('loading');
-
-    const payload = {
-      "Question": `[Product: ${product}] [Project Type: ${projectType}] \n\nBrief:\n${formData.message}`,
-      "Prepared by": formData.name,
-      "Notes": `Contact Email: ${formData.email}`,
-      "Department": "Sales",
-      "Type": "Communication",
-      "Role": "External Prospect"
-    };
-
-    try {
-      const response = await fetch('https://remote-tech.us', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
-        setStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-        setProduct('');
-        setProjectType('');
-      } else {
-        setStatus('error');
-      }
-    } catch (err) {
-      console.error("Transmission error:", err);
-      setStatus('error');
-    }
+    // Execute the hook submission logic and pass an optional success cleanup callback
+    submitForm(formData, product, projectType, () => {
+      setFormData({ name: '', email: '', message: '' });
+      setProduct('');
+      setProjectType('');
+    });
   };
 
   return (
@@ -88,15 +44,18 @@ export default function InquiryPage() {
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
             <FaServer className="text-[10px]" /> Architecture Desk
           </span>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight">Scope Your Project</h1>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight">Need Project Assistance</h1>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Select your enterprise software eco-system and target criteria to route your configuration task metrics directly.
+            Initialize a structural request to allocate core operational assets. Our network 
+            provides specialized systems engineering, scalable solution architecture, tactical 
+            project management, and full-stack development pipelines. 
+            Select your deployment environment below to match your technical requirements with an active engineer queue.
           </p>
           <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-start gap-3 text-left">
             <FaShieldAlt className="text-yellow-500 text-xl mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-white">Automated Scrubbing</h4>
-              <p className="text-gray-400 text-xs mt-1">This terminal handles client verification natively. No third-party tracking modules used.</p>
+              <p className="text-gray-400 text-xs mt-1">This terminal handles client verification natively. No third-party tracking tracking modules used.</p>
             </div>
           </div>
         </div>
@@ -110,9 +69,9 @@ export default function InquiryPage() {
               <p className="text-gray-400 text-sm">Thank you. Your conditional specifications match active project queues.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 bg-black/40 border border-white/10 p-6 md:p-8 rounded-3xl backdrop-blur-xl relative">
+            <form onSubmit={handleFormSubmit} className="space-y-4 bg-black/40 border border-white/10 p-6 md:p-8 rounded-3xl backdrop-blur-xl relative">
               
-              {/* 🤫 HONEYPOT */}
+              {/* 🤫 HONEYPOT AREA */}
               <div className="absolute opacity-0 top-0 left-0 w-0 h-0 overflow-hidden pointer-events-none" aria-hidden="true">
                 <input 
                   type="text" 
@@ -127,11 +86,11 @@ export default function InquiryPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Full Name</label>
-                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all text-white" placeholder="Alex Podbrezskis" />
+                  <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all text-white" placeholder="Enter <full-name>" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
-                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all text-white" placeholder="alex@enterprise.io" />
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all text-white" placeholder="Enter <email@domain.com>" />
                 </div>
               </div>
 
@@ -145,7 +104,7 @@ export default function InquiryPage() {
                   className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all text-white cursor-pointer appearance-none"
                 >
                   <option value="" disabled className="text-gray-600">Select core software system...</option>
-                  {Object.keys(INQUIRY_OPTIONS).map(name => (
+                  {Object.keys(REQUEST_OPTIONS).map(name => (
                     <option key={name} value={name} className="bg-slate-900 text-white">{name}</option>
                   ))}
                 </select>
@@ -164,7 +123,7 @@ export default function InquiryPage() {
                   <option value="" disabled>
                     {product ? "Select target deployment requirement..." : "Awaiting product selection above..."}
                   </option>
-                  {product && INQUIRY_OPTIONS[product].map(type => (
+                  {product && REQUEST_OPTIONS[product].map(type => (
                     <option key={type} value={type} className="bg-slate-900 text-white">{type}</option>
                   ))}
                 </select>
@@ -172,11 +131,11 @@ export default function InquiryPage() {
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Detailed Specifications</label>
-                <textarea rows={4} required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none text-white" placeholder="Describe your specialized workflow goals or scope metrics..." />
+                <textarea rows={4} required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none text-white" placeholder="Please take time to describe your project needs in detail providing specifications, goal and/or metrics constraints..." />
               </div>
 
               <button type="submit" disabled={status === 'loading'} className="w-full flex items-center justify-center gap-2 bg-white text-black font-bold py-4 rounded-xl hover:bg-blue-600 hover:text-white disabled:bg-white/20 disabled:text-gray-500 transition-all text-sm cursor-pointer">
-                {status === 'loading' ? <FaSpinner className="animate-spin text-lg" /> : <><FaEnvelope /> Dispatch Specifications</>}
+                {status === 'loading' ? <FaSpinner className="animate-spin text-lg" /> : <><FaEnvelope /> Submit Project Request</>}
               </button>
               
               {status === 'error' && <p className="text-red-400 text-xs text-center font-semibold mt-2">Submission fault. Verify API network node configurations.</p>}
