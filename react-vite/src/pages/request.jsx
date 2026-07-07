@@ -2,26 +2,27 @@
 import { useState, useEffect } from 'react';
 import { GLOBALS } from '../data/app__globals.jsx';
 import { REQUEST_OPTIONS } from '../data/business_requests.jsx';
-import { useBaserowForm } from '../hooks/useBaserowForm.js'; // 👈 Your new hook
+import { useBaserowForm } from '../hooks/useBaserowForm.js'; 
 import { FaEnvelope, FaSpinner, FaCheckCircle, FaServer, FaShieldAlt } from 'react-icons/fa';
 
-export default function InquiryPage() {
+export default function RequestPage() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [product, setProduct] = useState('');
   const [projectType, setProjectType] = useState('');
 
-  // 🛠️ Consume your clean standalone hook (Pass your unique Baserow public Form ID string here)
-  const { status, honeypot, setHoneypot, submitForm } = useBaserowForm('-fvyYPZMBZ0gRZF1_4NzBS7wM9_QFWEICjhdQJnbfeU');
+  // 🛠️ Consume hook (Pass your unique Baserow public Form ID string here)
+  //const { status, honeypot, setHoneypot, submitForm } = useBaserowForm('-fvyYPZMBZ0gRZF1_4NzBS7wM9_QFWEICjhdQJnbfeU');
+  const { status, honeypot, setHoneypot, submitForm } = useBaserowForm('sNsqHzGLgd8d3sMbLaep8ZDh-t-bAr7xUorFUcxkGg8');
 
-  // Reset secondary dropdown if primary product selection changes
+  // Reset secondary dropdown if primary selection changes
   useEffect(() => {
     setProjectType('');
   }, [product]);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    
-    // Execute the hook submission logic and pass an optional success cleanup callback
+
+    // Execute the hook submission logic and pass success cleanup callback
     submitForm(formData, product, projectType, () => {
       setFormData({ name: '', email: '', message: '' });
       setProduct('');
@@ -38,24 +39,23 @@ export default function InquiryPage() {
       }}
     >
       <main className="pt-32 px-6 max-w-4xl mx-auto pb-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        
+
         {/* Context Sidebar */}
         <div className="lg:col-span-5 space-y-6 text-center lg:text-left">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
             <FaServer className="text-[10px]" /> Architecture Desk
           </span>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight">Need Project Assistance</h1>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight">Service Request</h1>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Initialize a structural request to allocate core operational assets. Our network 
-            provides specialized systems engineering, scalable solution architecture, tactical 
-            project management, and full-stack development pipelines. 
-            Select your deployment environment below to match your technical requirements with an active engineer queue.
+            Initialize a structural entry to modify, upgrade, or build out backend environments. 
+            This node routes specifications across systems engineering, solution architecture, 
+            infrastructure management, and core development operations pipelines.
           </p>
           <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-start gap-3 text-left">
             <FaShieldAlt className="text-yellow-500 text-xl mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-white">Automated Scrubbing</h4>
-              <p className="text-gray-400 text-xs mt-1">This terminal handles client verification natively. No third-party tracking tracking modules used.</p>
+              <p className="text-gray-400 text-xs mt-1">This terminal handles client verification natively. No third-party tracking modules used.</p>
             </div>
           </div>
         </div>
@@ -65,20 +65,20 @@ export default function InquiryPage() {
           {status === 'success' ? (
             <div className="bg-emerald-500/10 border border-emerald-500/30 p-8 rounded-3xl text-center flex flex-col items-center gap-3 backdrop-blur-md">
               <FaCheckCircle className="text-emerald-400 text-3xl" />
-              <h4 className="font-bold text-lg text-white">Inquiry Archived</h4>
-              <p className="text-gray-400 text-sm">Thank you. Your conditional specifications match active project queues.</p>
+              <h4 className="font-bold text-lg text-white">Request Token Archived</h4>
+              <p className="text-gray-400 text-sm">Transmission received. Target parameters mapped successfully against pending queue priorities.</p>
             </div>
           ) : (
             <form onSubmit={handleFormSubmit} className="space-y-4 bg-black/40 border border-white/10 p-6 md:p-8 rounded-3xl backdrop-blur-xl relative">
-              
+
               {/* 🤫 HONEYPOT AREA */}
               <div className="absolute opacity-0 top-0 left-0 w-0 h-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <input 
-                  type="text" 
-                  name="firm_security_confirm" 
-                  value={honeypot} 
-                  onChange={(e) => setHoneypot(e.target.value)} 
-                  tabIndex="-1" 
+                <input
+                  type="text"
+                  name="firm_security_confirm"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex="-1"
                   placeholder="Do not fill this out"
                 />
               </div>
@@ -97,7 +97,7 @@ export default function InquiryPage() {
               {/* Selection Layer 1: Core Platform Product */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Target Product Stack</label>
-                <select 
+                <select
                   required
                   value={product}
                   onChange={(e) => setProduct(e.target.value)}
@@ -113,7 +113,7 @@ export default function InquiryPage() {
               {/* Selection Layer 2: Dynamic Project List */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Project Classification</label>
-                <select 
+                <select
                   required
                   disabled={!product}
                   value={projectType}
@@ -131,14 +131,42 @@ export default function InquiryPage() {
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Detailed Specifications</label>
-                <textarea rows={4} required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none text-white" placeholder="Please take time to describe your project needs in detail providing specifications, goal and/or metrics constraints..." />
+                <textarea 
+                  rows={4} 
+                  required 
+                  value={formData.message} 
+                  onChange={(e) => setFormData({...formData, message: e.target.value})} 
+                  className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none text-white" 
+                  placeholder="Provide environment parameters, scope constraints, and execution requirements..." 
+                />
               </div>
-
-              <button type="submit" disabled={status === 'loading'} className="w-full flex items-center justify-center gap-2 bg-white text-black font-bold py-4 rounded-xl hover:bg-blue-600 hover:text-white disabled:bg-white/20 disabled:text-gray-500 transition-all text-sm cursor-pointer">
-                {status === 'loading' ? <FaSpinner className="animate-spin text-lg" /> : <><FaEnvelope /> Submit Project Request</>}
+                            <button 
+                type="submit" 
+                disabled={status === 'loading'} 
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb'; // blue-600
+                  e.currentTarget.style.color = '#ffffff'; // force white text
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ffffff'; // white
+                  e.currentTarget.style.color = '#000000'; // force black text
+                }}
+                className="w-full flex items-center justify-center gap-2 font-bold py-4 rounded-xl disabled:bg-white/20 disabled:text-gray-500 transition-all text-sm cursor-pointer shadow-lg shadow-black/20"
+                style={{
+                  backgroundColor: '#ffffff',
+                  color: '#000000',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+              >
+                {status === 'loading' ? (
+                  <FaSpinner className="animate-spin text-lg" />
+                ) : (
+                  <>
+                    <FaEnvelope /> Submit Request
+                  </>
+                )}
               </button>
-              
-              {status === 'error' && <p className="text-red-400 text-xs text-center font-semibold mt-2">Submission fault. Verify API network node configurations.</p>}
+
             </form>
           )}
         </div>
