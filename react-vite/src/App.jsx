@@ -130,13 +130,13 @@ export default function App() {
 
         {/* Lead Capture Block */}
         <section className="w-full text-center py-12 border-t border-white/10">
-          <h2 className="text-2xl font-black mb-2">Have an infrastructure challenge?</h2>
-          <p className="text-gray-400 text-sm mb-6">Reach out directly to open an engineering architecture discovery session.</p>
+          <h2 className="text-2xl font-black mb-2">Have a CA Service Desk challenge?</h2>
+          <p className="text-gray-400 text-sm mb-6">Reach out directly to open a consultation / discovery session.</p>
           <a
-            href="mailto:careers@remote-tech.us?subject=Architecture Consultation Request"
+            href="mailto:info@remote-tech.us?subject=Consultation / Discovery Request"
             className="inline-flex items-center gap-2 bg-white text-black font-bold px-6 py-3 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-sm"
           >
-            <FaEnvelope /> Contact Engineering Desk
+            <FaEnvelope /> Consultation / Discovery Request
           </a>
         </section>
 
