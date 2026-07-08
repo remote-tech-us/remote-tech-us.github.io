@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:William Earnhardt
+ORG:Remote Tech US
+TITLE:Founder
+EMAIL;TYPE=INTERNET:william@remote-tech.us
+URL:https://remote-tech.us
+KEY:https://github.com/remote-tech-us
+END:VCARD

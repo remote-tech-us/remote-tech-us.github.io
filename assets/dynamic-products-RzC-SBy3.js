@@ -1,0 +1,1 @@
+import{_ as t}from"./index-wyWLfU7B.js";import{j as s}from"./vendor-C811conn.js";import{D as a}from"./dynamic-page-template-D3sQ_GnA.js";import"./Card-Vf8rNboB.js";import"./useAutoScroll-BkcmFc0m.js";const o=Object.assign({"../data/products/0001-smart-ass.jsx":t});function p(){return s.jsx(a,{filesDict:o,fallbackType:"Product"})}export{p as default};

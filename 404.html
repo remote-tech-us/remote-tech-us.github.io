@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | REMOTE TECH US</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen font-sans">
+    <div class="text-center p-8 max-w-md bg-slate-800/50 border border-white/10 rounded-3xl shadow-2xl backdrop-blur-xl">
+        <div class="w-20 h-20 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-500/20">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+        </div>
+        <h1 class="text-6xl font-black text-white mb-2">404</h1>
+        <h2 class="text-xl font-bold text-blue-400 mb-4">Route Not Found</h2>
+        <p class="text-gray-400 mb-8 leading-relaxed">
+            The page you are looking for doesn't exist or has moved. Redirecting you safely back to the dashboard...
+        </p>
+        <a href="/" id="home-link" class="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition duration-200 shadow-lg shadow-blue-600/20 cursor-pointer">
+            Return Home
+        </a>
+    </div>
+
+    <script type="text/javascript">
+        // Capture the broken pathname input (e.g. "/about")
+        var path = window.location.pathname;
+        
+        // Build the correct spa safe hash routing fallback location
+        // Keeps user destination intent intact if they typed it directly without a hash symbol
+        var targetUrl = window.location.origin + '/#' + path;
+        
+        // Update the direct button href rule safely
+        document.getElementById('home-link').setAttribute('href', targetUrl);
+
+        // Run an absolute clean auto-redirect wrapper after a 3 second delay
+        setTimeout(function() {
+            window.location.replace(targetUrl);
+        }, 3000);
+    </script>
+</body>
+</html>`:wq
+
