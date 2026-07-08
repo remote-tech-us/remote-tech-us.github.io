@@ -1,81 +1,54 @@
 // src/hooks/useBaserowForm.js
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-export function useBaserowForm(formId) {
-  const [status, setStatus] = useState('idle'); // idle | loading | success | error
+export function useBaserowForm(formId = import.meta.env.VITE_BASEROW_FORM_ID) {
+  const [status, setStatus] = useState('idle');
   const [honeypot, setHoneypot] = useState('');
-  const [loadTime, setLoadTime] = useState(0);
+  
+  const baseUrl = import.meta.env.VITE_BASEROW_API_URL;
 
-  useEffect(() => {
-    setLoadTime(Date.now());
-  }, []);
-
-  const submitForm = async (formData, product, projectType, callback) => {
-    // 🛡️ SPAM CHECK 1: Honeypot field triggered
-    if (honeypot !== '') {
-      console.warn("Spam bot detected via honeypot trap.");
-      setStatus('success'); 
-      if (callback) callback();
-      return;
-    }
-
-    // 🛡️ SPAM CHECK 2: Velocity check (sub-2.5 second bot submission)
-    const activeDuration = (Date.now() - loadTime) / 1000;
-    if (activeDuration < 2.5) {
-      console.warn("Spam bot detected via velocity test.");
+  const submitForm = async (formData, product, projectType, onSuccess) => {
+    // Spam protection check
+    if (honeypot) {
       setStatus('success');
-      if (callback) callback();
       return;
     }
-
     setStatus('loading');
- 
+
+    // Exact mapping derived from live Baserow schema dump
     const payload = {
-      "Name": formData.name,
-      "Email": formData.email,
-      "Product": product,
-      "Project": projectType,
-      "Notes": formData.message,
-      "Active": true // Passes the boolean true to your required Active checkbox field
+      "field_5000": formData.message,        // Detailed Specifications (long_text)
+      "field_5001": true,                    // Active (boolean)
+      "field_5002": formData.name,           // Full Name (text)
+      "field_5003": formData.email,          // Email Address (email)
+      "field_5004": product,                 // Target Product Stack (text)
+      "field_5005": projectType,             // Project Classification (text)
+      "field_5006": "New"                    // Status
     };
-    //const payload = {
-    //  "Question": `[Product: ${product}] [Project Type: ${projectType}] \n\nBrief:\n${formData.message}`,
-    //  "Prepared by": formData.name,
-    //  "Notes": `Contact Email: ${formData.email}`,
-    //  "Department": "Sales",
-    //  "Type": "Communication",
-    //  "Role": "External Prospect"
-    //};
 
     try {
-      //const response = await fetch(`https://br.remote-tech.us/form/-fvyYPZMBZ0gRZF1_4NzBS7wM9_QFWEICjhdQJnbfeU/submit/`, {
-      const response = await fetch(`https://br.remote-tech.us/form/sNsqHzGLgd8d3sMbLaep8ZDh-t-bAr7xUorFUcxkGg8/submit/`, {
+      const response = await fetch(`${baseUrl}/api/database/views/form/${formId}/submit/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(payload),
-        mode: 'cors'
       });
 
-      if (response.ok) {
-        setStatus('success');
-        if (callback) callback();
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("Baserow validation reject metrics:", errorData);
-        setStatus('error');
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null);
+        console.error("Baserow rejection details:", errData || response.statusText);
+        throw new Error(`Server returned status: ${response.status}`);
       }
-    } catch (err) {
-      console.error("Network or CORS routing block:", err);
+
+      setStatus('success');
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error("Baserow transmission failure:", error);
       setStatus('error');
     }
   };
 
-  return {
-    status,
-    setStatus,
-    honeypot,
-    setHoneypot,
-    submitForm
-  };
+  return { status, honeypot, setHoneypot, submitForm };
 }
-
