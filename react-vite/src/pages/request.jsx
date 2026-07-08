@@ -49,9 +49,7 @@ export default function RequestPage() {
           </span>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight">Service Request</h1>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Initialize a structural entry to modify, upgrade, or build out backend environments. 
-            This node routes specifications across systems engineering, solution architecture, 
-            infrastructure management, and core development operations pipelines.
+            Complete the small service request questionnaire providing the basic contact info with detailed specifictions and constraints. Once sumbitted, a team member will be notified. 
           </p>
           <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-start gap-3 text-left">
             <FaShieldAlt className="text-yellow-500 text-xl mt-0.5 flex-shrink-0" />
