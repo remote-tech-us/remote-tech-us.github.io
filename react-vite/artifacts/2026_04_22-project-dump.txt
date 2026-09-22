@@ -1,0 +1,445 @@
+.
+├── README.md
+├── dumpit.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── img
+│   │   ├── 0.jpg
+│   │   ├── globe.mp4
+│   │   └── globe.mp4-
+│   ├── remote-tech-us_v2.svg
+│   └── vite.svg
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   └── NavBar.jsx
+│   ├── index.css
+│   └── main.jsx
+├── tailwind.config.js
+└── vite.config.js
+
+6 directories, 20 files
+  ================================================================================
+
+  FILE: eslint.config.js
+  ------------------------------------------------
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+  ------------------------------------------------
+
+  FILE: index.html
+  ------------------------------------------------
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/remote-tech-us_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REMOTE TECH US</title>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+  ------------------------------------------------
+
+  FILE: package.json
+  ------------------------------------------------
+{
+  "name": "react-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://remote-tech.us",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "framer-motion": "^12.9.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-tooltip": "^5.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1"
+  }
+}
+  ------------------------------------------------
+
+  FILE: postcss.config.js
+  ------------------------------------------------
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+
+  ------------------------------------------------
+
+  FILE: src/App.css
+  ------------------------------------------------
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+  ------------------------------------------------
+
+  FILE: src/App.jsx
+  ------------------------------------------------
+import NavBar from './components/NavBar';
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/img/0.jpg')" }}>
+      <NavBar />
+      <div className="flex-1. flex-col items-center justify-center text-center px-6 -mt-17 animate-fade-in">
+        {/*
+        <video
+          className="rounded-lg shadow-lg w-full max-w-xl"
+          type="video/mp4"
+          src="/img/globe.mp4"
+          autoPlay
+          muted
+          loop
+          playsInLine
+        >
+          <source src="/img/globe.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+  */}
+        <a href="https://cal.com/remote-tech.us"
+           className="mt-8 inline-block bg-white-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition transform hover:scale-105"
+        >
+          <h5 className="text-1xl font-bold font-center">Schedule a Meeting</h5>
+        </a>
+        {/* 
+        <a href="https://vite.dev" target="_blank">
+          <img src={viteLogo} className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+        */}
+      </div>
+      {/*<h1>Vite + React</h1> */}
+      {/*<div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.jsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+      */}
+    </div>
+  )
+}
+
+export default App
+  ------------------------------------------------
+
+  FILE: src/components/NavBar.jsx
+  ------------------------------------------------
+import { useState } from 'react';
+
+function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="bg-black bg-opacity=60 backdrop-blur-md fixed w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center text-white font-bold text-2xl">
+            REMOTE TECH US 
+          </div>
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-6">
+              <NavLink href="https://pm.remote-tech.us" label="Open Project" />
+              <NavLink href="https://kanboard.remote-tech.us" label="Kanboard" />
+              <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
+              <NavLink href="https://dashy.remote-tech.us" label="Dashy" />
+              <NavLink to="/about" className={({  isActive }) => isActive ? 'active' : ''}>About</NavLink>
+            </div>
+          </div>
+          <div className="mr-2 flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
+          <NavLink href="https://kanboard.remote-tech.us" label="Kanboard Project Management" mobile />
+          <NavLink href="https://gitea.remote-tech.us" label="Gitea Code Management" mobile />
+          <NavLink href="https://dashy.remote-tech.us" label="Dashy Dashboard" mobile />
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function NavLink({ href, label, mobile }) {
+  return (
+    <a
+      href={href}
+      className={`${
+        mobile ? 'block' : 'inline-block'
+      } text-white hover:text-blue-400 px-3 py-2 rounded-md text-base font-medium`}
+    >
+      {label}
+    </a>
+  );
+}
+
+export default NavBar;
+  ------------------------------------------------
+
+  FILE: src/index.css
+  ------------------------------------------------
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 5s ease-out;
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+/*
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+*/
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 1.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #ff7499;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+
+  ------------------------------------------------
+
+  FILE: src/main.jsx
+  ------------------------------------------------
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+  ------------------------------------------------
+
+  FILE: tailwind.config.js
+  ------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
+  },
+  plugins: [],
+};
+
+  ------------------------------------------------
+
+  FILE: vite.config.js
+  ------------------------------------------------
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  //base: '/remote-tech.us/',//
+})
+  ------------------------------------------------

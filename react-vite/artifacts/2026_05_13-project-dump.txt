@@ -1,0 +1,2947 @@
+.
+├── README.md
+├── dumpit.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── img
+│   │   ├── 0.jpg
+│   │   ├── globe.mp4
+│   │   └── globe.mp4-
+│   ├── remote-tech-us_v2.svg
+│   ├── vite.svg
+│   └── william-earnhardt.vcf
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── Card.jsx
+│   │   ├── Carousel.jsx
+│   │   ├── ContactCard.jsx
+│   │   ├── MobileNavLink.jsx
+│   │   ├── NavBar.jsx
+│   │   ├── NavDropdown.jsx
+│   │   └── footer.jsx
+│   ├── data
+│   │   ├── app__globals.jsx
+│   │   ├── business_careers.jsx
+│   │   ├── business_case_studies.jsx
+│   │   ├── business_clients.jsx
+│   │   ├── business_contacts.jsx
+│   │   ├── business_dev_docs.jsx
+│   │   ├── business_products.jsx
+│   │   ├── business_projects.jsx
+│   │   ├── business_services.jsx
+│   │   ├── business_tech.jsx
+│   │   ├── business_tools.jsx
+│   │   ├── featured_clients.jsx
+│   │   ├── featured_products.jsx
+│   │   ├── featured_services.jsx
+│   │   ├── products
+│   │   │   └── smart-ass.jsx
+│   │   ├── services
+│   │   │   ├── azure.jsx
+│   │   │   ├── casdm.jsx
+│   │   │   └── snow.jsx
+│   │   ├── snippets
+│   │   └── tech_stack.jsx
+│   ├── hooks
+│   │   ├── ScrollToTop.jsx
+│   │   ├── scrollToTop.jsxbak
+│   │   ├── scrollToTop.jsxbak2
+│   │   └── useAutoScroll.js
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   ├── about.jsx
+│   │   ├── careers.jsx
+│   │   ├── case-studies.jsx
+│   │   ├── clients.jsx
+│   │   ├── contacts.jsx
+│   │   ├── dev-docs.jsx
+│   │   ├── dynamic-services.jsx
+│   │   ├── privacy-policy.jsx
+│   │   ├── products.jsx
+│   │   ├── services.jsx
+│   │   ├── tech-stack.jsx
+│   │   └── terms-of-service.jsx
+│   └── qrcode-gen.jsx
+├── tailwind.config.js
+└── vite.config.js
+
+12 directories, 63 files
+  ================================================================================
+
+  FILE: eslint.config.js
+  ------------------------------------------------
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+  ------------------------------------------------
+
+  FILE: index.html
+  ------------------------------------------------
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/remote-tech-us_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REMOTE TECH US</title>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+  ------------------------------------------------
+
+  FILE: package.json
+  ------------------------------------------------
+{
+  "name": "react-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://remote-tech.us",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "framer-motion": "^12.9.2",
+    "html-react-parser": "^6.0.1",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-device-detect": "^2.2.3",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.14.2",
+    "react-syntax-highlighter": "^16.1.1",
+    "react-tooltip": "^5.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1"
+  }
+}
+  ------------------------------------------------
+
+  FILE: postcss.config.js
+  ------------------------------------------------
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+
+  ------------------------------------------------
+
+  FILE: src/App.css
+  ------------------------------------------------
+/* Uncomment to enable red border */
+/*
+* {
+  outline: 1px solid red !important;
+}
+*/
+#root {
+  /*max-width: 1280px;*/
+  margin: 0 auto;
+  /*padding: 2rem;*/
+  text-align: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+  /* Add these to push the footer down */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Takes full height of the browser */ 
+}
+
+/* Add a rule for your main content area */
+main {
+  flex: 1; /* This grows to fill all space between Header and Footer */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* Important for background scaling */
+  overflow-x: hidden; /* Direct fix for the white gap */
+  background-color: #111827; /* Fallback matches bg-gray-900 */
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+  ------------------------------------------------
+
+  FILE: src/App.jsx
+  ------------------------------------------------
+import { GLOBALS } from './data/app__globals.jsx';
+import { CONTACTS } from './data/business_contacts.jsx';
+import { BUSINESS_SERVICES } from './data/business_services.jsx';
+import { BUSINESS_PROJECTS } from './data/business_projects.jsx';
+import { BUSINESS_TOOLS } from './data/business_tools.jsx';
+import { BUSINESS_TECH  } from './data/business_tech.jsx';
+import Card from './components/Card.jsx';
+import './App.css';
+
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
+import { useAutoScroll } from './hooks/useAutoScroll.js';
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  // const scrollRef = useAutoScroll(1, 30);
+  // Horizontal Marquee
+  const scrollLeft = useAutoScroll({ 
+    direction: 'left', 
+    step: 1, 
+    intervalTime: 50, // higher number slows
+    pauseOnHover: true 
+  });
+  // const scrollPef = useAutoScroll(1, 30);
+  const scrollRight = useAutoScroll({ 
+    direction: 'right', 
+    step: 1, 
+    pauseOnHover: true 
+  });
+  // Vertical News Ticker
+  const tickerRef = useAutoScroll({ 
+    direction: 'top', 
+    intervalTime: 50 
+  });
+  return (
+    <div className="relative min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+    {/* Main Container */}
+    <div className="pt-24 px-6 max-w-7xl mx-auto">
+      <header className="mb-12 text-center lg:text-left">
+        {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+        <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+      </header>
+
+      {/* Section: Services Carousel */}
+      <section className="mb-16 w-full max-w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+        </h2>
+        {/* 1. 'overflow-x-auto' enables the scroll.
+            2. 'flex-nowrap' prevents items from wrapping/squeezing.
+            3. 'snap-x' enables the snap-to-item behavior.
+            4. replace snap-mandatory with snap-proximity
+        */}
+        <div ref={scrollLeft} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full">
+          {BUSINESS_SERVICES.map((service) => (
+            <Card key={service.name} item={service} />
+          ))}
+        </div>
+      </section>
+
+      {/* Section: Projects Carousel */}
+      <section className="mb-16 w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-purple-500 rounded-full" /> Projects 
+        </h2>
+        <div ref={scrollRight} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+          {BUSINESS_PROJECTS.map((project) => (
+            <Card key={project.name} item={project} />
+          ))}
+        </div>
+      </section>
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/*  CARDS GRID */}
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Internal Tools
+          </h2>
+          <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
+          <br />
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
+          {/* This worked but not for this layout*/}
+          {/* <div ref={tickerRef} className="flex flex-col overflow-y-auto gap-6 h-[400px] scrollbar-hide"> */}
+            {BUSINESS_TOOLS.map((tool) => (
+              <Card key={tool.name} item={tool} />
+            ))}
+          </div>
+        </div>
+      </div>
+      {/*<hr className="w-full border-gray-800 my-10" />*/}
+      <hr className="w-8 w-full max-w-6xl" />
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/*  CARDS GRID */}
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Supporting Technologies
+          </h2>
+          <p>These technologies are the underpinning of modern workflows and tool chains.</p>
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
+            {BUSINESS_TECH.map((tech) => (
+              <Card key={tech.name} item={tech} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+}
+
+export default App
+  ------------------------------------------------
+
+  FILE: src/components/Card.jsx
+  ------------------------------------------------
+// src/components/card.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const Card = ({ item ,  index }) => {
+  // Destructure attributes with sensible defaults if necessary
+  const { 
+    url, 
+    locked, 
+    target, 
+    rel, 
+    download, 
+    name, 
+    icon, 
+    desc, 
+    tag 
+  } = item;
+
+  return (
+    <motion.a
+      key={item.name}
+      //href={item.url}
+      href={item.locked ? "#" : item.url} // Disable link if item is locked
+
+      // Dynamic Settings
+      target={target} 
+      rel={target === "_blank" ? (rel || "noopener noreferrer") : rel}
+      download={download} // Useful if the link is a file/PDF
+
+      whileHover={{ scale: 1.02 }}
+      /* 'w-72' or 'w-80' gives the card a consistent width in the carousel.
+         'shrink-0' is vital to prevent the flexbox from squishing the card.
+      */
+      //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+      className={`relative w-72 shrink-0 bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition
+        ${item.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+      >
+      {/* Tag Badge (Coming Soon, New, etc) */}
+      {item.tag  && (
+        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+          {item.tag}
+        </span>
+      )}
+      {item.icon  && (
+      <div className="text-3xl text-blue-400">
+        {item.icon}
+      </div>
+      )}
+      {item.desc  && (
+      <div>
+        <h3 className="text-xl font-bold text-white">{item.name}</h3>
+        <p className="text-gray-400 text-sm">{item.desc}</p>
+      </div>
+      )}
+    </motion.a>
+  );
+};
+
+export default Card;
+
+  ------------------------------------------------
+
+  FILE: src/components/Carousel.jsx
+  ------------------------------------------------
+// src/components/Carousel.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const Carousel = ({ item ,  index }) => {
+  import { item.name } from {item.path};
+  return (
+      {/* Section: Services Carousel */}
+      <section className="mb-16 w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+        </h2>
+        {/* 1. 'overflow-x-auto' enables the scroll.
+            2. 'flex-nowrap' prevents items from wrapping/squeezing.
+            3. 'snap-x' enables the snap-to-item behavior.
+        */}
+        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+          {SERVICES.map((service) => (
+            <Card key={service.name} item={service} />
+          ))}
+        </div>
+      </section>
+  );
+};
+
+export default Carousel;
+
+  ------------------------------------------------
+
+  FILE: src/components/ContactCard.jsx
+  ------------------------------------------------
+// src/components/ContactCard.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const ContactCard = ({ contact , index }) => {
+
+  // Use email prefix as ID if contact.id doesn't exist
+  const contactId = contact.id || contact.email?.split('@')[0] || index;
+  
+  // Construct URL for HashRouter: domain.com/#/contacts/id
+  const dynamicQrValue = `${window.location.origin}${window.location.pathname}#/contacts/${contactId}`;
+
+  return (
+    <motion.div
+        key={contact.id || contact.email || index} // Added unique key
+        whileHover={{ y: -5 }}
+        className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
+      >
+      {/* Tag Badge (Coming Soon, New, etc) */}
+      {contact.tag  && (
+        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+          {contact.tag}
+        </span>
+      )}
+      {contact.logo && (
+        <img src={contact.logo} alt="Logo" className="w-20 mb-4" />
+      )}
+      <h2 className="text-3xl font-black mb-1">{contact.name}</h2>
+      {contact.title && (
+        <p className="text-blue-600 font-bold mb-6">{contact.title}</p>
+      )}
+      <div className="text-gray-600 space-y-2 mb-6 text-sm">
+        {contact.phone && (
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <FaPhone className="text-blue-500" />
+            {contact.phone_sms && (
+              <FaSms className="text-blue-500" />
+            )}
+            {contact.phone}
+          </p>
+        )}
+        {contact.address && (
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <FaMapMarkerAlt className="text-blue-500" /> {contact.address}
+          </p>
+        )}
+      </div>
+      <div className="flex gap-4 mb-8 text-2xl text-gray-700">
+        {contact.linkedin && (
+          <a href={contact.linkedin} className="hover:text-blue-600"><FaLinkedin /></a>
+        )}
+        {contact.github && (
+          <a href={contact.github} className="hover:text-gray-900"><FaGithub /></a>
+        )}
+        {contact.email && (
+          <a href={`mailto:${contact.email}`} className="hover:text-red-500"><FaEnvelope /></a>
+        )}
+        {contact.chat && (
+          <a href={contact.chat} className="hover:text-red-500"><FaRocketchat /></a>
+        )}
+        {contact.web && (
+          <a href={contact.web} className="hover:text-red-500"><TbWorldWww /></a>
+        )}
+      </div>
+      <div className="flex flex-col w-full gap-3">
+        {contact.calcom && (
+          <a
+            href={contact.calcom}
+            //className="w-full bg-black/40 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+            <FaRegCalendarAlt /> Schedule Meeting
+          </a>
+        )}
+        {/* New Download Contact Button */}
+        {contact.vcfPath  && (
+          <a
+            href={contact.vcfPath}
+            download
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+            <FaAddressCard /> Save Contact
+          </a>
+        )}
+        {/* QR Code Section */}
+        {contact.qrValue  && (
+          <div className="bg-gray-50 p-4 rounded-xl mb-6 border border-gray-100 shadow-inner">
+            <QRCodeSVG value={dynamicQrValue} size={80} marginSize={2} className="mx-auto" />
+            <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Scan to Share</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+export default ContactCard;
+
+  ------------------------------------------------
+
+  FILE: src/components/NavBar.jsx
+  ------------------------------------------------
+import { useState } from 'react';
+import { NavLink as RouterLink } from 'react-router-dom';
+import { GLOBALS } from '../data/app__globals.jsx';
+import NavDropdown from './NavDropdown.jsx';
+import MobileNavLink from './MobileNavLink.jsx';
+
+// 1. Scan for service files
+// Ensure this path correctly points from NavBar.jsx to your data folder
+const productFiles = import.meta.glob('../data/products/*.jsx', { eager: true });
+const serviceFiles = import.meta.glob('../data/services/*.jsx', { eager: true });
+
+function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // 1. Build the Submenu Array for Products
+  const productSubmenu = Object.entries(productFiles).map(([path, module]) => {
+    const id = path.split('/').pop().replace('.jsx', '');
+    return {
+      label: module.CONFIG?.label || id.toUpperCase(),
+      path: `/products/${id}`,
+      icon: module.DATA?.[0]?.icon // Grabs icon from first item in that file
+    };
+  });
+
+  // 2. Build the Submenu Array for Services
+  const serviceSubmenu = Object.entries(serviceFiles).map(([path, module]) => {
+    const id = path.split('/').pop().replace('.jsx', '');
+    return {
+      label: module.CONFIG?.label || id.toUpperCase(),
+      path: `/services/${id}`,
+      icon: module.DATA?.[0]?.icon // Grabs icon from first item in that file
+    };
+  });
+
+  return (
+    <nav className="bg-black/60 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-10">
+          <div className="flex items-center text-white font-bold text-2xl">
+            <img src={ GLOBALS.app_logo } width='25px'/>
+             &nbsp;{ GLOBALS.app_title }
+          </div>
+          {/*<div className="ml-10 flex items-baseline space-x-6">*/}
+          <div className="hidden md:flex ml-4 lg:ml-10 items-baseline space-x-4 lg:space-x-6">
+            <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Home </RouterLink>
+            {/*<RouterLink to="/products" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Products </RouterLink>*/}
+            {/*<RouterLink to="/services" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Services </RouterLink> */}
+            {/* Submenu Example */}
+            <NavDropdown 
+              label="NavDropdown" 
+              items={[
+                { label: 'Software', path: '/products/software' },
+                { label: 'Hardware', path: '/products/hardware' },
+              ]} 
+            />
+            {/* Dynamic Products Dropdown */}
+            <NavDropdown 
+              label="Products" 
+              items={productSubmenu} 
+              basePath="/products" 
+            />
+            {/* DYNAMIC DROPDOWN */}
+            <NavDropdown 
+              label="Services" 
+              items={serviceSubmenu} 
+              basePath="/services" 
+            />
+            {/*
+            <RouterLink to="/contacts" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Team </RouterLink>
+            <RouterLink to="/clients" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Clients </RouterLink>
+            */}
+          </div>
+          {/*
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-6">
+              <NavLink href="https://pm.remote-tech.us" label="Open Project" />
+              <NavLink href="https://kanboard.remote-tech.us" label="Kanboard" />
+              <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
+              <NavLink href="https://dashy.remote-tech.us" label="Dashy" />
+              <NavLink to="/about" className={({  isActive }) => isActive ? 'active' : ''}>About</NavLink>
+            </div>
+          </div>
+          */}
+          <div className="mr-2 flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-black focus:outline-none">
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+      {isOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3"> 
+          <MobileNavLink item={{ label: 'Home', path: '/' }} onClose={() => setIsOpen(false)} />
+          
+          <MobileNavLink 
+            item={{ label: 'Services', path: '#', hasSubmenu: true }} 
+            subItems={serviceSubmenu} 
+            onClose={() => setIsOpen(false)} 
+          />
+
+          <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Home </RouterLink><br />
+          <RouterLink to="/products" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Products </RouterLink><br />
+          {/*
+          <RouterLink to="/services" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Services </RouterLink><br />
+          <RouterLink to="/contacts" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Our Team </RouterLink><br />
+          <RouterLink to="/clients" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"} > Clients </RouterLink><br />
+          <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
+          <NavLink href="https://kanboard.remote-tech.us" label="Kanboard Project Management" mobile />
+          <NavLink href="https://gitea.remote-tech.us" label="Gitea Code Management" mobile />
+          <NavLink href="https://dashy.remote-tech.us" label="Dashy Dashboard" mobile />
+          */}
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function NavLink({ href, label, mobile }) {
+  return (
+    <a
+      href={href}
+      className={`${
+        mobile ? 'block' : 'inline-block'
+      } text-white hover:text-blue-400 px-3 py-2 rounded-md text-base font-medium`}
+    >
+      {label}
+    </a>
+  );
+}
+
+export default NavBar;
+  ------------------------------------------------
+
+  FILE: src/components/NavDropdown.jsx
+  ------------------------------------------------
+// src/components/NavDropdown.jsx
+import { useState } from 'react'; // MUST HAVE THIS
+import { NavLink as RouterLink, useLocation } from 'react-router-dom';
+
+export default function NavDropdown({ label, items, basePath }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const location = useLocation();
+
+  // Dynamically checks if the current URL path matches the specified section
+  const isDropdownActive = 
+    items.some(item => location.pathname === item.path) || 
+    (basePath && location.pathname.startsWith(basePath));
+
+  return (
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/*<button className={`!bg-transparent !p-0 !border-0 flex items-center gap-1 py-2 text-white hover:text-blue-300 transition-colors`}>*/}
+      {/*<button className="bg-transparent p-0 border-0 flex items-center gap-1 text-base font-normal text-white hover:text-blue-300 transition-colors cursor-pointer focus:outline-none">*/}
+      <button 
+        type="button"
+        style={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', padding: 0 }}
+        // 4. Conditionally apply active classes based on state variable
+        className={`flex items-center gap-1 text-base transition-colors cursor-pointer focus:outline-none ${
+          isDropdownActive 
+            ? `${GLOBALS.theme.textActive} font-bold`
+            : `text-white ${GLOBALS.theme.textHover}` 
+        }`}
+      >
+        {label}
+        <span className={`text-[10px] transition-transform duration-200 ${isHovered ? 'rotate-180' : ''}`}>
+          ▼
+        </span>
+      </button>
+      
+      {/* Dropdown Menu */}
+      {isHovered && (
+        <div className="absolute left-0 mt-0 w-56 bg-black/90 backdrop-blur-xl border border-white/10 rounded-md shadow-2xl py-2 z-[60]">
+          {items.map((item) => (
+            <RouterLink
+              key={item.path}
+              to={item.path}
+              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-blue-600/20 hover:text-blue-300 transition-all"
+            >
+              {item.icon && <span className="text-lg">{item.icon}</span>}
+              {item.label}
+            </RouterLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/components/footer.jsx
+  ------------------------------------------------
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+
+const Footer = () => {
+  return (
+    <footer className="bg-gray-900 text-gray-300 py-12 px-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        {/* Brand Section */}
+        <div className="space-y-4 lg:col-span-2 text-left"> {/* text-left to align <p> below */}
+          <div className="flex items-center text-white font-bold text-2xl justify-start">
+            <img src={ GLOBALS.app_logo } width='25px'/> &nbsp;{ GLOBALS.app_title }
+          </div>
+          <p className="text-sm max-w-xs"> {/* max-w-xs keeps the text from stretching too far right */}
+            A React, Vite, and Tailwind CSS design.
+          </p>
+          {GLOBALS.app_linkedin && (
+            <a href={GLOBALS.app_linkedin} target="_blank" className="hover:text-blue-600 flex items-center gap-2 group" >
+              {/* Set size here (e.g., size={24} or size="1.5em") */}
+              <FaLinkedin size={24} className="shrink-0" />
+              <span className="text-xs opacity-80 group-hover:opacity-100 truncate">
+                {GLOBALS.app_linkedin}
+              </span>
+           </a>
+          )}
+          {GLOBALS.app_support && (
+            <a href={`mailto:${GLOBALS.app_support}`} className="hover:text-blue-600 flex items-center gap-2 group" >
+              {/* Set size here (e.g., size={24} or size="1.5em") */}
+              <FaEnvelope size={24} className="shrink-0" />
+              <span className="text-xs opacity-80 group-hover:opacity-100 truncate">
+                {GLOBALS.app_support}
+              </span>
+           </a>
+          )}
+        </div>
+        {/*
+        <div className="space-y-4">
+          <h2 className="text-white text-2xl font-bold">
+            <img src={ GLOBALS.app_logo } width='25px'/> { GLOBALS.app_title }
+          </h2>
+          <p className="text-sm">
+            A React, Vite, and Tailwind CSS web design.
+          </p>
+        </div>
+        */}
+        {/* Links Group 1 - Reimagined Resources */}
+        <div>
+          <h3 className="text-white font-semibold mb-4">Technical Resources</h3>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <a href="#/dev-docs" className="hover:text-white transition flex items-center gap-2">
+                <FaCode className="text-blue-400" /> Dev Documentation
+              </a>
+            </li>
+            <li>
+              <a href="#/tech-stack" className="hover:text-white transition flex items-center gap-2">
+                <FaHdd className="text-purple-400" /> Our Tech Stack
+              </a>
+            </li>
+            <li>
+              <a href="#/case-studies" className="hover:text-white transition flex items-center gap-2">
+                <FaProjectDiagram className="text-yellow-400" /> Case Studies
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Links Group 2 */}
+        <div>
+          <h3 className="text-white font-semibold mb-4">Company</h3>
+          <ul className="space-y-2 text-sm">
+            <li><a href="#/about" className="hover:text-white transition">About us</a></li>
+            <li><a href="#/careers" className="hover:text-white transition">Careers</a></li>
+            <li><a href="#/contacts" className="hover:text-white transition">Contact us</a></li>
+          </ul>
+        </div>
+
+        {/* Newsletter Section */}
+        <div>
+          {/* TODO: Need to install Linkmonk on unraid with reverse proxy */}
+          <h3 className="text-white font-semibold mb-4">The Future Is Here...</h3>
+          {/* 
+          <form className="flex flex-col space-y-2">
+            <input name="email" id="newsletter-email" 
+              type="email" 
+              placeholder="Email address" 
+              className="bg-gray-800 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">
+              Subscribe
+            </button>
+          </form>
+        */}
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm">
+        <p>© {new Date().getFullYear()} {GLOBALS.app_company} All rights reserved.</p>
+        <div className="flex space-x-6 mt-4 md:mt-0">
+          <a href="#/privacy-policy" className="hover:text-white">Privacy Policy</a>
+          <a href="#/terms-of-service" className="hover:text-white">Terms of Service</a>
+        </div>
+      </div>
+      {/*
+      <hr />
+      */}
+    </footer>
+  );
+};
+
+export default Footer;
+
+  ------------------------------------------------
+
+  FILE: src/data/app__globals.jsx
+  ------------------------------------------------
+// src/data/app_globals.jsx
+export const GLOBALS = {
+  bg_img:"/img/0.jpg"
+  ,app_company: 'REMOTE TECH US, LLC'
+  ,app_title: 'REMOTE TECH US'
+  ,app_linkedin: 'https://www.linkedin.com/company/remote-tech-us'
+  ,app_support: 'support@remote-tech.us'
+  ,app_subtitle: 'Professional Open-Source Infrastructure & Services'
+  ,app_logo: '/remote-tech-us_v2.svg'
+  //, bg_override_color: "#0f172a" // Tailwind's slate-900
+  //, bg_override_color: "blue" // Tailwind's slate-900
+  ,theme: {
+    textActive: "text-blue-400"
+    ,textHover: "hover:text-blue-300"
+    ,bgActiveHover: "hover:bg-blue-600/20"
+    ,bgHighlight: "bg-blue-600/10"
+  }
+};
+  ------------------------------------------------
+
+  FILE: src/data/business_careers.jsx
+  ------------------------------------------------
+// src/data/business_careers.jsx
+import { FaCode, FaServer, FaTerminal } from 'react-icons/fa';
+
+export const OPEN_POSITIONS = [
+  {
+    id: 'dev-001',
+    title: 'Senior Spel/Htmpl Developer',
+    department: 'CA Services',
+    location: 'Remote / US',
+    type: 'Contract',
+    icon: <FaCode />,
+    tags: ['Urgent', 'High-Level'],
+    desc: 'Specialist for CA Service Desk Manager customization. Must be proficient in SPEL code and HTMPL/PDM_MACRO customization.',
+    requirements: [
+      '5+ years CA SDM experience',
+      'Experience with REST/SOAP Integrations',
+      'Self-healing server config knowledge'
+    ]
+  },
+  {
+    id: 'dev-002',
+    title: 'DevOps Architect',
+    department: 'Infrastructure',
+    location: 'Remote',
+    type: 'Full-time',
+    icon: <FaServer />,
+    tags: ['New'],
+    desc: 'Help us scale our self-hosted infrastructure using Kubernetes, Docker, and Ansible.',
+    requirements: [
+      'Expertise in Infrastructure as Code (Terraform/Ansible)',
+      'Experience with Git-based CI/CD',
+      'Knowledge of zero-trust security (Vault)'
+    ]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_case_studies.jsx
+  ------------------------------------------------
+// src/data/business_case_studies.jsx
+import { FaHospital, FaIndustry, FaGlobe } from 'react-icons/fa';
+
+export const CASE_STUDIES = [
+  {
+    id: "sdm-optimization",
+    client: "Global Logistics Corp",
+    sector: "Logistics",
+    icon: <FaGlobe />,
+    title: "CA SDM SPEL Logic Overhaul",
+    challenge: "Client was facing 30-second lag times on ticket saves due to inefficient legacy SPEL code and PDM_MACRO bloat.",
+    solution: "Refactored the logic engine to use asynchronous web services and optimized database triggers, moving heavy processing away from the UI thread.",
+    results: [
+      "90% reduction in save latency",
+      "Automated 15 manual workflow steps",
+      "Zero downtime during migration"
+    ],
+    tags: ["CA SDM", "SPEL", "Optimization"]
+  },
+  {
+    id: "self-hosted-stack",
+    client: "Healthcare Providers North",
+    sector: "Medical",
+    icon: <FaHospital />,
+    title: "Privacy-First Infrastructure Migration",
+    challenge: "Strict HIPAA requirements necessitated moving away from public SaaS tools for project management and internal chat.",
+    solution: "Deployed a hardened, self-hosted stack featuring Gitea for code, OpenProject for PM, and Rocket.Chat for communication.",
+    results: [
+      "Full Data Sovereignty achieved",
+      "60% reduction in annual licensing costs",
+      "End-to-end encryption for all internal comms"
+    ],
+    tags: ["Self-Hosted", "Security", "Infrastructure"]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_clients.jsx
+  ------------------------------------------------
+// src/data/business_clients.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const BUSINESS_CLIENTS = [
+  { 
+    name: 'A&I Solutions',
+    url: 'https://www.anisolutions.com',
+    icon: <SiBroadcom />,
+    tag: '',
+    locked: false,
+    desc: 'No Longer providing CA Service Desk Manager Services'
+  },
+  { 
+    name: 'Belden', 
+    url: 'https://www.belden.com', 
+    icon: <FaCode />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager / Catalog!' 
+  },
+  { 
+    name: 'Sheetz', 
+    url: 'https://www.sheetz.com', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager / IT PAM' 
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_contacts.jsx
+  ------------------------------------------------
+// src/data/business_contacts.js
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+export const CONTACTS = [
+  {
+    tag: 'Founder',
+    locked: false,
+    logo: "/remote-tech-us_v2.svg",
+    name: "William Earnhardt",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    phone_sms: "yes",
+    email: "william@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: true
+  }
+  ,{
+    logo: "/remote-tech-us_v2.svg",
+    name: "Support",
+    email: "support@remote-tech.us",
+    chat: "https://chat.remote-tech.us/group/Support",
+    qrValue: false
+  }
+].map((contact, index) => ({
+  ...contact,
+  // Use email prefix if it exists, otherwise fall back to a slugified name or index
+  id: contact.email 
+    ? contact.email.split('@')[0] 
+    : (contact.name?.toLowerCase().replace(/\s+/g, '-') || `member-${index}`)
+}));
+  ------------------------------------------------
+
+  FILE: src/data/business_dev_docs.jsx
+  ------------------------------------------------
+// src/data/business_dev_docs.jsx
+export const DEV_DOCS_CATEGORIES = [
+  {
+    id: "getting-started",
+    title: "Getting Started",
+    pages: [
+    { 
+      id: "intro", 
+      title: "Introduction", 
+      content: "Welcome to the Remote Tech documentation. Our infrastructure is built on the principle of data sovereignty and open-source excellence." 
+    },
+    { 
+      id: "architecture", 
+      title: "Global Architecture", 
+      content: "We leverage Docker and Kubernetes to orchestrate self-healing environments. Our stack is designed to be cloud-agnostic and fully portable." }
+    ]
+  },
+  {
+    id: "legacy-systems",
+    title: "CA Service Desk",
+    pages: [
+    { 
+      id: "nxenv-best-practices", 
+      title: "NX.env Best Practice", 
+      content: "Always update NX_tpl to maintain persistents\ntest.", 
+      language: "javascript", // Use lower-case language identifiers
+      // Store as a component/function instead of a string
+      code: `
+const config = {
+  engine: "self-hosted",
+  uptime: "99.9%"
+};`
+    },
+    { 
+      id: "spel-best-practices", 
+      title: "SPEL Optimization", 
+      content: "When writing SPEL, avoid heavy synchronous logic in triggers. Use web service calls for external integrations to prevent UI blocking.",
+      language: "spel", // Use lower-case language identifiers
+    },
+    { 
+      id: "htmpl-macros", 
+      title: "HTMPL Customization", 
+      content: "Always use PDM_INCLUDE and PDM_MACRO to keep your web forms modular and maintainable across CA SDM upgrades.",
+      language: "htmpl", // Use lower-case language identifiers
+    }
+  ]
+    
+  },
+  {
+    id: "self-hosting",
+    title: "Self-Hosting Guides",
+    pages: [
+    { 
+      id: "gitea-setup", 
+      title: "Gitea Deployment", 
+      content: "Our Gitea deployment utilizes Postgres as the backend for reliability. Ensure your SSH keys are managed via the Gitea web interface.", 
+      language: "yml", // Use lower-case language identifiers
+    },
+    { 
+      id: "rocket-chat", 
+      title: "Rocket.Chat Config", 
+      content: "To enable high availability, we deploy Rocket.Chat using a ReplicaSet in MongoDB for seamless chat synchronization.",
+      language: "yaml", // Use lower-case language identifiers
+    }
+    ]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_products.jsx
+  ------------------------------------------------
+// src/data/business_products.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const BUSINESS_PRODUCTS = [
+  {
+    name: 'pdm_tools',
+    url: 'https://sass.remote-tech.us',
+    icon: '',
+    tag: '',
+    locked: false,
+    desc: 'Available via SMART-ASS'
+  },
+  {
+    name: 'docker-bash',
+    url: 'https://github.com',
+    icon: <FaGithub />,
+    tag: '',
+    locked: false,
+    desc: 'Available via SMART-ASS'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_projects.jsx
+  ------------------------------------------------
+// src/data/business_projects.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+{/* url options 
+   1. '/#/tech-stack', 
+   2. `${import.meta.env.BASE_URL}#/tech-stack`
+*/}
+export const BUSINESS_PROJECTS = [
+  { 
+    name: 'Infrastructure',
+    url: `${import.meta.env.BASE_URL}#/tech-stack`,
+    tag: "completed",
+    locked: false,
+    desc: "SCOPE OF WORK:Build out infrastruture to support newly formed business. (click to see our tech stack)"
+  },
+  { 
+    name: 'Sheetz',
+    url: '',
+    tag: "completed",
+    locked: true,
+    desc: "SCOPE OF WORK:Upgrade Service Desk Manager & IT PAM (Dev/Test& PRODUCTION  environments) from version r17.3 to version r17.4"
+  },
+  { 
+    name: 'Belden', 
+    url: '',
+    tag: "completed",
+    locked: true,
+    desc: "SCOPE OF WORK:Upgrade Service Desk Manager & Service Catalog (Dev/Test& PRODUCTION  environments) from version r17.3 to version r17.4"
+  },
+  { 
+    name: 'Company Website',
+    url: '',
+    tag: "completed",
+    locked: true,
+    desc: "SCOPE OF WORK:Built React - Vite - Tailwind CSS site to present company portal"
+  },
+  { 
+    name: 'Smart - Autonomous Subscription Services',
+    url: 'https://sass.remote-tech.us',
+    tag: "",
+    locked: false,
+    desc: "SCOPE OF WORK:Python/Flask/SQLAlchemy subscription services project"
+  },
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_services.jsx
+  ------------------------------------------------
+// src/data/business_services.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+export const BUSINESS_SERVICES = [
+  { 
+    name: 'CA Service Desk Manager',
+    desc: 'CA SDM Suite',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://www.broadcom.com/products/software/service-management/service-desk-manager',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA Automation Point ',
+    desc: 'CA AP Suite',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: '',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA IT Process Automation Manager',
+    desc: 'CA IT PAM Suite',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://www.broadcom.com/products/software/service-management/it-process-automation-manager',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA Service Catalog',
+    desc: 'CA Service Desk Manager - Catalog Component',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://www.broadcom.com/products/software/service-management/service-catalog',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA Embedded Entitlements Manager',
+    desc: 'CA EEM - Security Component',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://techdocs.broadcom.com/us/en/ca-enterprise-software/other/Embedded-Entitlements-Manager/12-7.html',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  }
+];
+
+  ------------------------------------------------
+
+  FILE: src/data/business_tech.jsx
+  ------------------------------------------------
+// src/data/business_tech.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiDocker, SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+export const BUSINESS_TECH = [
+  { 
+    name: 'Git',
+    url: 'https://github.com',
+    icon: <FaGithub />,
+    tag: "",
+    locked: false,
+    desc: 'Modern Distributed Version Control System!'
+  },
+  { 
+    name: 'Docker', 
+    url: 'https://docker.com', 
+    icon: <SiDocker />,
+    tag: "",
+    locked: false,
+    desc: 'Pupular container system!' 
+  },
+  { 
+    name: 'Kubernetes', 
+    url: 'https://kubernetes.com', 
+    icon: <SiKubernetes />,
+    tag: "",
+    locked: false,
+    desc: 'Container Orchestration' 
+  },
+  { 
+    name: 'RedHat Ansible', 
+    url: 'https://www.redhat.com/en/ansible-collaborative', 
+    icon: <SiAnsible />,
+    tag: "",
+    locked: false,
+    desc: 'Infrastructure As Code.'
+  },
+  { 
+    name: 'Hashicorp Terraform', 
+    url: 'https://developer.hashicorp.com/terraform', 
+    icon: <SiTerraform />,
+    tag: "",
+    locked: false,
+    desc: 'Infrastructure As Code'
+  },
+  { 
+    name: 'Hashicorp Vault', 
+    url: 'https://hashicorp.com/vault', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Zero Trust Secrets Vault'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_tools.jsx
+  ------------------------------------------------
+// src/data/business_tools.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+
+export const BUSINESS_TOOLS = [
+  { 
+    name: 'Chat',
+    url: 'https://chat.remote-tech.us',
+    icon: <FaRocketchat />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting Rocketchat allowing for complete privacy and data retention!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <SiGitea />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: "",
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <BsKanban />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Jupyter Lab', 
+    url: 'https://jlab.remote-tech.us/board/1', 
+    icon: <SiJupyter />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/featured_clients.jsx
+  ------------------------------------------------
+// src/data/featured_clients.jsx
+import { FaMicrosoft, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const FEATURED_CLIENTS = [
+  { 
+    name: 'Broadcom',
+    url: 'https://broadcom.com',
+    icon: <SiBroadcom />,
+    tag: 'Acquired CA Technologies',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Microsoft', 
+    url: 'https://microsoft.com', 
+    icon: <FaMicrosoft />,
+    tag: 'Sponser',
+    locked: false,
+    desc: 'OnMicrosoft Cloud Sponser' 
+  },
+  { 
+    name: 'Github', 
+    url: 'https://github.com', 
+    icon: <FaGithub />,
+    tag: 'Hosting',
+    locked: false,
+    desc: 'CI/CD Pipeline for Site'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/featured_products.jsx
+  ------------------------------------------------
+// src/data/featured_products.jsx
+import { FaMicrosoft, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const FEATURED_PRODUCTS = [
+  { 
+    name: 'Smart - Autonomous Subscription Services',
+    url: 'https://sass.remote-tech.us',
+    icon: '',
+    tag: '',
+    locked: false,
+    desc: 'Secure, scalable, and transparent subscription services for your enterprise software.'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/featured_services.jsx
+  ------------------------------------------------
+// src/data/featured_services.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+export const FEATURED_SERVICES = [
+  { 
+    name: 'Architecture',
+    url: '',
+    icon: <SiBroadcom />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Implementation', 
+    url: '', 
+    icon: <VscSymbolClass />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Configuration', 
+    url: '', 
+    icon: <VscSettingsGear />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Integrations', 
+    url: '', 
+    icon: <VscTypeHierarchy />,
+    tag: '',
+    locked: false,
+    desc: 'PeopleSoft, Workday, BigFix, Spectrum, AutomationPoint, IT PAM'
+  },
+  { 
+    name: 'Development', 
+    url: '', 
+    icon: <VscCode />, 
+    tag: '',
+    locked: true,
+    desc: 'HTMPL/PDM_MACRO, SPEL, PERL, ANSI C, REST/SOAP'
+  },
+  { 
+    name: 'Best Practices', 
+    url: '', 
+    icon: <VscWand />, 
+    tag: '',
+    locked: true,
+    desc: 'Self-Healing Server Configurations, CI/CD Pipeline, Release Management'
+  },
+  { 
+    name: 'Upgrades', 
+    url: '', 
+    icon: <VscThumbsup />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Support', 
+    url: '',
+    icon: <VscTelescope />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Training', 
+    url: '', 
+    icon: <VscCopilot />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/tech_stack.jsx
+  ------------------------------------------------
+// src/data/business_resources.jsx
+import { FaDatabase, FaProjectDiagram, FaRocketchat, FaGitAlt, FaTools, FaShieldAlt } from 'react-icons/fa';
+
+export const TECH_STACK = [
+  {
+    category: "DevOps & Hosting",
+    icon: <FaTools />,
+    items: [
+      { name: "Docker & Kubernetes", desc: "Container orchestration for self-healing apps." },
+      { name: "Gitea", desc: "Lightweight, self-hosted Git service for code sovereignty." }
+    ]
+  },
+  {
+    category: "Collaboration",
+    icon: <FaRocketchat />,
+    items: [
+      { name: "Rocket.Chat", desc: "Enterprise-grade chat without the Slack price tag." },
+      { name: "OpenProject", desc: "Full project management lifecycle control." }
+    ]
+  },
+  {
+    category: "Legacy Specialists",
+    icon: <FaDatabase />,
+    items: [
+      { name: "CA SDM (Service Desk)", desc: "Expert SPEL/HTMPL customization and logic." },
+      { name: "SQL Server / Postgres", desc: "High-availability database management." }
+    ]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/hooks/ScrollToTop.jsx
+  ------------------------------------------------
+// src/hooks/ScrollToTop.jsx
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+export default function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // Standard window scroll
+    window.scrollTo(0, 0);
+    
+    // Immediate fallback for document elements if window is trapped
+    if (document.documentElement) {
+      document.documentElement.scrollTo(0, 0);
+    }
+    if (document.body) {
+      document.body.scrollTo(0, 0);
+    }
+  }, [pathname]);
+
+  return null;
+}
+  ------------------------------------------------
+
+  FILE: src/hooks/useAutoScroll.js
+  ------------------------------------------------
+// src/hooks/useAutoScroll.jsx
+
+import { useEffect, useRef } from 'react';
+
+export function useAutoScroll(options = {}) {
+  const {
+    step = 1,            // Pixels per interval
+    intervalTime = 30,   // Milliseconds *higher number delays movement
+    direction = 'left',  // 'left', 'right', 'top', 'bottom'
+    pauseOnHover = true, // Sometimes you may want a marquee effect that never stops, even when user interacts with it
+    isEnabled = true,    // This allows you to pause the scrolling dynamically
+  } = options;           // Instead of a long list of arguments, options allows: useAutoScroll({ direction: 'top' }) without having to pass step or interval
+
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || !isEnabled) return;
+
+    const startScrolling = () => {
+      return setInterval(() => {
+        // Handle Horizontal vs Vertical
+        if (direction === 'left' || direction === 'right') {
+          // Safety: Only scroll if there is content to scroll
+          if (container.scrollWidth <= container.clientWidth) return;
+
+          const move = direction === 'left' ? step : -step;
+          container.scrollLeft += move;
+
+          // Infinite Loop Logic (Horizontal)
+          if (direction === 'left' && container.scrollLeft >= container.scrollWidth - container.clientWidth) {
+            container.scrollLeft = 0;
+          } else if (direction === 'right' && container.scrollLeft <= 0) {
+            container.scrollLeft = container.scrollWidth - container.clientWidth;
+          }
+        } else {
+          const move = direction === 'top' ? step : -step;
+          container.scrollTop += move;
+
+          // Infinite Loop Logic (Vertical)
+          if (direction === 'top' && container.scrollTop >= container.scrollHeight - container.clientHeight) {
+            container.scrollTop = 0;
+          } else if (direction === 'bottom' && container.scrollTop <= 0) {
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+          }
+        }
+      }, intervalTime);
+    };
+
+    let autoScroll = startScrolling();
+
+    const pause = () => { if (pauseOnHover) clearInterval(autoScroll); };
+    const resume = () => { if (pauseOnHover) autoScroll = startScrolling(); };
+
+    container.addEventListener('mouseenter', pause);
+    container.addEventListener('mouseleave', resume);
+
+    return () => {
+      clearInterval(autoScroll);
+      container.removeEventListener('mouseenter', pause);
+      container.removeEventListener('mouseleave', resume);
+    };
+  }, [step, intervalTime, direction, pauseOnHover, isEnabled]);
+
+  return scrollRef;
+}
+  ------------------------------------------------
+
+  FILE: src/index.css
+  ------------------------------------------------
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 5s ease-out;
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+/*
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+*/
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 1.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #ff7499;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+  ------------------------------------------------
+
+  FILE: src/main.jsx
+  ------------------------------------------------
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import NavBar from './components/NavBar.jsx';
+import Footer from './components/footer.jsx';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import ScrollToTop from './hooks/ScrollToTop.jsx';
+
+import './index.css'
+import App from './App.jsx'
+import AboutPage from './pages/about.jsx';
+import TechStackPage from './pages/tech-stack.jsx';
+import CareersPage from './pages/careers.jsx';
+import ContactsPage from './pages/contacts.jsx';
+import PrivacyPage from './pages/privacy-policy.jsx';
+import TermsPage from './pages/terms-of-service.jsx';
+import ClientsPage from './pages/clients.jsx';
+import ProductsPage from './pages/products.jsx';
+import ServicesPage from './pages/services.jsx';
+import CaseStudiesPage from './pages/case-studies.jsx';
+import DevDocsPage from './pages/dev-docs.jsx';
+import DynamicServicesPage from './pages/dynamic-services.jsx';
+
+{/* Notes 
+    Use HashRouter if:
+      You are deploying to GitHub Pages (which doesn't support easy SPA redirection).
+      You are running a small internal tool on Unraid or a simple file server and don't want to mess with Nginx/Apache configuration files.
+
+    Use BrowserRouter if:
+      You are building a professional, client-facing site where SEO matters.
+      You want clean, "pretty" URLs.
+      You have control over your server configuration (e.g., using Nginx with a try_files $uri /index.html; rule).
+*/}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <HashRouter>
+      <NavBar /> {/* NavBar is now inside the Router context! */}
+      <main>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/contacts" element={<ContactsPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPage />} />
+          <Route path="/terms-of-service" element={<TermsPage />} />
+          <Route path="/tech-stack" element={<TechStackPage />} />
+          {/* Dynamic route for specific contacts */}
+          <Route path="/contacts/:id" element={<ContactsPage />} />
+          <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/case-studies" element={<CaseStudiesPage />} />
+          <Route path="/dev-docs" element={<DevDocsPage />} />
+          <Route path="/services/:serviceId" element={<DynamicServicesPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </HashRouter>
+  </React.StrictMode>
+);
+  ------------------------------------------------
+
+  FILE: src/pages/about.jsx
+  ------------------------------------------------
+// src/pages/About.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaRocket, FaShieldAlt, FaCodeBranch, FaUsers } from 'react-icons/fa';
+
+export default function AboutPage() {
+  const features = [
+    {
+      icon: <FaShieldAlt className="text-blue-400" />,
+      title: "Privacy First",
+      desc: "We prioritize data sovereignty by self-hosting our entire infrastructure, ensuring your PII stays secure."
+    },
+    {
+      icon: <FaCodeBranch className="text-purple-400" />,
+      title: "Open Source Core",
+      desc: "Built on the power of community-driven software like Gitea, OpenProject, and RocketChat."
+    },
+    {
+      icon: <FaRocket className="text-yellow-400" />,
+      title: "Modern Architecture",
+      desc: "Leveraging Docker and Kubernetes to provide scalable, self-healing enterprise environments."
+    }
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-5xl mx-auto pb-20">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <img src={GLOBALS.app_logo} alt="Logo" className="w-24 mx-auto mb-6" />
+          <h1 className="text-4xl md:text-5xl font-black mb-4">{GLOBALS.app_title}</h1>
+          <p className="text-xl text-blue-400 font-medium max-w-2xl mx-auto">
+            Professional Open-Source Infrastructure & Services
+          </p>
+        </motion.div>
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          {features.map((f, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-center"
+            >
+              <div className="text-4xl mb-4 flex justify-center">{f.icon}</div>
+              <h3 className="text-xl font-bold mb-2 text-white">{f.title}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </section>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/5 border border-white/10 p-10 rounded-3xl"
+        >
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+            <FaUsers className="text-blue-500" /> Our Mission
+          </h2>
+          <div className="space-y-4 text-gray-300 leading-relaxed">
+            <p>
+              {GLOBALS.app_company} was founded on the principle that enterprise-grade 
+              infrastructure should be transparent, secure, and accessible. We specialize in 
+              the CA Service Desk Manager suite and modern DevOps orchestration.
+            </p>
+            <p>
+              By leveraging established open-source projects, we provide our clients 
+              with powerful tools for project management, code hosting, and real-time 
+              collaboration—without the high licensing costs or privacy concerns of 
+              proprietary SaaS platforms.
+            </p>
+          </div>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/careers.jsx
+  ------------------------------------------------
+// src/pages/careers.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { OPEN_POSITIONS } from '../data/business_careers.jsx';
+import { FaBriefcase, FaArrowRight } from 'react-icons/fa';
+
+export default function CareersPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-6xl mx-auto pb-20 w-full">
+        <header className="mb-16 text-center lg:text-left">
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaBriefcase className="text-blue-500" /> Join the Team
+          </h1>
+          <p className="text-gray-400 max-w-2xl">
+            Help us build the next generation of open-source enterprise infrastructure. 
+            We are looking for experts in legacy CA systems and modern cloud architecture.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 gap-6">
+          {OPEN_POSITIONS.map((job, index) => (
+            <motion.div 
+              key={job.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl group hover:border-blue-500/50 transition-all"
+            >
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div className="flex items-center gap-6">
+                  <div className="text-4xl text-blue-400 bg-blue-500/10 p-4 rounded-2xl">
+                    {job.icon}
+                  </div>
+                  <div>
+                    <div className="flex gap-2 mb-2">
+                      {job.tags.map(tag => (
+                        <span key={tag} className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold uppercase">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{job.title}</h3>
+                    <p className="text-gray-400 text-sm">{job.department} • {job.location} • {job.type}</p>
+                  </div>
+                </div>
+
+                <div className="w-full lg:w-auto">
+                  <a 
+                    href={`mailto:careers@remote-tech.us?subject=Application: ${job.title}`}
+                    className="flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all w-full"
+                  >
+                    Apply Now <FaArrowRight />
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-white/5">
+                <p className="text-gray-300 mb-4">{job.desc}</p>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {job.requirements.map((req, i) => (
+                    <li key={i} className="text-sm text-gray-500 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/case-studies.jsx
+  ------------------------------------------------
+// src/pages/case-studies.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { CASE_STUDIES } from '../data/business_case_studies.jsx';
+import { FaProjectDiagram, FaCheckCircle, FaLightbulb, FaExclamationCircle } from 'react-icons/fa';
+
+export default function CaseStudiesPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-6xl mx-auto pb-20 w-full">
+        <header className="mb-16 text-center lg:text-left">
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaProjectDiagram className="text-blue-500" /> Case Studies
+          </h1>
+          <p className="text-gray-400 max-w-2xl">
+            Real-world solutions for complex infrastructure and legacy system challenges. 
+            See how we help organizations reclaim their data and optimize their workflows.
+          </p>
+        </header>
+
+        <div className="space-y-12">
+          {CASE_STUDIES.map((study, idx) => (
+            <motion.div 
+              key={study.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden"
+            >
+              <div className="p-8 lg:p-12">
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                  <div className="p-3 bg-blue-500/20 text-blue-400 rounded-xl text-2xl">
+                    {study.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">{study.title}</h2>
+                    <p className="text-blue-400 text-sm font-medium uppercase tracking-wider">{study.client} • {study.sector}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <div className="space-y-6">
+                    <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                      <h3 className="flex items-center gap-2 text-red-400 font-bold mb-2">
+                        <FaExclamationCircle /> The Challenge
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed italic">"{study.challenge}"</p>
+                    </div>
+
+                    <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                      <h3 className="flex items-center gap-2 text-green-400 font-bold mb-2">
+                        <FaLightbulb /> The Solution
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">{study.solution}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-600/10 p-8 rounded-3xl border border-blue-500/20">
+                    <h3 className="flex items-center gap-2 text-white font-bold mb-6">
+                      <FaCheckCircle className="text-blue-400" /> Key Results
+                    </h3>
+                    <ul className="space-y-4">
+                      {study.results.map((result, i) => (
+                        <li key={i} className="flex items-start gap-3 text-gray-200">
+                          <span className="mt-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full shrink-0" />
+                          {result}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="mt-8 pt-8 border-t border-white/10 flex flex-wrap gap-2">
+                      {study.tags.map(tag => (
+                        <span key={tag} className="text-[10px] bg-white/10 text-gray-400 px-3 py-1 rounded-full font-bold uppercase tracking-widest">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/clients.jsx
+  ------------------------------------------------
+// src/pages/clients.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+{/* Begin Application Files */}
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_CLIENTS } from '../data/featured_clients.jsx';
+import { BUSINESS_CLIENTS } from '../data/business_clients.jsx';
+
+function ClientsPage() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollClient = useAutoScroll(1, 30);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
+
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Clients
+          </h2>
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_CLIENTS.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Clients
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_CLIENTS.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ClientsPage
+  ------------------------------------------------
+
+  FILE: src/pages/contacts.jsx
+  ------------------------------------------------
+// src/pages/contacts.jsx
+import { useEffect } from 'react'; // Add this for scrolling
+import { useParams } from 'react-router-dom'; // Fixes the ReferenceError
+import { QRCodeSVG } from 'qrcode.react';
+
+{/* Begin Application Files */}
+import { GLOBALS } from '../data/app__globals';
+import { CONTACTS } from '../data/business_contacts';
+import ContactCard from '../components/ContactCard.jsx';
+
+export default function ContactsPage() {
+
+  const { id } = useParams(); // Get the ID from the URL
+
+  useEffect(() => {
+    if (id) {
+      const element = document.getElementById(id);
+      if (element) {
+        // block: 'center' ensures it doesn't just "hit the top" 
+        // but settles nicely in view.
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [id]);  
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed"
+      style={{
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none'
+        // Using a gradient allows the override color to act as a "tint" over the image
+        //backgroundImage: GLOBALS.bg_img ? `linear-gradient(${GLOBALS.bg_override_color}, ${GLOBALS.bg_override_color}), url(${GLOBALS.bg_img})` : 'none'
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+    <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+        {CONTACTS.map((contact, index) => (
+          <div 
+            key={contact.email || index }
+            id={contact.id || contact.email?.split('@')[0]} 
+          >
+            <ContactCard contact={contact} index={index} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/dev-docs.jsx
+  ------------------------------------------------
+// src/pages/dev-docs.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { DEV_DOCS_CATEGORIES } from '../data/business_dev_docs.jsx';
+import { FaCheck, FaCopy, FaBook, FaChevronRight, FaTerminal } from 'react-icons/fa';
+import parse from 'html-react-parser';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; // Choose your theme
+
+export default function DocsPage() {
+  const [activePage, setActivePage] = useState(DEV_DOCS_CATEGORIES[0].pages[0]);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    // If code is a string, use it. If it's a JSX function, 
+    // you might want to add a 'copyText' string field to your data object.
+    const textToCopy = typeof activePage.code === 'string' 
+      ? activePage.code 
+      : activePage.copyText || ""; 
+
+    if (textToCopy) {
+      navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-fixed bg-cover"
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <div className="flex w-full pt-24">
+        {/* Sidebar */}
+        <aside className="hidden lg:block w-72 h-[calc(100vh-6rem)] overflow-y-auto border-r border-white/10 p-6 sticky top-24">
+          <div className="flex items-center gap-2 mb-8 text-blue-400 font-bold">
+            <FaBook /> <span>Documentation</span>
+          </div>
+          {DEV_DOCS_CATEGORIES.map((cat) => (
+            <div key={cat.id} className="mb-6">
+              <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">{cat.title}</h3>
+              <ul className="space-y-1">
+                {cat.pages.map((page) => (
+                  <li key={page.id}>
+                    <button
+                      onClick={() => setActivePage(page)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                        activePage.id === page.id 
+                        ? '!bg-blue-600 text-white font-bold' 
+                        : 'text-gray-400 hover:text-blue-600 hover:bg-white/5'
+                      }`}
+                    >
+                      {page.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </aside>
+
+        {/* Content Area */}
+        <main className="flex-1 px-6 lg:px-16 pb-20">
+          <motion.div
+            key={activePage.id}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="max-w-3xl"
+          >
+            <div className="flex items-center gap-2 text-blue-500 mb-4 text-sm font-bold">
+              Docs <FaChevronRight className="text-[10px]" /> {activePage.title}
+            </div>
+            <h1 className="text-4xl font-black mb-8 text-white">{activePage.title}</h1>
+            
+            <div className="prose prose-invert max-w-none">
+              <p className="text-lg text-gray-300 leading-relaxed mb-8">
+                {activePage.content}
+              </p>
+              
+              {/* Decorative Code Block Placeholder */}
+              <div className="bg-black/60 rounded-2xl border border-white/10 overflow-hidden mb-8">
+                <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    </div>
+                  </div>
+                  <FaTerminal className="text-gray-600 text-xs" />
+                </div>
+                  {/* Dynamic Language Label */}
+                  <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-2">
+                    {activePage.language || 'text'}
+                  </span>
+                {/* Syntax Highlighter renders the code exactly as typed in data file */}
+                <SyntaxHighlighter 
+                  language={activePage.language || 'javascript'} 
+                  style={atomDark}
+                  customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
+                >
+                  {activePage.code}
+                </SyntaxHighlighter>
+                <div className="p-6 font-mono text-sm text-blue-300">
+                  {/* Add the () to execute the function */}
+                  {/* {typeof activePage.code === 'function' ? activePage.code() : activePage.code}  */}
+                  {/* 1. If it's a function (the JSX approach), call it */}
+                  {/* {typeof activePage.code === 'function' && activePage.code()} */}
+
+                  {/* 2. If it's a string, render it inside a div that preserves whitespace */}
+                  {/*
+                  {typeof activePage.code === 'string' && (
+                    <div style={{ whiteSpace: "pre-wrap" }}>{activePage.code}</div>
+                  )}
+                  */}
+                </div>
+              </div>
+              {activePage.code && (
+                  <button onClick={handleCopy} className="text-gray-400 hover:text-white transition-all">
+                    {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
+                  </button>
+              )}
+            </div>
+          </motion.div>
+        </main>
+      </div>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/dynamic-services.jsx
+  ------------------------------------------------
+import { useParams } from 'react-router-dom';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+
+// Load all service data files
+const serviceDataFiles = import.meta.glob('../data/services/*.jsx', { eager: true });
+
+export default function DynamicServicesPage() {
+  const { serviceId } = useParams();
+  const filePath = `../data/services/${serviceId}.jsx`;
+  const module = serviceDataFiles[filePath];
+
+  if (!module) return <div className="pt-24 text-white">Service not found.</div>;
+
+  const { CONFIG, DATA } = module;
+
+  return (
+    <div className="min-h-screen bg-cover bg-fixed"
+      style={{
+        backgroundImage: `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})`
+      }}
+    >
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12">
+          <h1 className="text-4xl font-bold text-white">{CONFIG.title}</h1>
+          <p className="text-gray-400">{CONFIG.subtitle}</p>
+        </header>
+
+        <section>
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+            <span className={`w-8 h-1 ${CONFIG.accentColor || 'bg-blue-500'} rounded-full`} />
+            {CONFIG.section_title}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {DATA.map((item) => (
+              <Card key={item.name} item={item} />
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/pages/privacy-policy.jsx
+  ------------------------------------------------
+// src/pages/privacy-policy.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaShieldAlt, FaLock, FaUserShield, FaEnvelope } from 'react-icons/fa';
+
+export default function PrivacyPage() {
+  const sections = [
+    {
+      icon: <FaLock className="text-blue-400" />,
+      title: "Data Collection",
+      content: `We collect minimal personal information necessary to provide our services. This includes contact details provided via our contact forms and technical logs required for secure infrastructure management.`
+    },
+    {
+      icon: <FaShieldAlt className="text-green-400" />,
+      title: "Self-Hosted Security",
+      content: `Unlike traditional SaaS providers, we prioritize data sovereignty. Your information is stored on our private, self-hosted servers, reducing exposure to third-party data mining.`
+    },
+    {
+      icon: <FaUserShield className="text-purple-400" />,
+      title: "Your Rights",
+      content: `You have the right to access, correct, or delete your personal data. At ${GLOBALS.app_company}, we believe you should have full control over your digital footprint.`
+    }
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-4xl mx-auto pb-20 w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 text-center lg:text-left"
+        >
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaShieldAlt className="text-blue-500" /> Privacy Policy
+          </h1>
+          <p className="text-gray-400">
+            Last Updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
+        </motion.div>
+
+        <section className="grid grid-cols-1 gap-6 mb-12">
+          {sections.map((section, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-2xl p-3 bg-white/5 rounded-xl">
+                  {section.icon}
+                </div>
+                <h2 className="text-xl font-bold text-white">{section.title}</h2>
+              </div>
+              <p className="text-gray-300 leading-relaxed">
+                {section.content}
+              </p>
+            </motion.div>
+          ))}
+        </section>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="bg-blue-600/10 border border-blue-500/20 p-8 rounded-3xl"
+        >
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <FaEnvelope className="text-blue-400" /> Contact Us
+          </h2>
+          <p className="text-gray-300 mb-4">
+            If you have any questions regarding this Privacy Policy or how your data is handled by 
+            <strong> {GLOBALS.app_company}</strong>, please reach out to our privacy team.
+          </p>
+          <a 
+            href={`mailto:${GLOBALS.app_email || 'privacy@remote-tech.us'}`}
+            className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-colors"
+          >
+            Contact Privacy Officer
+          </a>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/products.jsx
+  ------------------------------------------------
+// src/pages/products.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_PRODUCTS } from '../data/featured_products.jsx';
+import { BUSINESS_PRODUCTS } from '../data/business_products.jsx';
+
+function ProductsPage() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollClient = useAutoScroll(1, 30);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
+
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Products
+          </h2>
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_PRODUCTS.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Products
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_PRODUCTS.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ProductsPage
+  ------------------------------------------------
+
+  FILE: src/pages/services.jsx
+  ------------------------------------------------
+// src/pages/services.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+
+{/* Begin Application Files */}
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_SERVICES } from '../data/featured_services.jsx';
+import { BUSINESS_SERVICES } from '../data/business_services.jsx';
+
+function ServicesPage() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollClient = useAutoScroll(1, 30);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
+
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+          </h2>
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_SERVICES.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Services
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_SERVICES.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ServicesPage
+  ------------------------------------------------
+
+  FILE: src/pages/tech-stack.jsx
+  ------------------------------------------------
+// src/pages/tech-stack.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { TECH_STACK } from '../data/tech_stack.jsx';
+import { FaLayerGroup } from 'react-icons/fa';
+
+export default function StackPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-6xl mx-auto pb-20 w-full">
+        <header className="mb-16 text-center lg:text-left">
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaLayerGroup className="text-blue-500" /> Our Tech Stack
+          </h1>
+          <p className="text-gray-400 max-w-2xl">
+            We don't rely on third-party SaaS for our core operations. We build, host, and 
+            maintain our own infrastructure using these industry-leading tools.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {TECH_STACK.map((group, idx) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+            >
+              <div className="text-3xl text-blue-400 mb-6 bg-white/5 w-fit p-3 rounded-2xl">
+                {group.icon}
+              </div>
+              <h2 className="text-xl font-bold mb-6 text-white">{group.category}</h2>
+              <div className="space-y-6">
+                {group.items.map((item, i) => (
+                  <div key={i} className="border-l-2 border-blue-500/30 pl-4 group">
+                    <h3 className="font-bold text-gray-200 group-hover:text-blue-400 transition-colors">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/terms-of-service.jsx
+  ------------------------------------------------
+// src/pages/terms-of-service.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaGavel, FaHandshake, FaExclamationTriangle, FaCopyright } from 'react-icons/fa';
+
+export default function TermsPage() {
+  const sections = [
+    {
+      icon: <FaHandshake className="text-blue-400" />,
+      title: "1. Acceptance of Terms",
+      content: `By accessing or using the services provided by ${GLOBALS.app_company}, you agree to be bound by these Terms of Service. If you do not agree to these terms, please refrain from using our infrastructure and consulting services.`
+    },
+    {
+      icon: <FaGavel className="text-purple-400" />,
+      title: "2. Service Provision",
+      content: "We provide specialized infrastructure, open-source management, and CA Service Desk Manager consulting. While we strive for 99.9% uptime on our self-hosted platforms, services are provided 'as-is' unless otherwise specified in a separate Service Level Agreement (SLA)."
+    },
+    {
+      icon: <FaCopyright className="text-yellow-400" />,
+      title: "3. Intellectual Property",
+      content: `All custom code, configurations, and documentation provided by ${GLOBALS.app_company} remain our intellectual property until full payment is received. Open-source components used within our stack are governed by their respective licenses (GPL, MIT, etc.).`
+    },
+    {
+      icon: <FaExclamationTriangle className="text-red-400" />,
+      title: "4. Limitation of Liability",
+      content: `${GLOBALS.app_company} shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our services, including but not limited to data loss or system downtime.`
+    }
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-4xl mx-auto pb-20 w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 text-center lg:text-left"
+        >
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaGavel className="text-blue-500" /> Terms of Service
+          </h1>
+          <p className="text-gray-400">
+            Effective Date: January 1, {new Date().getFullYear()}
+          </p>
+        </motion.div>
+
+        <section className="space-y-6">
+          {sections.map((section, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-2xl p-3 bg-white/5 rounded-xl">
+                  {section.icon}
+                </div>
+                <h2 className="text-xl font-bold text-white">{section.title}</h2>
+              </div>
+              <p className="text-gray-300 leading-relaxed italic border-l-2 border-blue-500/30 pl-4">
+                {section.content}
+              </p>
+            </motion.div>
+          ))}
+        </section>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12 p-8 bg-white/5 border border-white/10 rounded-3xl text-center"
+        >
+          <p className="text-gray-400 text-sm">
+            Questions about our Terms? Contact our legal team at{' '}
+            <a href={`mailto:${GLOBALS.app_support}`} className="text-blue-400 hover:underline">
+              {GLOBALS.app_support}
+            </a>
+          </p>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: tailwind.config.js
+  ------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
+  },
+  plugins: [],
+};
+
+  ------------------------------------------------
+
+  FILE: vite.config.js
+  ------------------------------------------------
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  //base: '/remote-tech.us/',//
+})
+  ------------------------------------------------

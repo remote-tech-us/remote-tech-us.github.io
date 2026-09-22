@@ -1,0 +1,4220 @@
+.
+├── README.md
+├── convert-svg-2-icon.js
+├── dif
+├── dumpit.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── img
+│   │   ├── 0.jpg
+│   │   ├── globe.mp4
+│   │   └── globe.mp4-
+│   ├── remedy-ars-rrr.svg
+│   ├── remote-tech-us_v2.svg
+│   ├── servicenow_icon.svg
+│   ├── vite.svg
+│   └── william-earnhardt.vcf
+├── select-files.js
+├── select-svg.js
+├── select-svgs.js
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   ├── react.svg
+│   │   ├── remedy-ars-rrr.jsx
+│   │   ├── remote-tech-icon.jsx
+│   │   └── service-now-icon.jsx
+│   ├── components
+│   │   ├── Card.jsx
+│   │   ├── Carousel.jsx
+│   │   ├── ContactCard.jsx
+│   │   ├── MobileNavLink.jsx
+│   │   ├── NavBar.jsx
+│   │   ├── NavDropdown.jsx
+│   │   ├── SectionRenderer.jsx
+│   │   ├── dynamic-page-template.jsx
+│   │   ├── footer.jsx
+│   │   └── remote-tech-icon.jsx
+│   ├── data
+│   │   ├── app__globals.jsx
+│   │   ├── business_careers.jsx
+│   │   ├── business_case_studies.jsx
+│   │   ├── business_clients.jsx
+│   │   ├── business_contacts.jsx
+│   │   ├── business_dev_docs.jsx
+│   │   ├── business_products.jsx
+│   │   ├── business_projects.jsx
+│   │   ├── business_services.jsx
+│   │   ├── business_tech.jsx
+│   │   ├── business_tools.jsx
+│   │   ├── featured_clients.jsx
+│   │   ├── featured_products.jsx
+│   │   ├── featured_services.jsx
+│   │   ├── products
+│   │   │   └── 0001-smart-ass.jsx
+│   │   ├── services
+│   │   │   ├── 0001-casdm.jsx
+│   │   │   ├── 0002-snow.jsx
+│   │   │   ├── 0003-azure.jsx
+│   │   │   └── 0004-remedy-ars.jsx
+│   │   ├── snippets
+│   │   └── tech_stack.jsx
+│   ├── hooks
+│   │   ├── ScrollToTop.jsx
+│   │   ├── scrollToTop.jsxbak
+│   │   ├── scrollToTop.jsxbak2
+│   │   └── useAutoScroll.js
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   ├── about.jsx
+│   │   ├── careers.jsx
+│   │   ├── case-studies.jsx
+│   │   ├── clients.jsx
+│   │   ├── contact-us.jsx
+│   │   ├── dev-docs.jsx
+│   │   ├── dynamic-products.jsx
+│   │   ├── dynamic-services.jsx
+│   │   ├── privacy-policy.jsx
+│   │   ├── products.jsx
+│   │   ├── services.jsx
+│   │   ├── tech-stack.jsx
+│   │   └── terms-of-service.jsx
+│   └── qrcode-gen.jsx
+├── tailwind.config.js
+└── vite.config.js
+
+12 directories, 78 files
+  ================================================================================
+
+  FILE: convert-svg-2-icon.js
+  ------------------------------------------------
+// convert-svg-2-icon.js
+import fs from 'fs';
+import path from 'path';
+import { promptFileSelection } from './select-files.js';
+
+const INPUT_SRC_PATH = './public';
+const OUTPUT_JSX_PATH = './src/assets';
+
+/**
+ * Converts a kebab-case/snake_case filename into a clean PascalCase component name
+ */
+function toPascalCase(str) {
+    return str
+        .replace(/[-_]+/g, ' ')
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+(.)(\w*)/g, ($1, $2, $3) => $2.toUpperCase() + $3.toLowerCase())
+        .replace(/^[a-z]/, $1 => $1.toUpperCase());
+}
+
+async function main() {
+    try {
+        const defaultPath = './public';
+        const targetExtension = 'svg';
+
+        const selectedFiles = await promptFileSelection(defaultPath, targetExtension);
+
+        console.log(`\nReady to convert ${selectedFiles.length} file(s):`);
+        selectedFiles.forEach(filePath => {
+            console.log(`<- Processing: ${filePath}`);
+            convertSvgToReact(filePath);
+        });
+
+    } catch (error) {
+        console.error('\nExecution stopped:', error.message);
+    }
+}
+
+function convertSvgToReact(svgFile) {
+  try {
+    if (!fs.existsSync(svgFile)) {
+      console.error(`❌ Input SVG file not found at: ${svgFile}`);
+      return;
+    }
+
+    let svgRaw = fs.readFileSync(svgFile, 'utf8');
+
+    // Attempt to grab Inkscape layer configuration first
+    const layerRegex = /<g[^>]*inkscape:groupmode="layer"[^>]*>([\s\S]*?)<\/g>/;
+    const match = svgRaw.match(layerRegex);
+
+    let innerContent = '';
+    let isSimpleSvg = false;
+    let originalViewBox = '';
+
+    // Extract core width and height definitions to maintain design ratios
+    const widthMatch = svgRaw.match(/<svg[^>]*\bwidth=["']([^"']+)["']/);
+    const heightMatch = svgRaw.match(/<svg[^>]*\bheight=["']([^"']+)["']/);
+    const viewBoxMatch = svgRaw.match(/<svg[^>]*\bviewBox=["']([^"']+)["']/);
+
+    const origWidth = widthMatch ? widthMatch[1] : "24";
+    const origHeight = heightMatch ? heightMatch[1] : "24";
+    
+    // Calculate fallback viewBox dynamically if not defined explicitly
+    originalViewBox = viewBoxMatch ? viewBoxMatch[1] : `0 0 ${origWidth} ${origHeight}`;
+
+    if (match) {
+      innerContent = match[1].trim();
+    } else {
+      // Fallback: Strip the outer wrapper tag and capture all inner tags
+      isSimpleSvg = true;
+      const rootSvgRegex = /<svg[^>]*>([\s\S]*?)<\/svg>/i;
+      const simpleMatch = svgRaw.match(rootSvgRegex);
+      
+      if (!simpleMatch) {
+         console.error(`❌ Invalid or unparseable markup found inside: ${path.basename(svgFile)}`);
+         return;
+      }
+      innerContent = simpleMatch[1].trim();
+    }
+
+    // Convert standard kebab-case presentation attributes to camelCase React properties
+    innerContent = innerContent
+      .replace(/fill-rule=/g, 'fillRule=')
+      .replace(/stroke-width=/g, 'strokeWidth=')
+      .replace(/stroke-linecap=/g, 'strokeLinecap=')
+      .replace(/stroke-linejoin=/g, 'strokeLinejoin=')
+      .replace(/stroke-dasharray=/g, 'strokeDasharray=')
+      .replace(/fill-opacity=/g, 'fillOpacity=')
+      .replace(/stroke-opacity=/g, 'strokeOpacity=')
+      .replace(/clip-rule=/g, 'clipRule=');
+
+    // Parse inline style declarations safely into standard React style objects
+    const styleRegex = /style="([^"]*)"/g;
+    innerContent = innerContent.replace(styleRegex, (m, styleString) => {
+      const pairs = styleString.split(';').filter(Boolean);
+      const objectProperties = pairs.map(pair => {
+        let [key, val] = pair.split(':');
+        if (!key || !val) return '';
+        key = key.trim();
+        val = val.trim().replace(/['"]/g, '');
+        const camelKey = key.replace(/-([a-z])/g, (m, letter) => letter.toUpperCase());
+        if (val.startsWith('url(#')) return `${camelKey}: 'currentColor'`;
+        return `${camelKey}: '${val}'`;
+      }).filter(Boolean);
+      return `style={{ ${objectProperties.join(', ')} }}`;
+    });
+
+    // Cleanup foreign editor metadata strings
+    innerContent = innerContent
+      .replace(/inkscape:[a-z]+="[^"]*"/g, '')
+      .replace(/sodipodi:[a-z]+="[^"]*"/g, '');
+
+    // Format final line indentation
+    const formattedContent = innerContent.split('\n').map(line => '    ' + line.trim()).join('\n');
+
+    const baseName = path.basename(svgFile, '.svg');
+    const componentName = toPascalCase(baseName);
+    
+    // Inject components natively dependent on whether matrix layer conversions are required
+    let jsxBody = "";
+    if (isSimpleSvg) {
+        jsxBody = `  return (\n    <svg\n      viewBox="${originalViewBox}"\n      width={width}\n      height={height}\n      className={\`inline-block align-middle \${className}\`}\n    >\n${formattedContent}\n    </svg>\n  );`;
+    } else {
+        jsxBody = `  return (\n    <svg\n      viewBox="-2 -2 46 46"\n      width={width}\n      height={height}\n      className={\`inline-block align-middle \${className}\`}\n    >\n      {/* Retain Inkscape's exact original structural placement matrix transform */}\n      <g transform="translate(-65.4537, -102.595)">\n    ${formattedContent}\n      </g>\n    </svg>\n  );`;
+    }
+
+    const componentTemplate =
+`// Generated automatically from geometry vectors
+import React from 'react';
+
+export default function ${componentName}({ width = "1.5em", height = "1.5em", className = "" }) {
+${jsxBody}
+}
+`;
+
+    const outFileName = `${componentName}.jsx`;
+    const finalOutputPath = path.join(OUTPUT_JSX_PATH, outFileName);
+
+    // Create target directory if missing
+    if (!fs.existsSync(OUTPUT_JSX_PATH)) {
+        fs.mkdirSync(OUTPUT_JSX_PATH, { recursive: true });
+    }
+
+    fs.writeFileSync(finalOutputPath, componentTemplate, 'utf8');
+    console.log(`✅ Clean React component generated at: ${finalOutputPath}\n`);
+
+  } catch (error) {
+    console.error("❌ An error occurred during the conversion process:", error);
+  }
+}
+
+main();
+
+  ------------------------------------------------
+
+  FILE: eslint.config.js
+  ------------------------------------------------
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+  ------------------------------------------------
+
+  FILE: index.html
+  ------------------------------------------------
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/remote-tech-us_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REMOTE TECH US</title>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+  ------------------------------------------------
+
+  FILE: package.json
+  ------------------------------------------------
+{
+  "name": "react-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://remote-tech.us",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "framer-motion": "^12.9.2",
+    "html-react-parser": "^6.0.1",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-device-detect": "^2.2.3",
+    "react-dom": "^19.0.0",
+    "react-helmet-async": "^3.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.14.2",
+    "react-syntax-highlighter": "^16.1.1",
+    "react-tooltip": "^5.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1"
+  }
+}
+  ------------------------------------------------
+
+  FILE: postcss.config.js
+  ------------------------------------------------
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+
+  ------------------------------------------------
+
+  FILE: select-files.js
+  ------------------------------------------------
+import fs from 'fs';
+import path from 'path';
+import readline from 'readline';
+
+/**
+ * Prompts the user to select files of a specific extension from a directory.
+ * @param {string} defaultDir - The fallback directory if none is provided.
+ * @param {string} [extension='svg'] - The file extension to filter by (case-insensitive).
+ * @returns {Promise<string[]>} Array of absolute file paths to the selected files.
+ */
+export async function promptFileSelection(defaultDir, extension = 'svg') {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    // Format extension to ensure clean matching (e.g., "svg" -> ".svg")
+    const cleanExt = extension.startsWith('.') ? extension.toLowerCase() : `.${extension.toLowerCase()}`;
+
+    return new Promise((resolve, reject) => {
+        rl.question(`Enter directory path [Default: ${defaultDir}]: `, (inputDir) => {
+            const chosenDir = inputDir.trim() || defaultDir;
+            const absolutePath = path.resolve(chosenDir);
+
+            if (!fs.existsSync(absolutePath)) {
+                rl.close();
+                return reject(new Error(`Directory does not exist: ${absolutePath}`));
+            }
+
+            // Filter directory for files matching the targeted extension
+            const files = fs.readdirSync(absolutePath).filter(file => 
+                file.toLowerCase().endsWith(cleanExt)
+            );
+
+            if (files.length === 0) {
+                rl.close();
+                return reject(new Error(`No *${cleanExt} files found in: ${absolutePath}`));
+            }
+
+            console.log(`\nFound ${files.length} *${cleanExt} file(s):`);
+            files.forEach((file, index) => {
+                console.log(`${index + 1}: ${file}`);
+            });
+
+            rl.question('\nSelect files (e.g., 1,2,3-5,6) or press Enter for ALL: ', (selection) => {
+                rl.close();
+                
+                let selectedFiles = [];
+                const trimmedSelection = selection.trim();
+                
+                if (!trimmedSelection) {
+                    selectedFiles = files;
+                } else {
+                    const selectedIndices = parseSelection(trimmedSelection, files.length);
+                    selectedFiles = selectedIndices.map(idx => files[idx - 1]);
+                }
+
+                // Map files to absolute system paths
+                const absoluteFilePaths = selectedFiles.map(file => path.join(absolutePath, file));
+                resolve(absoluteFilePaths);
+            });
+        });
+    });
+}
+
+function parseSelection(input, max) {
+    const results = new Set();
+    const parts = input.split(',');
+
+    parts.forEach(part => {
+        const trimPart = part.trim();
+        if (trimPart.includes('-')) {
+            const [start, end] = trimPart.split('-').map(Number);
+            for (let i = start; i <= end; i++) {
+                if (i >= 1 && i <= max) results.add(i);
+            }
+        } else {
+            const num = Number(trimPart);
+            if (num >= 1 && num <= max) results.add(num);
+        }
+    });
+
+    return Array.from(results).sort((a, b) => a - b);
+}
+
+  ------------------------------------------------
+
+  FILE: src/App.css
+  ------------------------------------------------
+/* Uncomment to enable red border */
+/*
+* {
+  outline: 1px solid red !important;
+}
+*/
+#root {
+  /*max-width: 1280px;*/
+  margin: 0 auto;
+  /*padding: 2rem;*/
+  text-align: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+  /* Add these to push the footer down */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Takes full height of the browser */ 
+}
+
+/* Add a rule for your main content area */
+main {
+  flex: 1; /* This grows to fill all space between Header and Footer */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* Important for background scaling */
+  overflow-x: hidden; /* Direct fix for the white gap */
+  background-color: #111827; /* Fallback matches bg-gray-900 */
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+  ------------------------------------------------
+
+  FILE: src/App.jsx
+  ------------------------------------------------
+import { GLOBALS } from './data/app__globals.jsx';
+import { CONTACTS } from './data/business_contacts.jsx';
+import { BUSINESS_SERVICES } from './data/business_services.jsx';
+import { BUSINESS_PROJECTS } from './data/business_projects.jsx';
+import { BUSINESS_TOOLS } from './data/business_tools.jsx';
+import { BUSINESS_TECH  } from './data/business_tech.jsx';
+import Card from './components/Card.jsx';
+import './App.css';
+
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
+import { useAutoScroll } from './hooks/useAutoScroll.js';
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  // const scrollRef = useAutoScroll(1, 30);
+  // Horizontal Marquee
+  const scrollLeft = useAutoScroll({ 
+    direction: 'left', 
+    step: 1, 
+    intervalTime: 50, // higher number slows
+    pauseOnHover: true 
+  });
+  // const scrollPef = useAutoScroll(1, 30);
+  const scrollRight = useAutoScroll({ 
+    direction: 'right', 
+    step: 1, 
+    pauseOnHover: true 
+  });
+  // Vertical News Ticker
+  const tickerRef = useAutoScroll({ 
+    direction: 'top', 
+    intervalTime: 50 
+  });
+  return (
+    <div className="relative min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+    {/* Main Container */}
+    <div className="pt-24 px-6 max-w-7xl mx-auto">
+      <header className="mb-12 text-center lg:text-left">
+        {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+        <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+      </header>
+
+      {/* Section: Services Carousel */}
+      <section className="mb-16 w-full max-w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+        </h2>
+        {/* 1. 'overflow-x-auto' enables the scroll.
+            2. 'flex-nowrap' prevents items from wrapping/squeezing.
+            3. 'snap-x' enables the snap-to-item behavior.
+            4. replace snap-mandatory with snap-proximity
+        */}
+        <div ref={scrollLeft} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full">
+          {BUSINESS_SERVICES.map((service) => (
+            <Card key={service.name} item={service} />
+          ))}
+        </div>
+      </section>
+
+      {/* Section: Projects Carousel */}
+      <section className="mb-16 w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-purple-500 rounded-full" /> Projects 
+        </h2>
+        <div ref={scrollRight} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+          {BUSINESS_PROJECTS.map((project) => (
+            <Card key={project.name} item={project} />
+          ))}
+        </div>
+      </section>
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/*  CARDS GRID */}
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Internal Tools
+          </h2>
+          <p>The following are the core tools used to manage projects, and are all self-hosted to maintain Personally Identifiable Information (PII) data.</p>
+          <br />
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
+          {/* This worked but not for this layout*/}
+          {/* <div ref={tickerRef} className="flex flex-col overflow-y-auto gap-6 h-[400px] scrollbar-hide"> */}
+            {BUSINESS_TOOLS.map((tool) => (
+              <Card key={tool.name} item={tool} />
+            ))}
+          </div>
+        </div>
+      </div>
+      {/*<hr className="w-full border-gray-800 my-10" />*/}
+      <hr className="w-8 w-full max-w-6xl" />
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/*  CARDS GRID */}
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Supporting Technologies
+          </h2>
+          <p>These technologies are the underpinning of modern workflows and tool chains.</p>
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 justify-items-center gap-6">
+            {BUSINESS_TECH.map((tech) => (
+              <Card key={tech.name} item={tech} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+}
+
+export default App
+  ------------------------------------------------
+
+  FILE: src/assets/remedy-ars-rrr.jsx
+  ------------------------------------------------
+// Generated automatically from geometry vectors
+import React from 'react';
+
+export default function RemedyARSRRR({ className = "" }) {
+  return (
+    <svg
+      viewBox="20 50 200 160" /* Exact pixel boundary wrapping all coordinate arrays */
+      preserveAspectRatio="xMidYMid meet" /* Centers the vector structure completely */
+      className={`inline-block align-middle max-w-full max-h-full ${className}`}
+    >
+      <g>
+        <path
+          d="M 52.348648,146.41816 H 36.021172 V 85.394311 c 0.02745,-6.386177 4.714996,-11.073721 10.933026,-11.046268 h 36.31645 c 13.08806,0 23.708812,6.115082 23.616162,13.695451 v 13.956246 c 0.0927,6.79454 -9.714816,11.37914 -15.531351,11.39629 7.292116,-0.0172 13.125811,1.43441 16.159331,7.43968 l 7.08279,15.49017 13.80526,-6.57492 0.003,-39.037694 H 107.0275 V 74.38579 h 61.02386 c 6.38617,0.02745 11.07372,4.714996 11.04626,10.933026 v 36.316454 c 0,13.08806 -6.11851,23.71224 -13.69545,23.61616 l -13.95625,-0.003 c -6.79453,0.0961 -11.3757,-9.71481 -11.39286,-15.53134 0.0172,7.29211 -1.43783,13.12237 -7.4431,16.15932 l -15.57939,7.1274 6.54403,13.7435 h 39.03426 l 0.003,-21.37877 h 16.32748 v 61.02385 c -0.0275,6.38618 -4.715,11.07372 -10.92959,11.04627 h -36.32332 c -13.08806,0 -23.71567,-6.11165 -23.61959,-13.69202 l -0.003,-13.95968 c -0.0892,-6.79454 9.72168,-11.37227 15.53821,-11.39286 -7.29211,0.0206 -13.12237,-1.43783 -16.15933,-7.4431 l -7.07249,-15.45586 -13.695451,6.52001 v 39.03427 h 21.378771 v 16.33433 H 47.029693 c -6.386177,-0.0274 -11.070289,-4.71842 -11.046268,-10.93302 v -36.31302 c 0,-13.08463 6.115082,-23.71224 13.698882,-23.61616 h 13.952819 c 6.794536,-0.0892 11.379132,9.71825 11.39629,15.53478 -0.01373,-7.29211 1.441265,-13.12581 7.443105,-16.15933 L 97.9441,138.82064 91.386344,125.04283 H 52.348648 Z m 92.251262,-17.28831 h 18.19426 l 0.003,-38.413153 h -18.20112 z m -20.40763,53.81752 v 18.19083 l 38.41315,0.007 V 182.94737 Z M 70.477704,162.63926 H 52.286879 l -0.0034,38.41315 H 70.477704 Z M 90.761795,108.84232 V 90.651497 H 52.348648 v 18.190823 z"
+          fill="#23a793"
+          id="path3"
+          style={{ clipRule: 'evenodd', fillRule: 'evenodd', strokeWidth: '3.43158' }} 
+        />
+      </g>
+    </svg>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/assets/remote-tech-icon.jsx
+  ------------------------------------------------
+// Generated automatically from raw Inkscape SVG geometry vectors
+import React from 'react';
+
+export default function RemoteTechIcon({ width = "1.5em", height = "1.5em", className = "" }) {
+  return (
+    <svg
+      viewBox="-2 -2 46 46"
+      width={width}
+      height={height}
+      className={`inline-block align-middle ${className}`}
+    >
+      {/* Retain Inkscape's exact original structural placement matrix transform */}
+      <g transform="translate(-65.4537, -102.595)">
+        <path
+        id="use604"
+        style={{ display: 'inline', fill: 'none', stroke: 'currentColor', strokeWidth: '1.13771' }}
+        d="m 88.632934,125.38982 a 3.2476051,3.3485835 0 0 1 -4.591382,-0.005 3.2476051,3.3485835 0 0 1 0.0025,-4.73414 3.2476051,3.3485835 0 0 1 4.591384,-3.8e-4 3.2476051,3.3485835 0 0 1 0.0032,4.73415" />
+        <path
+        id="use605"
+        style={{ display: 'inline', fill: 'none', stroke: 'currentColor', strokeWidth: '1.32292' }}
+        d="m 91.498281,128.44811 a 7.3093791,7.540626 0 0 1 -10.333815,-0.0124 7.3093791,7.540626 0 0 1 0.0056,-10.66075 7.3093791,7.540626 0 0 1 10.333821,-8.5e-4 7.3093791,7.540626 0 0 1 0.0072,10.66075" />
+        <path
+        id="use606"
+        style={{ display: 'inline', fill: 'none', stroke: 'currentColor', strokeWidth: '1.32292' }}
+        d="m 96.688981,133.82447 a 14.677311,14.640156 0 0 1 -20.75041,-0.024 14.677311,14.640156 0 0 1 0.01119,-20.69789 14.677311,14.640156 0 0 1 20.750423,-0.002 14.677311,14.640156 0 0 1 0.01451,20.69788" />
+        <path
+        style={{ display: 'inline', fill: 'none', fillOpacity: '1', fillRule: 'nonzero', stroke: 'none', strokeWidth: '1.32292', strokeDasharray: 'none' }}
+        d="m 86.337367,115.56764 c 0.414943,1.45512 0.733766,1.08821 0.733766,1.9744 0,0.0756 0.05348,0.17342 0,0.2269 -0.02674,0.0267 -0.08671,-0.0267 -0.113445,0 -0.111895,0.11189 -0.03077,0.48455 -0.113448,0.56723 -0.02674,0.0267 -0.07563,0 -0.113446,0 -0.07563,0.15126 -0.118628,0.32387 -0.226893,0.45379 -0.236442,0.28373 -0.326456,0.15975 -0.567232,0.34033 -0.701625,0.52622 -0.0685,0.0236 -0.226894,0.34034 -0.03781,0.0756 -0.226893,0.0289 -0.226893,0.11345 0,0.21747 1.612844,-0.70091 0.325318,-0.31228"
+        id="use607" />
+        <path
+        style={{ display: 'inline', fill: '#00a9ff', fillOpacity: '1', fillRule: 'nonzero', stroke: 'none', strokeWidth: '1.32292', strokeDasharray: 'none' }}
+        d="m 86.339904,122.78474 -0.0026,-6.68794"
+        id="use608" />
+        <path
+        style={{ display: 'inline', fill: 'currentColor', fillOpacity: '1', fillRule: 'nonzero', stroke: '#cccbca', strokeWidth: '1.32292', strokeDasharray: 'none', strokeOpacity: '1' }}
+        d="M 86.337367,103.92597 V 119.2718"
+        id="use609" />
+        <path
+        style={{ display: 'inline', fill: '#cccbca', fillOpacity: '1', fillRule: 'nonzero', stroke: '#cccbca', strokeWidth: '1.32292', strokeDasharray: 'none', strokeOpacity: '1' }}
+        d="m 86.335123,125.76228 -0.04399,17.97839"
+        id="use610" />
+        <path
+        style={{ display: 'inline', fill: '#eeeeec', fillOpacity: '1', fillRule: 'nonzero', stroke: '#cccbca', strokeWidth: '1.32292', strokeDasharray: 'none', strokeOpacity: '1' }}
+        d="m 94.308162,123.01855 h 6.065548"
+        id="use611" />
+        <path
+        style={{ display: 'inline', fill: '#cccbca', fillOpacity: '1', fillRule: 'nonzero', stroke: '#cccbca', strokeWidth: '1.32292', strokeDasharray: 'none', strokeOpacity: '1' }}
+        d="m 78.399867,122.97597 h -6.35"
+        id="use612" />
+        <path
+        id="use613"
+        style={{ display: 'inline', fill: 'none', fillOpacity: '1', stroke: 'currentColor', strokeWidth: '1.32292', strokeDasharray: 'none' }}
+        d="m 87.429289,103.2888 a 20.258675,20.219881 0 0 0 -2.538346,0.015 20.258675,20.219881 0 0 0 -12.875182,5.86735 20.258675,20.219881 0 0 0 -2.488737,25.4987 3.2476051,3.3485836 0 0 0 -0.299724,0.26768 3.2476051,3.3485836 0 0 0 -0.0026,4.73408 3.2476051,3.3485836 0 0 0 4.591451,0.006 l 0.0057,-0.006 a 3.2476051,3.3485836 0 0 0 0.168465,-0.18965 20.258675,20.219881 0 0 0 26.651084,-1.69137 l 0.0357,-0.0351 a 20.258675,20.219881 0 0 0 2.74143,-25.1442 3.2476051,3.3485836 0 0 0 0.56018,-0.45062 l 0.006,-0.006 a 3.2476051,3.3485836 0 0 0 -0.003,-4.73408 3.2476051,3.3485836 0 0 0 -4.591453,0 3.2476051,3.3485836 0 0 0 -0.315227,0.38034 20.258675,20.219881 0 0 0 -11.645284,-4.51238 z" />
+        <path
+        style={{ fill: 'none', strokeWidth: '0.19545', strokeLinecap: 'round' }}
+        d="M 71.534618,157.2946 C 57.854123,155.654 45.71297,151.3441 35.657766,144.55891 c -2.904812,-1.96014 -2.95871,-1.97817 -3.95853,-1.32387 -5.478831,3.58542 -11.52477,3.77917 -16.585796,0.53152 -6.8122795,-4.37143 -8.8206038,-14.53968 -4.146212,-20.99249 0.632862,-0.87364 1.150658,-1.75644 1.150658,-1.96178 0,-0.20534 -0.641761,-1.46834 -1.426136,-2.80667 C 7.3386719,112.28446 4.28824,104.68362 2.5748838,97.78061 1.2449845,92.422527 0.76362544,89.246452 0.41369697,83.520802 -1.7540105,48.052035 20.173301,15.589086 53.918104,4.308598 76.786009,-3.335872 102.31675,0.06552325 122.30314,13.419362 l 4.38777,2.931674 2.22795,-1.523394 c 12.27513,-8.393324 27.45105,5.272025 21.03785,18.943806 -0.51492,1.097723 -1.45496,2.600212 -2.08896,3.338863 l -1.15274,1.343002 2.4062,4.715941 c 3.86962,7.584112 6.52584,15.834602 7.87363,24.456368 0.98588,6.306621 0.88123,17.206926 -0.22706,23.649423 -2.78775,16.205215 -9.6896,30.188485 -20.48604,41.505035 -12.26485,12.85571 -26.73888,20.57659 -44.615795,23.79942 -3.384999,0.61024 -16.97907,1.09313 -20.131327,0.7151 z m 5.081694,-12.59139 v -8.13852 l -4.20217,-0.51959 c -2.311194,-0.28578 -4.55398,-0.55869 -4.983969,-0.60646 -0.42999,-0.0478 -1.045657,-0.17478 -1.368149,-0.28224 -0.322492,-0.10746 -2.539678,-0.81809 -4.927078,-1.57918 -8.925522,-2.8454 -17.010517,-7.78618 -23.486706,-14.35286 -3.114153,-3.15766 -4.421778,-4.60854 -4.421778,-4.90619 0,-0.10331 -0.79854,-1.28446 -1.774534,-2.62478 C 27.615776,106.42521 23.39915,96.594707 22.274658,90.297796 22.0251,88.90033 21.734381,87.493092 21.628615,87.1706 c -0.239249,-0.729497 -0.425374,-3.814746 -0.507011,-8.40434 -0.06338,-3.563155 0.48933,-8.970938 1.186028,-11.60426 0.209666,-0.792479 0.349534,-1.58405 0.310818,-1.759048 -0.03872,-0.174998 0.03674,-0.582034 0.167681,-0.904526 0.130941,-0.322492 0.694646,-1.993588 1.252679,-3.713546 5.467686,-16.85241 19.427387,-30.849419 36.427124,-36.524476 3.934224,-1.313371 10.667054,-2.758371 12.889134,-2.766266 3.478361,-0.01236 3.261244,0.54984 3.261244,-8.444594 V 5.0816942 h 2.345397 2.345398 v 7.9957278 7.995728 l 1.270423,0.216977 c 0.698733,0.119337 1.622233,0.198556 2.052223,0.176042 1.140289,-0.05971 7.00974,1.082073 10.065663,1.958065 1.451215,0.415996 2.638572,0.676765 2.638572,0.579486 0,-0.09728 0.395786,0.07715 0.879524,0.387609 0.483738,0.310464 1.231334,0.622352 1.661323,0.693086 0.429985,0.07073 0.885575,0.269347 1.012425,0.441363 0.12684,0.172016 0.61057,0.341378 1.07497,0.376359 0.46439,0.03498 0.84435,0.212456 0.84435,0.394388 0,0.181931 0.17591,0.222069 0.3909,0.0892 0.215,-0.132874 0.3909,-0.08202 0.3909,0.113012 0,0.348008 2.64207,1.699222 3.23252,1.653184 0.16542,-0.0129 0.6758,0.325943 1.13417,0.752981 0.45837,0.427039 0.98267,0.684183 1.1651,0.571432 0.18244,-0.112751 0.3317,-0.04209 0.3317,0.157022 0,0.199113 0.70362,0.827657 1.5636,1.396764 0.85998,0.569107 1.5636,0.924805 1.5636,0.790439 0,-0.134365 0.34596,0.170972 0.76879,0.678528 0.42284,0.507556 0.77465,0.767179 0.7818,0.576939 0.007,-0.19024 0.38487,0.126857 0.83937,0.70466 0.4545,0.577802 0.89228,0.984633 0.97285,0.904067 0.16713,-0.167133 7.19049,6.782396 7.19335,7.117733 10e-4,0.120573 0.61669,0.888652 1.36815,1.706848 0.75145,0.818195 1.36628,1.659263 1.36628,1.869043 0,0.209776 0.24798,0.476573 0.55107,0.592877 0.30309,0.116308 0.64809,0.598026 0.76667,1.070486 0.11858,0.472461 0.53254,1.207325 0.91991,1.633038 0.38737,0.425709 1.03656,1.521616 1.44265,2.435343 0.40608,0.913728 0.8979,1.661323 1.09293,1.661323 0.19503,0 0.24588,0.175905 0.11301,0.3909 -0.13287,0.214995 -0.026,0.390899 0.23753,0.390899 0.26352,0 0.36938,0.109734 0.23527,0.243851 -0.13412,0.134118 0.13408,0.969666 0.59599,1.856773 0.46192,0.887108 0.89507,1.934046 0.96256,2.326537 0.0675,0.392486 0.33086,1.096106 0.58528,1.563598 0.25441,0.467488 0.4919,1.113841 0.52774,1.436333 0.0358,0.322492 0.36285,1.58369 0.72669,2.802664 1.35189,4.529224 2.0481,10.306973 1.93815,16.084234 -0.058,3.04938 -0.1824,5.984086 -0.27638,6.521573 -0.094,0.537487 -0.27366,1.592915 -0.39929,2.345397 -0.12564,0.752482 -0.40558,1.972166 -0.62208,2.710408 -0.21651,0.738241 -0.31023,1.425677 -0.20827,1.527631 0.10195,0.101955 0.0223,0.381847 -0.17698,0.62198 -0.1993,0.240137 -0.43458,0.871987 -0.52286,1.404115 -0.0883,0.532132 -0.30303,1.319317 -0.47723,1.749307 -0.1742,0.429989 -0.83082,2.101085 -1.45916,3.713546 -0.62835,1.61247 -1.8202,4.16308 -2.64856,5.66805 -0.82837,1.50496 -1.52259,2.86404 -1.54272,3.02016 -0.0201,0.15613 -0.4736,0.75539 -1.0077,1.3317 -0.5341,0.5763 -0.90312,1.11579 -0.82004,1.19886 0.0831,0.0831 -0.39892,0.77224 -1.0711,1.53147 -0.67217,0.75924 -1.17549,1.4583 -1.11849,1.55348 0.057,0.0952 -0.52059,0.72114 -1.28355,1.39103 -0.76296,0.66988 -1.2993,1.30586 -1.19188,1.4133 0.10743,0.10743 -0.25449,0.54915 -0.80427,0.9816 l -0.99959,0.78628 -1.58038,-1.58037 -1.58038,-1.58038 2.45567,-2.85319 c 1.35061,-1.56925 3.21891,-4.03305 4.15178,-5.47511 2.21493,-3.42393 5.29396,-9.768713 5.04962,-10.405454 -0.10542,-0.274736 -0.0288,-0.499522 0.1704,-0.499522 0.47918,0 2.07379,-5.390861 1.80319,-6.09602 -0.11592,-0.302099 -0.0645,-0.549273 0.11423,-0.549273 0.27203,0 1.0842,-4.26014 1.19236,-6.254393 0.16795,-3.096678 0.26998,-7.64843 0.14239,-6.352117 l -0.16353,1.661323 h -11.28748 -11.28748 l -0.18147,-0.879524 c -0.0998,-0.483738 -0.1954,0.08795 -0.21241,1.270423 -0.0366,2.544444 -0.18633,3.463617 -0.9819,6.027949 -0.32821,1.057931 -0.51588,2.054357 -0.41704,2.214286 0.0988,0.159932 0.0467,0.349781 -0.11589,0.421894 -0.27625,0.122523 -3.28086,6.078402 -3.17269,6.28905 0.0272,0.05305 -0.8448,1.063931 -1.93786,2.246402 l -1.9874,2.149947 -1.56597,-1.528773 -1.565975,-1.528773 1.557008,-1.955518 c 3.629717,-4.558729 5.575677,-10.312637 5.575677,-16.486411 0,-4.741072 -0.72894,-7.806389 -2.92817,-12.313336 C 97.791075,58.332587 89.90547,52.478812 82.994483,51.779512 l -1.687376,-0.170741 v 5.663028 c 0,5.402428 0.03598,5.663029 0.781799,5.663029 0.429989,0 0.825775,-0.02137 0.879524,-0.04748 0.05375,-0.02611 1.028965,0.501602 2.167151,1.172699 1.138182,0.671096 2.132044,1.220177 2.208582,1.220177 0.345594,0 2.815282,2.724629 3.313488,3.655536 0.304729,0.569392 0.710616,1.035259 0.901969,1.035259 0.191353,0 0.239199,0.175904 0.106325,0.390899 -0.132875,0.214995 -0.0553,0.3909 0.172379,0.3909 0.227683,0 0.380462,0.131928 0.339504,0.293174 -0.09074,0.35724 0.4802,2.899279 0.755624,3.364348 0.212087,0.358107 0.171644,4.619721 -0.05617,5.919517 -0.07537,0.429989 -0.350113,1.348142 -0.61055,2.040335 -0.260441,0.692197 -0.49756,1.395816 -0.526933,1.563598 -0.02937,0.167786 -0.268446,0.568919 -0.531279,0.891412 -0.262833,0.322492 -0.826151,1.026111 -1.251821,1.563598 l -0.773942,0.977249 -1.369442,-1.320416 -1.369438,-1.320416 0.908845,-1.415881 c 1.422569,-2.216201 1.888748,-4.189392 1.679781,-7.109978 -0.317871,-4.442659 -3.043551,-7.957444 -7.112268,-9.171313 -2.421377,-0.722402 -3.494857,-0.721964 -5.934121,0.0024 -6.87488,2.041621 -9.518592,10.977671 -5.00027,16.901496 0.544847,0.71433 1.159431,1.194464 1.36574,1.066956 0.206305,-0.127503 0.326769,-0.02142 0.267696,0.23574 -0.05908,0.257157 0.68416,0.898584 1.651637,1.425388 1.551644,0.844894 2.15429,0.942983 5.111203,0.831916 2.902097,-0.109006 3.575089,-0.273528 5.012646,-1.225411 l 1.66049,-1.099495 1.339472,1.021667 c 0.736709,0.561914 1.333878,1.14464 1.327041,1.294944 -0.01991,0.437698 -1.179179,1.856441 -1.341227,1.641431 -0.08101,-0.107498 -0.645133,0.237409 -1.253595,0.76646 -0.608463,0.529051 -1.194245,0.922957 -1.301742,0.875349 -0.107498,-0.0476 -0.723165,0.116285 -1.368149,0.364205 -0.644984,0.24792 -1.39258,0.417989 -1.661323,0.377937 -0.373067,-0.0556 -0.488624,1.36415 -0.488624,6.003252 0,4.60335 0.118434,6.07468 0.488624,6.0703 0.268743,-0.003 1.588659,-0.26514 2.933142,-0.58214 3.12199,-0.73609 7.282025,-2.83084 9.970288,-5.020464 l 2.104056,-1.713774 1.777729,1.679652 c 1.261531,1.191935 1.656412,1.80098 1.359904,2.097486 -0.229802,0.2298 -0.602524,0.42002 -0.828269,0.4227 -0.225744,0.003 -1.15804,0.69924 -2.071767,1.54791 -0.913728,0.84867 -1.666917,1.41817 -1.673754,1.26555 -0.0068,-0.15262 -0.226722,0.004 -0.488625,0.34765 -0.261906,0.34383 -0.564146,0.63258 -0.671643,0.64168 -0.503686,0.0426 -4.137551,1.90544 -4.391635,2.25128 -0.157955,0.21499 -0.289884,0.23743 -0.293175,0.0499 -0.0033,-0.18757 -0.269842,-0.12206 -0.592334,0.14559 -0.322492,0.26764 -0.586349,0.35559 -0.586349,0.19545 0,-0.16015 -0.219881,-0.1087 -0.488625,0.11434 -0.268743,0.22304 -0.62316,0.40503 -0.787592,0.40442 -0.164432,-6e-4 -1.527694,0.20616 -3.029472,0.45946 l -2.730503,0.46056 v 11.62829 11.62829 l 1.734597,0.0656 c 0.954029,0.0361 1.84571,-0.11417 1.981509,-0.33389 0.135802,-0.21973 0.41768,-0.29397 0.626401,-0.16498 0.532131,0.32888 5.820881,-0.6608 5.820881,-1.08925 0,-0.19326 0.180177,-0.24001 0.400394,-0.10391 0.50505,0.31214 5.91582,-1.46889 9.751329,-3.20979 3.51185,-1.59398 9.54945,-5.57154 12.55839,-8.27345 l 2.18789,-1.96463 1.59657,1.6393 1.59657,1.63931 -0.99334,1.1727 c -0.54633,0.64499 -0.86984,0.90884 -0.71891,0.58635 0.15094,-0.32249 -0.44543,0.15443 -1.32525,1.05984 -0.87982,0.9054 -1.59967,1.56308 -1.59967,1.46152 0,-0.10157 -1.18736,0.66652 -2.63857,1.70686 -1.45122,1.04034 -3.3422,2.30832 -4.20217,2.81774 -0.85998,0.50942 -1.65155,1.02345 -1.75905,1.1423 -0.1075,0.11884 -0.45931,0.27325 -0.7818,0.34312 -0.32249,0.0699 -0.64535,0.29085 -0.71746,0.49106 -0.0721,0.20021 -0.292,0.26459 -0.48863,0.14306 -0.19663,-0.12152 -0.35751,-0.0347 -0.35751,0.19302 0,0.22768 -0.13193,0.38511 -0.29317,0.34985 -0.50688,-0.11087 -2.44313,0.52721 -2.44313,0.80511 0,0.14594 -0.37995,0.29396 -0.84435,0.32894 -0.464392,0.035 -0.989409,0.2923 -1.166709,0.57181 -0.1773,0.27951 -0.325057,0.35474 -0.328348,0.16717 -0.0033,-0.18757 -0.269842,-0.12206 -0.592334,0.14559 -0.322492,0.26764 -0.586349,0.35559 -0.586349,0.19545 0,-0.16015 -0.263857,-0.0722 -0.58635,0.19545 -0.322492,0.26764 -0.586349,0.38149 -0.586349,0.25299 0,-0.12851 -0.483738,-0.0465 -1.074974,0.18229 -0.591235,0.22877 -1.382807,0.48827 -1.759048,0.57668 -0.37624,0.0884 -1.07986,0.25716 -1.563598,0.37502 -0.483738,0.11785 -1.319286,0.28753 -1.856773,0.37706 -0.537487,0.0895 -1.417011,0.25721 -1.954497,0.37263 -0.537487,0.1154 -2.296402,0.31206 -3.908699,0.43701 -1.6123,0.12494 -3.019539,0.31535 -3.127196,0.42311 -0.107662,0.10777 -0.20851,3.81102 -0.224111,8.22944 l -0.02837,8.03349 3.546463,-0.24933 c 5.462016,-0.38399 16.009792,-2.47831 16.634742,-3.30293 0.11127,-0.14681 0.64207,-0.31609 1.17955,-0.37618 0.53749,-0.0601 1.03625,-0.28106 1.10836,-0.49106 0.0721,-0.20999 0.28688,-0.28554 0.47726,-0.16788 0.46326,0.28631 6.23237,-2.13339 6.23237,-2.614 0,-0.20763 0.1749,-0.2694 0.38867,-0.13729 0.51486,0.3182 5.95275,-2.67393 10.44144,-5.74529 14.06634,-9.62476 24.49798,-24.1074 29.20155,-40.541601 0.83002,-2.900091 2.03207,-8.769155 2.16845,-10.587612 0.0242,-0.322492 0.23893,-2.741468 0.4772,-5.375502 0.41981,-4.640767 0.38095,-5.627949 -0.6271,-15.928523 -0.12625,-1.289969 -0.40528,-2.404396 -0.62008,-2.476509 -0.2148,-0.07211 -0.2904,-0.293148 -0.16801,-0.491193 0.32856,-0.531612 -1.2696,-6.652567 -2.84836,-10.909233 -1.55014,-4.17949 -4.82058,-10.841384 -6.90839,-14.072383 l -1.38925,-2.149948 0.8711,-0.68874 c 3.1303,-2.475 3.81686,-3.197274 4.62867,-4.869443 0.69831,-1.438404 0.9008,-2.499217 0.87907,-4.605205 -0.0436,-4.225586 -1.62877,-7.016403 -5.16647,-9.096081 -1.5188,-0.892849 -2.26284,-1.06541 -4.55187,-1.055698 -3.40523,0.01445 -5.26974,0.914571 -7.73722,3.735267 -0.99477,1.137175 -1.95014,1.899126 -2.193,1.749028 -0.23668,-0.146278 -1.92271,-1.391537 -3.74672,-2.767242 -5.76283,-4.346432 -17.11678,-10.4228103 -18.21137,-9.7463153 -0.19849,0.1226773 -0.3609,0.041884 -0.3609,-0.1795405 0,-0.4898296 -7.650562,-2.9203621 -8.174039,-2.5968368 C 96.38259,7.3364595 96.097409,7.2490778 95.953311,7.0159191 95.80921,6.7827604 95.45088,6.6842565 95.157018,6.7970208 94.863159,6.9097856 94.509289,6.8185007 94.370645,6.5941658 94.231997,6.3698309 93.786778,6.2730469 93.381267,6.3790906 92.975755,6.4851342 92.557845,6.4325398 92.452579,6.2622143 92.066969,5.6382867 84.071275,4.9119472 77.98446,4.9479111 52.290903,5.0997225 28.692714,18.60886 15.284797,40.841275 8.3651863,52.315072 4.9808413,64.816802 4.9652124,78.961709 4.9490424,93.596449 8.7438221,106.51748 16.723768,118.99898 l 1.730291,2.70636 -1.621486,1.3469 c -2.460024,2.04343 -3.689609,4.74559 -3.683334,8.09456 0.0059,3.13629 0.625962,4.85716 2.532723,7.02884 3.82289,4.35403 10.189852,4.40711 14.3879,0.11996 l 1.922001,-1.9628 3.255871,2.35851 c 6.84902,4.96133 13.530107,8.31708 21.469313,10.78352 6.31418,1.96159 12.974823,3.19965 17.847042,3.31733 l 2.052223,0.0496 z m -0.19545,-24.7563 c 0,-10.08097 -0.07964,-11.6739 -0.586349,-11.72777 -2.218437,-0.23584 -3.943047,-0.54817 -4.690795,-0.84951 -2.016408,-0.81258 -5.103244,-1.86706 -5.321949,-1.818 -0.142275,0.0319 -0.366304,-0.10661 -0.497841,-0.30783 -0.250133,-0.38265 -3.080785,-2.22991 -3.757249,-2.45195 -0.214994,-0.0706 -0.711499,-0.53589 -1.103345,-1.03404 -0.391845,-0.49815 -0.900515,-0.90573 -1.13038,-0.90573 -0.492623,0 -1.9975,-1.611987 -3.607029,-3.863764 -0.632476,-0.884852 -1.292119,-1.608826 -1.465874,-1.608826 -0.173751,0 -0.315913,-0.263857 -0.315913,-0.586349 0,-0.322492 -0.175905,-0.586349 -0.3909,-0.586349 -0.214994,0 -0.354733,-0.131929 -0.31053,-0.293175 0.0442,-0.161246 -0.236537,-0.888784 -0.623872,-1.616749 -0.970998,-1.824922 -2.625379,-6.247915 -2.867815,-7.667115 -0.110179,-0.644984 -0.311207,-2.052223 -0.446728,-3.127197 L 49.057894,79.548059 37.48772,79.444607 25.917546,79.341155 l 0.07669,2.448849 c 0.228628,7.299999 1.581143,12.627162 5.159268,20.320856 0.771928,1.6598 1.55849,2.92204 1.747914,2.80497 0.189425,-0.11708 0.3052,-0.0679 0.257277,0.10937 -0.152129,0.5626 0.502498,2.10033 0.812554,1.9087 0.163684,-0.10116 0.297607,0.0317 0.297607,0.29516 0,0.8348 2.162599,3.78447 2.583796,3.52415 0.223393,-0.13806 0.286872,-0.0606 0.142171,0.17356 -0.42037,0.68017 6.449736,7.8587 7.277138,7.60383 0.191783,-0.0591 0.252888,0.0476 0.135791,0.23708 -0.415679,0.67258 7.310591,6.14308 8.039736,5.69245 0.293573,-0.18144 0.335982,-0.0989 0.124767,0.24286 -0.23427,0.37906 -0.140313,0.44878 0.350805,0.26032 0.368928,-0.14157 0.577875,-0.10708 0.464327,0.0766 -0.304898,0.49333 6.138389,3.37408 10.159592,4.54228 3.888454,1.12964 8.928314,2.03514 11.31028,2.0321 l 1.563598,-0.002 z m 0.01353,-22.410029 c -0.0085,-3.80583 -0.158592,-6.029427 -0.404432,-5.992006 -0.214995,0.03272 -1.094519,-0.235986 -1.954498,-0.597134 -0.859979,-0.361144 -1.711546,-0.643413 -1.892372,-0.627257 -0.180822,0.01616 -0.571015,-0.290176 -0.86709,-0.680732 -0.296075,-0.390555 -0.543913,-0.598795 -0.550754,-0.462751 -0.0068,0.136041 -0.764435,-0.479626 -1.683549,-1.368148 -0.919119,-0.888527 -1.62882,-1.720791 -1.577116,-1.849479 0.0517,-0.128684 -0.24113,-0.593698 -0.650738,-1.033362 -0.409608,-0.439661 -0.638065,-0.906063 -0.507685,-1.036447 0.130385,-0.130385 0.0025,-0.237061 -0.284137,-0.237061 -0.286658,0 -0.417344,-0.103854 -0.290407,-0.230791 0.126933,-0.126933 -0.0074,-0.906023 -0.298624,-1.73131 -0.700758,-1.986153 -0.804506,-6.397931 -0.202064,-8.592187 0.265628,-0.967476 0.495747,-1.847 0.511379,-1.954498 0.01563,-0.107497 0.262485,-0.429512 0.548561,-0.715588 0.286076,-0.286076 0.431581,-0.663431 0.323341,-0.838566 -0.108237,-0.175131 0.09123,-0.428949 0.443256,-0.564033 0.352029,-0.135087 0.539688,-0.345977 0.417024,-0.468645 -0.71664,-0.71664 6.51298,-5.600895 8.320023,-5.620917 0.489183,-0.0054 0.602747,-0.941306 0.685298,-5.647662 0.113767,-6.485864 0.432014,-6.087561 -4.007944,-5.016211 -4.059496,0.979548 -7.476861,3.042262 -11.150727,6.730556 -3.617892,3.632102 -5.659529,7.092325 -6.81764,11.554717 -0.745074,2.870899 -1.212914,8.465915 -0.789761,9.444911 0.170803,0.39516 0.274927,1.011746 0.231389,1.370189 -0.159343,1.311742 1.239253,5.679763 2.750005,8.588681 3.392063,6.531333 10.720702,12.28362 16.574904,13.00972 0.788276,0.0978 1.53217,0.27671 1.653102,0.39764 0.120933,0.12093 0.504479,0.21987 0.852333,0.21987 0.556027,0 0.630822,-0.73133 0.618923,-6.051499 z M 61.52954,96.063565 60.78488,95.184041 61.664404,95.9287 c 0.826534,0.699797 1.057477,1.014389 0.74466,1.014389 -0.07418,0 -0.469963,-0.395786 -0.879524,-0.879524 z m 58.85897,-21.010851 h 11.278 l -0.14652,-2.801304 c -0.0806,-1.540719 -0.28548,-2.903981 -0.45531,-3.029471 -0.16983,-0.125495 -0.34855,-0.896954 -0.39717,-1.714364 -0.11453,-1.925607 -2.4518,-8.898285 -4.04488,-12.066874 -8.00137,-15.91451 -23.07348,-26.700286 -40.624729,-29.071539 -2.257445,-0.304991 -4.236374,-0.557963 -4.39762,-0.56216 -0.161246,-0.0042 -0.293174,4.754386 -0.293174,10.574631 v 10.582263 l 0.879524,-0.0861 c 0.483738,-0.04735 1.143381,0.01433 1.465873,0.137061 0.467551,0.177945 2.675938,0.729227 5.179419,1.292943 0.161246,0.03631 0.381127,0.088 0.488624,0.114878 0.107498,0.02687 0.307713,0.03384 0.444922,0.01548 0.137206,-0.01837 0.357087,0.13391 0.488625,0.33839 0.131534,0.204475 1.030724,0.771284 1.9982,1.259576 0.967476,0.488292 2.462667,1.369641 3.322646,1.958551 0.859979,0.588914 1.683952,1.104127 1.831056,1.144925 0.5235,0.14518 3.740684,3.555298 4.810334,5.098804 0.59811,0.863075 1.23946,1.569227 1.42521,1.569227 0.18576,0 0.33774,0.251294 0.33774,0.558428 0,0.307137 0.21988,0.790875 0.48863,1.074973 0.47051,0.497408 1.65371,2.837431 1.84239,3.643743 0.0503,0.214995 0.28777,0.742709 0.5277,1.172699 0.23992,0.429989 0.46445,0.913728 0.49894,1.074974 0.0345,0.161246 0.0994,0.337151 0.14415,0.390899 0.0448,0.05375 0.1363,0.449535 0.20336,0.879524 0.0671,0.42999 0.31626,1.729309 0.55377,2.887376 0.23752,1.158067 0.46001,3.005067 0.49441,4.104445 0.0442,1.412891 0.10878,1.626439 0.22022,0.728445 l 0.15766,-1.270423 z M 49.684713,71.534618 c 0.571272,-3.337493 0.520053,-3.111924 0.902923,-3.976195 0.159237,-0.359452 0.329548,-0.887166 0.378469,-1.172699 0.04892,-0.285532 0.391697,-1.09084 0.76173,-1.789573 0.37003,-0.698733 0.536334,-1.273117 0.369568,-1.276408 -0.166765,-0.0033 -0.127308,-0.13522 0.08769,-0.293175 0.214995,-0.157955 1.235594,-1.548502 2.268003,-3.090108 1.848818,-2.760685 5.136717,-6.383222 5.793562,-6.383222 0.184883,0 0.555859,-0.351809 0.824391,-0.781799 0.268532,-0.429989 0.709788,-0.781799 0.980564,-0.781799 0.270776,0 0.492318,-0.175905 0.492318,-0.390899 0,-0.214995 0.263857,-0.3909 0.586349,-0.3909 0.322493,0 0.58635,-0.175905 0.58635,-0.390899 0,-0.214995 0.131928,-0.3634 0.293174,-0.329791 0.161247,0.03361 1.348604,-0.424024 2.638572,-1.016964 2.40474,-1.10535 7.496836,-2.562241 8.955494,-2.562241 0.80861,0 0.816995,-0.108623 0.816995,-10.583605 V 25.740735 l -1.172698,0.266862 c -0.644985,0.146773 -1.751496,0.24193 -2.458915,0.211458 -0.707419,-0.03047 -1.474586,0.06101 -1.704815,0.203304 -0.230228,0.142289 -1.112019,0.310425 -1.959536,0.373635 -0.847517,0.06321 -1.767632,0.303064 -2.044698,0.533009 -0.277069,0.229945 -0.602654,0.319189 -0.723524,0.198319 -0.323809,-0.323811 -5.767246,1.369866 -5.767246,1.794429 0,0.199143 -0.224786,0.27582 -0.499522,0.170393 -0.636733,-0.244337 -6.987205,2.837397 -10.385017,5.039604 -3.443755,2.231984 -7.947848,6.084482 -7.659344,6.551291 0.126342,0.204424 -0.0032,0.323348 -0.287964,0.264275 -0.284724,-0.05908 -0.473704,0.11247 -0.419955,0.381213 0.05375,0.268744 -0.122157,0.444648 -0.3909,0.3909 -0.268743,-0.05375 -0.44029,0.135231 -0.381213,0.419955 0.05907,0.284723 -0.0587,0.415018 -0.261723,0.289543 -0.450559,-0.278461 -2.824006,2.514723 -2.534656,2.982904 0.113427,0.183527 0.0294,0.285352 -0.186731,0.22628 -0.543129,-0.148456 -2.432135,2.458433 -2.132611,2.943075 0.133573,0.216124 0.07139,0.286982 -0.138179,0.157458 -0.411781,-0.254495 -2.997252,3.73218 -2.997252,4.621621 0,0.297212 -0.1176,0.467703 -0.261334,0.378871 -0.369658,-0.228461 -1.623421,2.517972 -1.350823,2.959047 0.123749,0.200231 0.06695,0.364053 -0.126226,0.364053 -0.477096,0 -1.323638,1.923781 -1.04496,2.374691 0.122917,0.198882 0.06006,0.361606 -0.139682,0.361606 -0.329693,0 -1.44202,3.166036 -1.44202,4.104445 0,0.214995 -0.137641,0.492764 -0.305868,0.617266 -0.168227,0.124497 -0.361447,0.845754 -0.429377,1.602786 -0.06793,0.757031 -0.220995,1.534691 -0.340144,1.728131 -0.119149,0.193441 -0.333032,1.231236 -0.475296,2.30621 -0.142263,1.074974 -0.34815,2.433123 -0.457526,3.018112 l -0.198865,1.063614 11.560117,-0.08637 c 10.036401,-0.07498 11.566089,-0.0091 11.605445,0.499984 0.05461,0.706347 0.05112,0.722148 0.776909,-3.518096 z"
+        id="path5"
+        transform="matrix(0.26458333,0,0,0.26458333,65.453727,102.59477)" />
+        <path
+        style={{ fill: '#eeeeec', stroke: '#eeeeec', strokeWidth: '0.423307', strokeLinecap: 'round', strokeMiterlimit: '0', strokeDasharray: 'none', strokeOpacity: '1', paintOrder: 'markers stroke fill' }}
+        d="m 75.925004,157.63045 c -11.862867,-0.61514 -22.472173,-3.36779 -32.584104,-8.45414 -2.606897,-1.31128 -7.517094,-4.23525 -9.516351,-5.66689 l -1.28359,-0.91916 -1.06898,0.7847 c -1.470473,1.07943 -4.061449,2.23805 -5.738912,2.56631 -1.888071,0.36947 -5.354656,0.16445 -7.198434,-0.42574 -3.151594,-1.00881 -6.398742,-3.62291 -8.100659,-6.52139 -1.8257168,-3.10933 -2.5777249,-7.34687 -1.8796119,-10.59156 0.5965305,-2.77255 1.4104085,-4.4944 3.3809979,-7.15286 0.311658,-0.42044 0.252588,-0.59178 -0.808383,-2.34474 C 9.4737011,116.1734 6.2303538,109.41546 5.0594574,106.26251 -1.9216232,87.464119 -1.4847629,66.807449 6.2862163,48.255981 14.983858,27.49231 32.462392,11.317021 53.929084,4.1654858 58.82069,2.5358679 64.909233,1.1951015 70.453937,0.52652429 74.192594,0.07571925 83.989186,0.13731285 87.872026,0.63603613 101.74075,2.4173746 114.27381,7.3085942 125.04645,15.143931 l 1.66833,1.213432 1.19284,-0.971679 c 4.07472,-3.319247 9.75045,-4.116236 14.63761,-2.05542 4.00899,1.690515 7.37883,5.628115 8.5628,10.005509 0.60192,2.225382 0.54759,5.906041 -0.11856,8.033486 -0.83831,2.677228 -1.8544,4.451597 -3.6672,6.403902 l -0.6536,0.703891 0.88932,1.529197 c 5.11355,8.792758 8.65242,19.745671 9.90976,30.670997 0.4373,3.799893 0.37402,13.170987 -0.11612,17.193456 -1.20339,9.876012 -4.07339,19.169648 -8.54758,27.678798 -11.38649,21.65519 -32.4826,36.91918 -56.639682,40.98138 -5.003935,0.84145 -12.035468,1.31756 -16.239364,1.09957 z m 0.446617,-12.91026 v -8.1347 l -1.228198,-0.12772 c -0.675509,-0.0703 -1.80601,-0.1832 -2.512225,-0.251 -2.588053,-0.24848 -6.720541,-1.06623 -9.720932,-1.92362 C 42.597956,128.47871 27.122785,112.0977 22.440948,91.444968 21.417669,86.931034 21.125685,84.088692 21.13338,78.716364 c 0.0058,-4.014264 0.104431,-5.653007 0.490817,-8.150772 2.617174,-16.918523 11.662747,-30.895977 26.09139,-40.317095 7.155907,-4.672418 17.076915,-8.109958 25.418056,-8.807127 0.859739,-0.07186 1.99024,-0.183616 2.512225,-0.248351 l 0.949062,-0.1177 V 13.049884 5.0244488 h -1.508703 c -1.948506,0 -6.642377,0.5428696 -9.768393,1.1297631 C 38.574741,11.175092 16.806858,30.257389 8.5266412,55.938863 6.2530127,62.990628 5.2141751,69.050039 4.9853242,76.59493 4.5231698,91.83152 8.6405743,106.51748 16.910421,119.12939 l 1.680062,2.56217 -0.976987,0.78409 c -1.698115,1.36283 -2.653415,2.51827 -3.502481,4.23623 -0.818184,1.65549 -0.824139,1.68787 -0.824139,4.48206 0,2.79799 0.0049,2.82439 0.830353,4.49463 1.888509,3.82114 5.652029,6.05904 9.576256,5.69432 2.85041,-0.26492 4.845241,-1.34369 6.900524,-3.73169 l 1.297753,-1.50783 2.800516,2.08245 c 10.527129,7.82792 23.118299,12.78419 35.984968,14.16478 3.251687,0.34891 3.696166,0.38905 4.745313,0.42856 l 0.949062,0.0357 z m 11.745085,7.56938 c 15.778284,-1.89378 30.694634,-8.97195 42.184344,-20.0175 23.33103,-22.42912 29.42327,-57.301059 15.05136,-86.153867 -1.07197,-2.152059 -2.66706,-5.054276 -3.54465,-6.449376 -0.87758,-1.395097 -1.56468,-2.561464 -1.52689,-2.591923 0.0378,-0.03046 0.79883,-0.532065 1.69117,-1.114678 3.19259,-2.084456 4.74186,-4.924205 4.74186,-8.691608 0,-3.233778 -1.0231,-5.667966 -3.23002,-7.684973 -3.01192,-2.752727 -6.91232,-3.393747 -10.54115,-1.732411 -2.02086,0.925177 -3.18023,2.057589 -5.35058,5.22612 -0.0296,0.0432 -1.0401,-0.720133 -2.24556,-1.696294 C 115.84298,13.687251 104.12361,8.3033971 92.15576,6.1352658 89.118402,5.5850089 84.31477,5.0295217 82.568442,5.0265984 l -1.284026,-0.00215 v 8.0194896 8.01949 l 0.837408,0.120445 c 0.460574,0.06625 1.64132,0.184 2.623879,0.261677 4.226573,0.334138 10.40003,1.80657 15.073346,3.595146 3.286601,1.25785 8.082591,3.769779 11.277101,5.906447 14.36613,9.608888 23.6155,25.029417 25.35834,42.277405 0.33929,3.357683 0.15534,11.00434 -0.3416,14.200861 -1.46858,9.446339 -5.26097,18.457121 -10.94922,26.015481 -1.01675,1.35102 -2.60501,3.26031 -3.52946,4.24287 l -1.68084,1.78647 -1.68138,-1.65761 -1.68138,-1.65761 1.18291,-1.27768 c 8.49176,-9.17212 13.15052,-20.136002 14.10821,-33.202124 l 0.1514,-2.065606 h -11.41756 -11.41755 v -2.456398 -2.456397 h 11.2771 11.27709 V 74.22302 c 0,-0.995424 -0.71566,-5.323859 -1.26931,-7.676987 -1.70764,-7.257906 -5.34902,-14.732577 -10.11725,-20.767722 -2.11822,-2.681039 -6.48975,-6.907826 -9.38116,-9.070557 C 104.46082,31.82815 97.908883,28.830305 89.881806,27.052197 87.996249,26.634523 83.38914,26.015479 82.166213,26.015479 h -0.881797 l 3.73e-4,10.328034 3.73e-4,10.328033 2.288542,0.374478 c 6.283875,1.028239 11.645764,3.809919 16.252379,8.431532 2.536917,2.545176 4.291587,4.988304 5.864477,8.165462 4.68295,9.459284 4.24311,20.824221 -1.15851,29.934241 -1.23758,2.087236 -3.65884,5.226789 -4.15473,5.387292 -0.12282,0.03975 -0.966846,-0.608085 -1.875617,-1.439641 l -1.652306,-1.511919 1.543729,-1.924049 c 2.666194,-3.323052 4.508114,-7.427663 5.345114,-11.911291 0.55175,-2.955608 0.35559,-8.372891 -0.40835,-11.277096 -1.27247,-4.837441 -3.576536,-8.827613 -7.092047,-12.281986 -3.875159,-3.807768 -8.837034,-6.268424 -14.119824,-7.002195 l -0.841216,-0.116844 0.05964,5.602417 0.05963,5.602419 1.339853,0.373783 c 3.814475,1.064138 7.13783,3.852665 8.914875,7.480203 1.075377,2.195202 1.51384,4.094866 1.52216,6.59485 0.01125,3.380731 -0.982306,6.403667 -2.970014,9.036364 l -0.94519,1.251896 -0.581211,-0.50535 C 88.356882,86.658171 87.67301,86.035363 87.156832,85.552098 l -0.938507,-0.878667 0.560085,-0.665623 c 2.894672,-3.440124 3.099152,-9.011367 0.474458,-12.92711 -3.956133,-5.902101 -12.670251,-5.902101 -16.626384,0 -3.67247,5.478905 -1.707444,12.979036 4.124247,15.741453 1.437182,0.680779 1.637177,0.714912 4.188945,0.714912 2.534118,0 2.759142,-0.03764 4.141792,-0.692847 0.804146,-0.381065 1.81676,-1.004255 2.250254,-1.384867 l 0.788171,-0.692023 1.434339,1.457403 1.434342,1.457402 -0.893236,0.785067 c -1.261985,1.109159 -3.753075,2.439647 -5.405002,2.886803 l -1.405917,0.380563 v 5.909895 5.909901 l 1.060717,-0.15292 c 4.698817,-0.67739 9.625814,-2.98196 13.00966,-6.085165 l 1.230119,-1.1281 1.752304,1.600291 1.752301,1.600292 -1.478298,1.382882 c -3.925558,3.67217 -9.824113,6.49044 -15.212106,7.26819 l -2.003043,0.28914 -0.05782,11.65579 -0.05782,11.6558 h 1.110859 c 1.605852,0 5.780373,-0.61275 8.495405,-1.24699 9.076443,-2.12027 17.361963,-6.48577 24.022913,-12.65727 l 1.35706,-1.25734 1.64876,1.65983 1.64876,1.65984 -0.77274,0.80882 c -1.10303,1.15454 -4.92835,4.26907 -7.02538,5.72 -8.14804,5.6376 -17.662089,9.06261 -27.791816,10.00491 -1.406856,0.13087 -2.574136,0.25925 -2.593957,0.2853 -0.01982,0.026 -0.105849,3.70429 -0.191171,8.17388 l -0.155134,8.12654 2.190818,-0.15216 c 1.204952,-0.0837 3.406304,-0.29804 4.891896,-0.47635 z M 76.371621,119.96621 V 108.29187 L 74.31015,108.01111 C 65.198058,106.77011 56.382399,100.13885 52.138553,91.333313 50.39306,87.711599 49.743682,85.398631 48.988121,80.112044 L 48.884396,79.386291 H 37.394112 25.903825 v 1.627477 c 0,4.67307 1.466371,11.80619 3.485659,16.955893 6.266979,15.982399 19.781418,27.936269 36.328189,32.133219 3.042203,0.77163 7.467693,1.48853 9.369923,1.51788 l 1.284025,0.0198 z m 0.171122,-22.401948 0.05947,-5.827727 -1.409556,-0.381549 C 70.339521,90.041304 66.403714,85.90813 65.071353,80.726144 c -0.487966,-1.897864 -0.48302,-5.247267 0.01055,-7.145883 1.32072,-5.080388 5.221358,-9.151835 10.061519,-10.502112 l 1.339853,-0.373783 0.05965,-5.611023 0.05965,-5.611021 -0.729577,0.124287 c -4.667057,0.795056 -7.437026,1.85504 -10.83109,4.144733 -7.01155,4.730112 -11.251936,12.876242 -11.252155,21.616315 -8.5e-5,3.376099 0.29891,5.453727 1.190339,8.271281 2.824952,8.928874 10.030126,15.548252 19.046783,17.498232 2.697718,0.58342 2.447386,1.13793 2.515864,-5.572908 z M 49.822376,70.00732 C 52.78685,57.940994 62.77465,48.691935 74.702611,46.96733 l 1.892319,-0.2736 V 36.354605 26.015479 h -0.881797 c -1.472311,0 -6.001733,0.652861 -8.679668,1.25107 -7.611216,1.700222 -15.419507,5.489608 -21.595646,10.480429 -2.657927,2.14782 -6.974898,6.612643 -8.952903,9.259532 -5.893732,7.886761 -9.279169,16.565248 -10.430851,26.739234 l -0.107206,0.947064 11.534716,0.05783 11.534714,0.05783 0.169876,-1.451508 c 0.09343,-0.798329 0.379727,-2.305664 0.636211,-3.349632 z"
+        id="path41"
+        
+        transform="matrix(0.26458333,0,0,0.26458333,65.4537,102.595)" />
+      </g>
+    </svg>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/assets/service-now-icon.jsx
+  ------------------------------------------------
+// Generated automatically from geometry vectors
+import React from 'react';
+
+export default function ServiceNowIcon({ width = "1.5em", height = "1.5em", className = "" }) {
+  return (
+    <svg
+      viewBox="20 0 120 60"
+      width={width}
+      height={height}
+      className={`inline-block align-left ${className}`}
+    >
+    <path d="M18.175 40.99V18.992h5.65v1.77c1.738-1.443 3.928-2.23 6.187-2.22 2.93-.008 5.712 1.288 7.6 3.537 1.432 1.726 2.263 3.945 2.263 7.712v11.2h-5.872V29.332c0-2.148-.5-3.308-1.3-4.124a4.62 4.62 0 0 0-3.301-1.224 7.01 7.01 0 0 0-5.335 2.721v14.32z" fill="#293e40"/><path d="M54.988 18.54a12.89 12.89 0 0 0-8.886 22.198c.907.865 2.3.94 3.3.172a9.2 9.2 0 0 1 10.963 0 2.54 2.54 0 0 0 3.351-.172 12.89 12.89 0 0 0-8.729-22.198m-.072 19.283c-1.718.056-3.383-.6-4.603-1.81s-1.886-2.872-1.842-4.59a6.41 6.41 0 0 1 9.671-5.728 6.41 6.41 0 0 1 3.139 5.728c.046 1.71-.614 3.366-1.824 4.577s-2.866 1.87-4.577 1.824" fill="#81b5a1"/><path d="M84.038 28.465l-4.7 12.524h-4.375l-8.73-21.997h5.872l4.776 12.574 4.7-12.574h4.905l4.647 12.574 4.826-12.574h5.864L93.103 40.99h-4.375z" fill="#293e40"/>
+    </svg>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/components/Card.jsx
+  ------------------------------------------------
+// src/components/card.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const Card = ({ item ,  index }) => {
+  // Destructure attributes with sensible defaults if necessary
+  const { 
+    url, 
+    locked, 
+    target, 
+    rel, 
+    download, 
+    name, 
+    icon, 
+    desc, 
+    tag 
+  } = item;
+
+  return (
+    <motion.a
+      key={item.name}
+      //href={item.url}
+      href={item.locked ? "#" : item.url} // Disable link if item is locked
+
+      // Dynamic Settings
+      target={target} 
+      rel={target === "_blank" ? (rel || "noopener noreferrer") : rel}
+      download={download} // Useful if the link is a file/PDF
+
+      whileHover={{ scale: 1.02 }}
+      /* 'w-72' or 'w-80' gives the card a consistent width in the carousel.
+         'shrink-0' is vital to prevent the flexbox from squishing the card.
+      */
+      //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+      className={`relative w-72 shrink-0 bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition
+        ${item.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+      >
+      {/* Tag Badge (Coming Soon, New, etc) */}
+      {item.tag  && (
+        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+          {item.tag}
+        </span>
+      )}
+      {item.icon  && (
+      <div className="text-3xl text-blue-400">
+        {item.icon}
+      </div>
+      )}
+      {item.desc  && (
+      <div>
+        <h3 className="text-xl font-bold text-white">{item.name}</h3>
+        <p className="text-gray-400 text-sm">{item.desc}</p>
+      </div>
+      )}
+    </motion.a>
+  );
+};
+
+export default Card;
+
+  ------------------------------------------------
+
+  FILE: src/components/Carousel.jsx
+  ------------------------------------------------
+// src/components/Carousel.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const Carousel = ({ item ,  index }) => {
+  import { item.name } from {item.path};
+  return (
+      {/* Section: Services Carousel */}
+      <section className="mb-16 w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+        </h2>
+        {/* 1. 'overflow-x-auto' enables the scroll.
+            2. 'flex-nowrap' prevents items from wrapping/squeezing.
+            3. 'snap-x' enables the snap-to-item behavior.
+        */}
+        <div ref={scrollRef} className="flex overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-mandatory scrollbar-hide">
+          {SERVICES.map((service) => (
+            <Card key={service.name} item={service} />
+          ))}
+        </div>
+      </section>
+  );
+};
+
+export default Carousel;
+
+  ------------------------------------------------
+
+  FILE: src/components/ContactCard.jsx
+  ------------------------------------------------
+// src/components/ContactCard.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; 
+
+const ContactCard = ({ contact , index }) => {
+
+  // Use email prefix as ID if contact.id doesn't exist
+  const contactId = contact.id || contact.email?.split('@')[0] || index;
+
+  // FIX 1: Aligned hash path string exactly to match "/contact-us/:id" route from main.jsx
+  const dynamicQrValue = `${window.location.origin}${window.location.pathname}#/contact-us/${contactId}`;
+
+  return (
+    <motion.div
+        key={contact.id || contact.email || index} 
+        whileHover={{ y: -5 }}
+        className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
+      >
+      {/* Tag Badge (Coming Soon, New, etc) */}
+      {contact.tag  && (
+        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+          {contact.tag}
+        </span>
+      )}
+      {contact.logo && (
+        <img src={contact.logo} alt="Logo" className="w-20 mb-4" />
+      )}
+      <h2 className="text-3xl font-black mb-1">{contact.name}</h2>
+      {contact.title && (
+        <p className="text-blue-600 font-bold mb-6">{contact.title}</p>
+      )}
+      <div className="text-gray-600 space-y-2 mb-6 text-sm">
+        {contact.phone && (
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <FaPhone className="text-blue-500" />
+            {contact.phone_sms && (
+              <FaSms className="text-blue-500" />
+            )}
+            {contact.phone}
+          </p>
+        )}
+        {contact.address && (
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <FaMapMarkerAlt className="text-blue-500" /> {contact.address}
+          </p>
+        )}
+      </div>
+      <div className="flex gap-4 mb-8 text-2xl text-gray-700">
+        {contact.linkedin && (
+          <a href={contact.linkedin} className="hover:text-blue-600"><FaLinkedin /></a>
+        )}
+        {contact.github && (
+          <a href={contact.github} className="hover:text-gray-900"><FaGithub /></a>
+        )}
+        {contact.email && (
+          <a href={`mailto:${contact.email}`} className="hover:text-red-500"><FaEnvelope /></a>
+        )}
+        {contact.chat && (
+          <a href={contact.chat} className="hover:text-red-500"><FaRocketchat /></a>
+        )}
+        {contact.web && (
+          <a href={contact.web} className="hover:text-red-500"><TbWorldWww /></a>
+        )}
+      </div>
+      <div className="flex flex-col w-full gap-3">
+        {contact.calcom && (
+          <a
+            href={contact.calcom}
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+            <FaRegCalendarAlt /> Schedule Meeting
+          </a>
+        )}
+        {/* New Download Contact Button */}
+        {contact.vcfPath  && (
+          <a
+            href={contact.vcfPath}
+            download
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+            <FaAddressCard /> Save Contact
+          </a>
+        )}
+        {/* FIX 2: Wrapped block logic checking to verify target data generation options safely */}
+        {contact.showQR !== false && (
+          <div className="bg-gray-50 p-4 rounded-xl mb-6 border border-gray-100 shadow-inner">
+            <QRCodeSVG value={dynamicQrValue} size={100} marginSize={2} className="mx-auto" />
+            <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Scan to Share</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+export default ContactCard;
+
+  ------------------------------------------------
+
+  FILE: src/components/MobileNavLink.jsx
+  ------------------------------------------------
+// src/components/MobileNavLink.jsx
+import { useState } from 'react';
+import { NavLink as RouterLink, useLocation } from 'react-router-dom';
+import { GLOBALS } from '../data/app__globals.jsx';
+
+export default function MobileNavLink({ item, subItems, onClose, basePath }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  // Evaluate active text highlighting paths for mobile headers
+  const isMobileHeaderActive =
+    (subItems && subItems.some(sub => location.pathname === sub.path)) ||
+    (basePath && location.pathname.startsWith(basePath)) ||
+    location.pathname === item.path;
+
+  // Global Theme Highlighting Fallbacks
+  const activeColorClass = GLOBALS.theme?.textActive || "text-blue-400 font-bold";
+  const hoverTextClass = GLOBALS.theme?.textHover || "hover:text-blue-300";
+
+  // If no submenu items exist, render a standard link layout row block
+  if (!subItems || subItems.length === 0) {
+    return (
+      <RouterLink
+        to={item.path}
+        onClick={onClose}
+        className={({ isActive }) =>
+          `block px-4 py-3 border-b border-white/5 transition-colors ${
+            isActive
+              ? activeColorClass
+              : `text-white ${hoverTextClass} hover:bg-white/5`
+          }`
+        }
+      >
+        {item.label}
+      </RouterLink>
+    );
+  }
+
+  return (
+    <div className="border-b border-white/5">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', padding: '12px 16px' }}
+        className={`nav-menu-btn w-full flex justify-between items-center transition-colors cursor-pointer focus:outline-none ${
+          isMobileHeaderActive
+            ? activeColorClass
+            : `text-white ${hoverTextClass} hover:bg-white/5`
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          {item.icon} {item.label}
+        </div>
+        <span
+          className="text-xs transition-transform duration-200"
+          style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        >
+          ▼
+        </span>
+      </button>
+
+      {/* Accordion Nested Options Sub-Block */}
+      {isOpen && (
+        <div className="bg-white/5 pb-2 transition-all">
+          {subItems.map((sub, index) => (
+            <RouterLink
+              key={`${sub.path}-${index}`}
+              to={sub.path}
+              onClick={onClose}
+              className={({ isActive: isSubActive }) =>
+                `flex items-center gap-3 pl-8 pr-4 py-2 text-sm transition-all ${
+                  isSubActive
+                    ? `${activeColorClass} bg-blue-600/10`
+                    : `text-gray-300 ${hoverTextClass} hover:bg-blue-600/20`
+                }`
+              }
+            >
+              {sub.icon && <span className="text-lg flex items-center">{sub.icon}</span>}
+              <span>{sub.label}</span>
+            </RouterLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/components/NavBar.jsx
+  ------------------------------------------------
+// src/components/NavBar.jsx
+import { useState } from 'react';
+import { NavLink as RouterLink } from 'react-router-dom';
+import { GLOBALS } from '../data/app__globals.jsx';
+import NavDropdown from './NavDropdown.jsx';
+import MobileNavLink from './MobileNavLink.jsx';
+
+const productFiles = import.meta.glob('../data/products/*.jsx', { eager: true });
+const serviceFiles = import.meta.glob('../data/services/*.jsx', { eager: true });
+
+export default function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Parse product filesystem routes
+  const productSubmenu = Object.entries(productFiles).map(([path, module]) => {
+    const id = path.split('/').pop().replace('.jsx', '');
+    return {
+      label: module.CONFIG?.label || id.toUpperCase(),
+      path: `/products/${id}`,
+      icon: module.CONFIG?.icon
+    };
+  });
+
+  // Parse service filesystem routes
+  const serviceSubmenu = Object.entries(serviceFiles).map(([path, module]) => {
+    const id = path.split('/').pop().replace('.jsx', '');
+    return {
+      label: module.CONFIG?.label || id.toUpperCase(),
+      path: `/services/${id}`,
+      icon: module.CONFIG?.icon
+    };
+  });
+
+  return (
+    <nav className="bg-black/60 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-10">
+          <div className="flex items-center text-white font-bold text-2xl">
+            <img src={GLOBALS.app_logo} width='25px' alt="logo" />
+            &nbsp;{GLOBALS.app_title}
+          </div>
+          
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex ml-4 lg:ml-10 items-center space-x-4 lg:space-x-6 h-full">
+            <RouterLink to="/" className={({ isActive }) => isActive ? "text-blue-400 font-bold" : "text-white hover:text-blue-300"}> 
+              Home 
+            </RouterLink>
+
+            <NavDropdown
+              label="Products"
+              items={productSubmenu}
+              basePath="/products"
+            />
+
+            <NavDropdown
+              label="Services"
+              items={serviceSubmenu}
+              basePath="/services"
+            />
+          </div>
+
+          {/* Hamburger Mobile Toggle */}
+          <div className="mr-2 flex md:hidden">
+            <button 
+              type="button"
+              onClick={() => setIsOpen(!isOpen)} 
+              className="nav-menu-btn focus:outline-none text-xl"
+            >
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Drawer Block Execution */}
+      {/* Inside Mobile Drawer Block Execution layout boundary loop in NavBar.jsx */}
+      {isOpen && (
+        <div className="md:hidden absolute top-10 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 px-2 pt-2 pb-3 space-y-1">
+          <MobileNavLink item={{ label: 'Home', path: '/' }} onClose={() => setIsOpen(false)} />
+          
+          <MobileNavLink 
+            item={{ label: 'Products', path: '#' }} 
+            subItems={productSubmenu} 
+            basePath="/products" 
+            onClose={() => setIsOpen(false)} 
+          />
+          
+          <MobileNavLink 
+            item={{ label: 'Services', path: '#' }} 
+            subItems={serviceSubmenu} 
+            basePath="/services" 
+            onClose={() => setIsOpen(false)} 
+          />
+        </div>
+      )}
+    </nav>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/components/NavDropdown.jsx
+  ------------------------------------------------
+// src/components/NavDropdown.jsx
+import { useState } from 'react';
+import { NavLink as RouterLink, useLocation } from 'react-router-dom';
+import { GLOBALS } from '../data/app__globals.jsx'; // FIX: Added missing import
+
+export default function NavDropdown({ label, items, basePath }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const location = useLocation();
+  
+  // 1. Split path sections cleanly into individual array strings
+  const pathParts = location.pathname.split('/').filter(Boolean); // e.g. ["services", "0001-casdm"]
+  console.log('location:' + location.pathname + ' ==>[split]==> ' + location.pathname.split('/'));
+  // HIGHLIGHTING FIX: Split path parts to accurately verify base directories
+  //const pathParts = location.pathname.split('/').filter(Boolean); // e.g. ["services", "00"]
+  // COPY AND PASTE THIS TEMP DEBUGGER LOG
+  console.log(`[Dropdown Debug: ${label}]`, {
+    rawPathname: location.pathname,
+    parsedParts: pathParts,
+    firstDirectory: pathParts[0],
+    configuredBasePath: basePath,
+    dropdownLabel: label
+  });
+  //alert(pathParts);
+
+  // Check if current route is part of this drop section
+  // const isDropdownActive =
+  //  items.some(item => location.pathname === item.path) ||
+  //  (basePath && location.pathname.startsWith(basePath));
+  
+  // BULLETPROOF MATCHING LOGIC FOR MIXED HASH/BROWSER URLS:
+  const isDropdownActive =
+    // Check 1: Does the current URL path string exactly match one of your submenu child item paths?
+    items.some(item => location.pathname === item.path) ||
+    // Check 2: Clean base path check
+    (basePath && location.pathname.startsWith(basePath)) ||
+    // Check 3: Read window location directly if React Router parameters shift via HashRouter
+    window.location.hash.toLowerCase().includes(label.toLowerCase()) ||
+    location.pathname.toLowerCase().includes(label.toLowerCase());
+
+  // Safely extract theme colors with clean, definitive fallbacks
+  const activeColorClass = GLOBALS.theme?.textActive || "text-blue-400 font-bold";
+  const inactiveColorClass = `text-red ${GLOBALS.theme?.textHover || "hover:text-blue-300"}`;
+  console.log('label:' + label + '  isDropdownActive:' + isDropdownActive + '  activeColorClass:' + activeColorClass + '  inactiveColorClass:' + inactiveColorClass);
+  return (
+    <div
+      className="relative flex items-center h-10" // Force layout tracking boundary
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <button
+        type="button"
+        className={`nav-menu-btn flex items-center gap-1 text-base transition-colors cursor-pointer focus:outline-none ${
+          isDropdownActive ? activeColorClass : inactiveColorClass
+        }`}
+      >
+        {label}
+        <span className={`text-[10px] ml-1 transition-transform duration-200 ${isHovered ? 'rotate-180' : ''}`}>
+          ▼
+        </span>
+      </button>
+
+      {/* Dropdown Menu Panel */}
+      {isHovered && (
+        <div className="absolute left-0 top-10 w-56 bg-black/90 backdrop-blur-xl border border-white/10 rounded-md shadow-2xl py-2 z-[60]">
+          {items.map((item) => (
+            <RouterLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive: isChildActive }) =>
+                `flex items-center gap-3 px-4 py-2 text-sm transition-all ${
+                  isChildActive 
+                    ? "text-blue-400 font-bold bg-blue-600/10" 
+                    : "text-gray-300 hover:bg-blue-600/20 hover:text-blue-300"
+                }`
+              }
+            >
+              {item.icon && <span className="text-lg flex items-center">{item.icon}</span>}
+              <span>{item.label}</span>
+            </RouterLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/components/SectionRenderer.jsx
+  ------------------------------------------------
+// src/components/SectionRenderer.jsx
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from './Card.jsx';
+
+export default function SectionRenderer({ section }) {
+  // Directly spread your config file configuration overrides straight into the hook initializer
+  const scrollRef = useAutoScroll(section.scrollOptions || {});
+
+  if (section.layout === 'carousel') {
+    return (
+      <section className="mb-16 w-full overflow-hidden">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+          <span className={`w-8 h-1 ${section.accentColor || 'bg-blue-500'} rounded-full`} />
+          {section.title}
+        </h2>
+        <div 
+          ref={scrollRef} 
+          className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide w-full"
+        >
+          {section.items.map((item, index) => (
+            <Card 
+              key={`${item.name.replace(/\s+/g, '-').toLowerCase()}-${index}`} 
+              item={item} 
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // Standard Multi-Column UI Grid Layout engine logic fallback
+  return (
+    <div className="flex flex-col items-center justify-center w-full pt-12 pb-12">
+      <div className="grid grid-cols-1 w-full items-start">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+          <span className={`w-8 h-1 ${section.accentColor || 'bg-yellow-500'} rounded-full`} />
+          {section.title}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+          {section.items.map((item, index) => (
+            <Card 
+              key={`${item.name.replace(/\s+/g, '-').toLowerCase()}-${index}`} 
+              item={item} 
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/components/dynamic-page-template.jsx
+  ------------------------------------------------
+// src/components/dynamic-page-template.jsx
+import { useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import SectionRenderer from './SectionRenderer.jsx';
+
+export default function DynamicPageTemplate({ filesDict, fallbackType }) {
+  // 1. Determine current sub-route parameters
+  const { productId, serviceId } = useParams();
+  const activeId = productId || serviceId;
+  
+  // 2. Locate the correct data file from the provided bundle dictionary
+  const matchedKey = Object.keys(filesDict).find(key => key.endsWith(`/${activeId}.jsx`));
+  const module = filesDict[matchedKey];
+
+  if (!module) {
+    return <div className="pt-24 text-white text-center">{fallbackType} configuration not found.</div>;
+  }
+
+  const { CONFIG, DATA } = module;
+
+  return (
+    <div className="min-h-screen bg-cover bg-fixed"
+      style={{
+        backgroundImage: `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})`
+      }}
+    >
+      {/* Dynamic SEO Injector */}
+      <Helmet>
+        <title>{CONFIG.seo?.title || `${CONFIG.title} | ${GLOBALS.app_title}`}</title>
+        <meta name="description" content={CONFIG.seo?.description || CONFIG.subtitle} />
+        <meta name="keywords" content={CONFIG.seo?.keywords?.join(', ')} />
+      </Helmet>
+
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          <h1 className="text-4xl font-bold text-white">{CONFIG.title}</h1>
+          <p className="text-gray-400 mt-2">{CONFIG.subtitle}</p>
+        </header>
+
+        {CONFIG.sections?.map((section, index) => (
+          <SectionRenderer 
+            key={`${section.id || 'section'}-${index}`} 
+            section={section} 
+          />
+        ))}
+        {DATA && DATA.length > 0 && (
+          <section>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-white">
+              <span className={`w-8 h-1 ${CONFIG.accentColor || 'bg-blue-500'} rounded-full`} />
+                {CONFIG.section_title}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {DATA.map((item, index) => (
+                <Card 
+                  key={`${item.name.replace(/\s+/g, '-').toLowerCase()}-${index}`} 
+                  item={item} 
+                />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/components/footer.jsx
+  ------------------------------------------------
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+
+const Footer = () => {
+  return (
+    <footer className="bg-gray-900 text-gray-300 py-12 px-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        {/* Brand Section */}
+        <div className="space-y-4 lg:col-span-2 text-left"> {/* text-left to align <p> below */}
+          <div className="flex items-center text-white font-bold text-2xl justify-start">
+            <img src={ GLOBALS.app_logo } width='25px'/> &nbsp;{ GLOBALS.app_title }
+          </div>
+          <p className="text-sm max-w-xs"> {/* max-w-xs keeps the text from stretching too far right */}
+            A React, Vite, and Tailwind CSS design.
+          </p>
+          {GLOBALS.app_linkedin && (
+            <a href={GLOBALS.app_linkedin} target="_blank" className="hover:text-blue-600 flex items-center gap-2 group" >
+              {/* Set size here (e.g., size={24} or size="1.5em") */}
+              <FaLinkedin size={24} className="shrink-0" />
+              <span className="text-xs opacity-80 group-hover:opacity-100 truncate">
+                {GLOBALS.app_linkedin}
+              </span>
+           </a>
+          )}
+          {GLOBALS.app_support && (
+            <a href={`mailto:${GLOBALS.app_support}`} className="hover:text-blue-600 flex items-center gap-2 group" >
+              {/* Set size here (e.g., size={24} or size="1.5em") */}
+              <FaEnvelope size={24} className="shrink-0" />
+              <span className="text-xs opacity-80 group-hover:opacity-100 truncate">
+                {GLOBALS.app_support}
+              </span>
+           </a>
+          )}
+        </div>
+        {/*
+        <div className="space-y-4">
+          <h2 className="text-white text-2xl font-bold">
+            <img src={ GLOBALS.app_logo } width='25px'/> { GLOBALS.app_title }
+          </h2>
+          <p className="text-sm">
+            A React, Vite, and Tailwind CSS web design.
+          </p>
+        </div>
+        */}
+        {/* Links Group 1 - Reimagined Resources */}
+        <div>
+          <h3 className="text-white font-semibold mb-4">Technical Resources</h3>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <a href="#/dev-docs" className="hover:text-white transition flex items-center gap-2">
+                <FaCode className="text-blue-400" /> Dev Documentation
+              </a>
+            </li>
+            <li>
+              <a href="#/tech-stack" className="hover:text-white transition flex items-center gap-2">
+                <FaHdd className="text-purple-400" /> Our Tech Stack
+              </a>
+            </li>
+            <li>
+              <a href="#/case-studies" className="hover:text-white transition flex items-center gap-2">
+                <FaProjectDiagram className="text-yellow-400" /> Case Studies
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Links Group 2 */}
+        <div>
+          <h3 className="text-white font-semibold mb-4">Company</h3>
+          <ul className="space-y-2 text-sm">
+            <li><a href="#/about" className="hover:text-white transition">About us</a></li>
+            <li><a href="#/careers" className="hover:text-white transition">Careers</a></li>
+            <li><a href="#/contact-us" className="hover:text-white transition">Contact us</a></li>
+          </ul>
+        </div>
+
+        {/* Newsletter Section */}
+        <div>
+          {/* TODO: Need to install Linkmonk on unraid with reverse proxy */}
+          <h3 className="text-white font-semibold mb-4">The Future Is Here...</h3>
+          {/* 
+          <form className="flex flex-col space-y-2">
+            <input name="email" id="newsletter-email" 
+              type="email" 
+              placeholder="Email address" 
+              className="bg-gray-800 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">
+              Subscribe
+            </button>
+          </form>
+        */}
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm">
+        <p>© {new Date().getFullYear()} {GLOBALS.app_company} All rights reserved.</p>
+        <div className="flex space-x-6 mt-4 md:mt-0">
+          <a href="#/privacy-policy" className="hover:text-white">Privacy Policy</a>
+          <a href="#/terms-of-service" className="hover:text-white">Terms of Service</a>
+        </div>
+      </div>
+      {/*
+      <hr />
+      */}
+    </footer>
+  );
+};
+
+export default Footer;
+
+  ------------------------------------------------
+
+  FILE: src/data/app__globals.jsx
+  ------------------------------------------------
+// src/data/app_globals.jsx
+export const GLOBALS = {
+  bg_img:"/img/0.jpg"
+  ,app_company: 'REMOTE TECH US, LLC'
+  ,app_title: 'REMOTE TECH US'
+  ,app_linkedin: 'https://www.linkedin.com/company/remote-tech-us'
+  ,app_support: 'support@remote-tech.us'
+  ,app_subtitle: 'Professional Open-Source Infrastructure & Services'
+  ,app_logo: '/remote-tech-us_v2.svg'
+  //, bg_override_color: "#0f172a" // Tailwind's slate-900
+  //, bg_override_color: "blue" // Tailwind's slate-900
+  ,theme: {
+    textActive: "text-blue-400"
+    ,textHover: "hover:text-blue-300"
+    ,bgActiveHover: "hover:bg-blue-600/20"
+    ,bgHighlight: "bg-blue-600/10"
+  }
+};
+  ------------------------------------------------
+
+  FILE: src/data/business_careers.jsx
+  ------------------------------------------------
+// src/data/business_careers.jsx
+import { FaCode, FaServer, FaTerminal } from 'react-icons/fa';
+
+export const OPEN_POSITIONS = [
+  {
+    id: 'dev-001',
+    title: 'Senior Spel/Htmpl Developer',
+    department: 'CA Services',
+    location: 'Remote / US',
+    type: 'Contract',
+    icon: <FaCode />,
+    tags: ['Urgent', 'High-Level'],
+    desc: 'Specialist for CA Service Desk Manager customization. Must be proficient in SPEL code and HTMPL/PDM_MACRO customization.',
+    requirements: [
+      '5+ years CA SDM experience',
+      'Experience with REST/SOAP Integrations',
+      'Self-healing server config knowledge'
+    ]
+  },
+  {
+    id: 'dev-002',
+    title: 'DevOps Architect',
+    department: 'Infrastructure',
+    location: 'Remote',
+    type: 'Full-time',
+    icon: <FaServer />,
+    tags: ['New'],
+    desc: 'Help us scale our self-hosted infrastructure using Kubernetes, Docker, and Ansible.',
+    requirements: [
+      'Expertise in Infrastructure as Code (Terraform/Ansible)',
+      'Experience with Git-based CI/CD',
+      'Knowledge of zero-trust security (Vault)'
+    ]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_case_studies.jsx
+  ------------------------------------------------
+// src/data/business_case_studies.jsx
+import { FaHospital, FaIndustry, FaGlobe } from 'react-icons/fa';
+
+export const CASE_STUDIES = [
+  {
+    id: "sdm-optimization",
+    client: "Global Logistics Corp",
+    sector: "Logistics",
+    icon: <FaGlobe />,
+    title: "CA SDM SPEL Logic Overhaul",
+    challenge: "Client was facing 30-second lag times on ticket saves due to inefficient legacy SPEL code and PDM_MACRO bloat.",
+    solution: "Refactored the logic engine to use asynchronous web services and optimized database triggers, moving heavy processing away from the UI thread.",
+    results: [
+      "90% reduction in save latency",
+      "Automated 15 manual workflow steps",
+      "Zero downtime during migration"
+    ],
+    tags: ["CA SDM", "SPEL", "Optimization"]
+  },
+  {
+    id: "self-hosted-stack",
+    client: "Healthcare Providers North",
+    sector: "Medical",
+    icon: <FaHospital />,
+    title: "Privacy-First Infrastructure Migration",
+    challenge: "Strict HIPAA requirements necessitated moving away from public SaaS tools for project management and internal chat.",
+    solution: "Deployed a hardened, self-hosted stack featuring Gitea for code, OpenProject for PM, and Rocket.Chat for communication.",
+    results: [
+      "Full Data Sovereignty achieved",
+      "60% reduction in annual licensing costs",
+      "End-to-end encryption for all internal comms"
+    ],
+    tags: ["Self-Hosted", "Security", "Infrastructure"]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_clients.jsx
+  ------------------------------------------------
+// src/data/business_clients.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const BUSINESS_CLIENTS = [
+  { 
+    name: 'A&I Solutions',
+    url: 'https://www.anisolutions.com',
+    icon: <SiBroadcom />,
+    tag: '',
+    locked: false,
+    desc: 'No Longer providing CA Service Desk Manager Services'
+  },
+  { 
+    name: 'Belden', 
+    url: 'https://www.belden.com', 
+    icon: <FaCode />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager / Catalog!' 
+  },
+  { 
+    name: 'Sheetz', 
+    url: 'https://www.sheetz.com', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager / IT PAM' 
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_contacts.jsx
+  ------------------------------------------------
+// src/data/business_contacts.js
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+export const CONTACTS = [
+  {
+    id: "main-office",
+    name: "Information",
+    logo: "/remote-tech-us_v2.svg",
+    email: "info@remote-tech.us",
+    showQR: false,
+    type: "company" // Matches the default filter string rule
+  },
+  {
+    tag: 'Founder',
+    locked: false,
+    logo: "/remote-tech-us_v2.svg",
+    name: "William Earnhardt",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    phone_sms: "yes",
+    email: "william@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    //chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    //calcom:"https://cal.com/remote-tech.us",
+  }
+  ,{
+    logo: "/remote-tech-us_v2.svg",
+    name: "Support",
+    email: "support@remote-tech.us",
+    //chat: "https://chat.remote-tech.us/group/Support",
+    showQR: false,
+    type: "company"
+  }
+].map((contact, index) => ({
+  ...contact,
+  // Use email prefix if it exists, otherwise fall back to a slugified name or index
+  id: contact.email 
+    ? contact.email.split('@')[0] 
+    : (contact.name?.toLowerCase().replace(/\s+/g, '-') || `member-${index}`)
+}));
+  ------------------------------------------------
+
+  FILE: src/data/business_dev_docs.jsx
+  ------------------------------------------------
+// src/data/business_dev_docs.jsx
+export const DEV_DOCS_CATEGORIES = [
+  {
+    id: "getting-started",
+    title: "Getting Started",
+    pages: [
+    { 
+      id: "intro", 
+      title: "Introduction", 
+      content: "Welcome to the Remote Tech documentation. Our infrastructure is built on the principle of data sovereignty and open-source excellence." 
+    },
+    { 
+      id: "architecture", 
+      title: "Global Architecture", 
+      content: "We leverage Docker and Kubernetes to orchestrate self-healing environments. Our stack is designed to be cloud-agnostic and fully portable." }
+    ]
+  },
+  {
+    id: "legacy-systems",
+    title: "CA Service Desk",
+    pages: [
+    { 
+      id: "nxenv-best-practices", 
+      title: "NX.env Best Practice", 
+      content: "Always update NX_tpl to maintain persistents\ntest.", 
+      language: "javascript", // Use lower-case language identifiers
+      // Store as a component/function instead of a string
+      code: `
+const config = {
+  engine: "self-hosted",
+  uptime: "99.9%"
+};`
+    },
+    { 
+      id: "spel-best-practices", 
+      title: "SPEL Optimization", 
+      content: "When writing SPEL, avoid heavy synchronous logic in triggers. Use web service calls for external integrations to prevent UI blocking.",
+      language: "spel", // Use lower-case language identifiers
+    },
+    { 
+      id: "htmpl-macros", 
+      title: "HTMPL Customization", 
+      content: "Always use PDM_INCLUDE and PDM_MACRO to keep your web forms modular and maintainable across CA SDM upgrades.",
+      language: "htmpl", // Use lower-case language identifiers
+    }
+  ]
+    
+  },
+  {
+    id: "self-hosting",
+    title: "Self-Hosting Guides",
+    pages: [
+    { 
+      id: "gitea-setup", 
+      title: "Gitea Deployment", 
+      content: "Our Gitea deployment utilizes Postgres as the backend for reliability. Ensure your SSH keys are managed via the Gitea web interface.", 
+      language: "yml", // Use lower-case language identifiers
+    },
+    { 
+      id: "rocket-chat", 
+      title: "Rocket.Chat Config", 
+      content: "To enable high availability, we deploy Rocket.Chat using a ReplicaSet in MongoDB for seamless chat synchronization.",
+      language: "yaml", // Use lower-case language identifiers
+    }
+    ]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_products.jsx
+  ------------------------------------------------
+// src/data/business_products.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const BUSINESS_PRODUCTS = [
+  {
+    name: 'pdm_tools',
+    url: 'https://sass.remote-tech.us',
+    icon: '',
+    tag: '',
+    locked: false,
+    desc: 'Available via SMART-ASS'
+  },
+  {
+    name: 'docker-bash',
+    url: 'https://github.com',
+    icon: <FaGithub />,
+    tag: '',
+    locked: false,
+    desc: 'Available via SMART-ASS'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_projects.jsx
+  ------------------------------------------------
+// src/data/business_projects.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+{/* url options 
+   1. '/#/tech-stack', 
+   2. `${import.meta.env.BASE_URL}#/tech-stack`
+*/}
+export const BUSINESS_PROJECTS = [
+  { 
+    name: 'Infrastructure',
+    url: `${import.meta.env.BASE_URL}#/tech-stack`,
+    tag: "completed",
+    locked: false,
+    desc: "SCOPE OF WORK:Build out infrastruture to support newly formed business. (click to see our tech stack)"
+  },
+  { 
+    name: 'Sheetz',
+    url: '',
+    tag: "completed",
+    locked: true,
+    desc: "SCOPE OF WORK:Upgrade Service Desk Manager & IT PAM (Dev/Test& PRODUCTION  environments) from version r17.3 to version r17.4"
+  },
+  { 
+    name: 'Belden', 
+    url: '',
+    tag: "completed",
+    locked: true,
+    desc: "SCOPE OF WORK:Upgrade Service Desk Manager & Service Catalog (Dev/Test& PRODUCTION  environments) from version r17.3 to version r17.4"
+  },
+  { 
+    name: 'Company Website',
+    url: '',
+    tag: "completed",
+    locked: true,
+    desc: "SCOPE OF WORK:Built React - Vite - Tailwind CSS site to present company portal"
+  },
+  { 
+    name: 'Smart - Autonomous Subscription Services',
+    url: 'https://sass.remote-tech.us',
+    tag: "",
+    locked: false,
+    desc: "SCOPE OF WORK:Python/Flask/SQLAlchemy subscription services project"
+  },
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_services.jsx
+  ------------------------------------------------
+// src/data/business_services.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+export const BUSINESS_SERVICES = [
+  { 
+    name: 'CA Service Desk Manager',
+    desc: 'CA SDM Suite',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://www.broadcom.com/products/software/service-management/service-desk-manager',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA Automation Point ',
+    desc: 'CA AP Suite',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: '',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA IT Process Automation Manager',
+    desc: 'CA IT PAM Suite',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://www.broadcom.com/products/software/service-management/it-process-automation-manager',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA Service Catalog',
+    desc: 'CA Service Desk Manager - Catalog Component',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://www.broadcom.com/products/software/service-management/service-catalog',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  },
+  { 
+    name: 'CA Embedded Entitlements Manager',
+    desc: 'CA EEM - Security Component',
+    icon: <SiBroadcom />,
+    locked: false,
+    tag: '',
+    url: 'https://techdocs.broadcom.com/us/en/ca-enterprise-software/other/Embedded-Entitlements-Manager/12-7.html',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  }
+];
+
+  ------------------------------------------------
+
+  FILE: src/data/business_tech.jsx
+  ------------------------------------------------
+// src/data/business_tech.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiDocker, SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+export const BUSINESS_TECH = [
+  { 
+    name: 'Git',
+    url: 'https://github.com',
+    icon: <FaGithub />,
+    tag: "",
+    locked: false,
+    desc: 'Modern Distributed Version Control System!'
+  },
+  { 
+    name: 'Docker', 
+    url: 'https://docker.com', 
+    icon: <SiDocker />,
+    tag: "",
+    locked: false,
+    desc: 'Pupular container system!' 
+  },
+  { 
+    name: 'Kubernetes', 
+    url: 'https://kubernetes.com', 
+    icon: <SiKubernetes />,
+    tag: "",
+    locked: false,
+    desc: 'Container Orchestration' 
+  },
+  { 
+    name: 'RedHat Ansible', 
+    url: 'https://www.redhat.com/en/ansible-collaborative', 
+    icon: <SiAnsible />,
+    tag: "",
+    locked: false,
+    desc: 'Infrastructure As Code.'
+  },
+  { 
+    name: 'Hashicorp Terraform', 
+    url: 'https://developer.hashicorp.com/terraform', 
+    icon: <SiTerraform />,
+    tag: "",
+    locked: false,
+    desc: 'Infrastructure As Code'
+  },
+  { 
+    name: 'Hashicorp Vault', 
+    url: 'https://hashicorp.com/vault', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Zero Trust Secrets Vault'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_tools.jsx
+  ------------------------------------------------
+// src/data/business_tools.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+
+export const BUSINESS_TOOLS = [
+  { 
+    name: 'Chat',
+    url: 'https://chat.remote-tech.us',
+    icon: <FaRocketchat />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting Rocketchat allowing for complete privacy and data retention!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <SiGitea />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: "",
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <BsKanban />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Jupyter Lab', 
+    url: 'https://jlab.remote-tech.us/board/1', 
+    icon: <SiJupyter />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/featured_clients.jsx
+  ------------------------------------------------
+// src/data/featured_clients.jsx
+import { FaMicrosoft, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const FEATURED_CLIENTS = [
+  { 
+    name: 'Broadcom',
+    url: 'https://broadcom.com',
+    icon: <SiBroadcom />,
+    tag: 'Acquired CA Technologies',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Microsoft', 
+    url: 'https://microsoft.com', 
+    icon: <FaMicrosoft />,
+    tag: 'Sponser',
+    locked: false,
+    desc: 'OnMicrosoft Cloud Sponser' 
+  },
+  { 
+    name: 'Github', 
+    url: 'https://github.com', 
+    icon: <FaGithub />,
+    tag: 'Hosting',
+    locked: false,
+    desc: 'CI/CD Pipeline for Site'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/featured_products.jsx
+  ------------------------------------------------
+// src/data/featured_products.jsx
+import { FaMicrosoft, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const FEATURED_PRODUCTS = [
+  { 
+    name: 'Smart - Autonomous Subscription Services',
+    url: 'https://sass.remote-tech.us',
+    icon: '',
+    tag: '',
+    locked: false,
+    desc: 'Secure, scalable, and transparent subscription services for your enterprise software.'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/featured_services.jsx
+  ------------------------------------------------
+// src/data/featured_services.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+export const FEATURED_SERVICES = [
+  { 
+    name: 'Architecture',
+    url: '',
+    icon: <SiBroadcom />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Implementation', 
+    url: '', 
+    icon: <VscSymbolClass />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Configuration', 
+    url: '', 
+    icon: <VscSettingsGear />,
+    tag: '',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Integrations', 
+    url: '', 
+    icon: <VscTypeHierarchy />,
+    tag: '',
+    locked: false,
+    desc: 'PeopleSoft, Workday, BigFix, Spectrum, AutomationPoint, IT PAM'
+  },
+  { 
+    name: 'Development', 
+    url: '', 
+    icon: <VscCode />, 
+    tag: '',
+    locked: true,
+    desc: 'HTMPL/PDM_MACRO, SPEL, PERL, ANSI C, REST/SOAP'
+  },
+  { 
+    name: 'Best Practices', 
+    url: '', 
+    icon: <VscWand />, 
+    tag: '',
+    locked: true,
+    desc: 'Self-Healing Server Configurations, CI/CD Pipeline, Release Management'
+  },
+  { 
+    name: 'Upgrades', 
+    url: '', 
+    icon: <VscThumbsup />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Support', 
+    url: '',
+    icon: <VscTelescope />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  },
+  { 
+    name: 'Training', 
+    url: '', 
+    icon: <VscCopilot />, 
+    tag: '',
+    locked: true,
+    desc: 'CA Service Desk Manager Suite'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/products/0001-smart-ass.jsx
+  ------------------------------------------------
+// src/data/services_casdm.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+import RemoteTechIcon from "../../assets/remote-tech-icon.jsx";
+
+// 1. Add metadata for the page to use
+export const CONFIG = {
+  label: "Remote Tech US", // This is what shows in the NavBar
+  icon: <RemoteTechIcon className="h-4 w-4" />,
+  title: "Products Developed by Remote Tech US",
+  subtitle: "Secure, scalable, and transparent software",
+  section_title: "Coming Soon",
+  bg_color: "rgba(30, 41, 59, 0.8)",
+  accentColor: "bg-red-600" // Custom color for this specific service
+};
+
+// 2. Your existing array (keeping the name for compatibility or renaming to DATA)
+export const DATA = [
+  { 
+    name: 'SMART-ASS',
+    desc: "Smart - Autonomous Subscription Service",
+    icon: <RemoteTechIcon />,
+    locked: false,
+    tag: '',
+    url: 'https://sass.remote-tech.us',
+    target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+    rel: '',
+    download: ''
+  }
+];
+
+  ------------------------------------------------
+
+  FILE: src/data/services/0001-casdm.jsx
+  ------------------------------------------------
+// src/data/services_casdm.jsx
+import { FaGit, FaWordpress, FaJenkins, FaDocker, FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom, SiKubernetes, SiAnsible, SiTerraform, SiMysql, SiMariadb, SiPostgresql, SiMongodb,  SiPerl, SiPython, SiPhp, SiDotnet, SiGnubash  } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+import { VscCopilot, VscTypeHierarchy, VscTelescope, VscThumbsup, VscCode, VscSymbolClass, VscSettingsGear, VscBug, VscTools, VscSourceControl, VscWand, VscTerminal, VscTerminalCmd, VscTasklist, VscSync, VscChecklist } from "react-icons/vsc";
+
+// 1. Add metadata for the page to use
+export const CONFIG = {
+  label: "CA SDM Suite", // This is what shows in the NavBar
+  icon: <SiBroadcom />,
+  title: "CA Service Management",
+  subtitle: "Enterprise IT Service Management Solutions",
+  seo: {
+    title: "CA Service Desk Suite Management - Remote Tech",
+    description: "Enterprise level CA SDM, automation point and process engineering solutions.",
+    keywords: ["CA SDM", "Service Management", "Automation Point", "ITIL"]
+  },
+  section_title: "CASDM Services",
+  bg_color: "rgba(30, 41, 59, 0.8)",
+  accentColor: "bg-red-600", // Custom color for this specific service
+  // Map an array of indepentent layout zones
+  sections: [
+    {
+      id: "featured",
+      title: "Featured Software",
+      accentColor: "bg-blue-500",
+      layout: "carousel",
+      // Pass parameters safely straight to your custom hook options block
+      scrollOptions: {
+        direction: "left",
+        intervalTime: 40,
+        step: 1
+      },
+      items: [
+        { 
+          name: 'CA Service Desk Manager',
+          desc: 'CA SDM Suite',
+          icon: <SiBroadcom />,
+          locked: false,
+          tag: '',
+          url: 'https://www.broadcom.com/products/software/service-management/service-desk-manager',
+          target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+          rel: '',
+          download: ''
+        },
+        { 
+          name: 'CA Automation Point ',
+          desc: 'CA AP Suite',
+          icon: <SiBroadcom />,
+          locked: false,
+          tag: '',
+          url: '',
+          target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+          rel: '',
+          download: ''
+        },
+        { 
+          name: 'CA IT Process Automation Manager',
+          desc: 'CA IT PAM Suite',
+          icon: <SiBroadcom />,
+          locked: false,
+          tag: '',
+          url: 'https://www.broadcom.com/products/software/service-management/it-process-automation-manager',
+          target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+          rel: '',
+          download: ''
+        },
+        { 
+          name: 'CA Service Catalog',
+          desc: 'CA Service Desk Manager - Catalog Component',
+          icon: <SiBroadcom />,
+          locked: false,
+          tag: '',
+          url: 'https://www.broadcom.com/products/software/service-management/service-catalog',
+          target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+          rel: '',
+          download: ''
+        },
+        { 
+          name: 'CA Embedded Entitlements Manager',
+          desc: 'CA EEM - Security Component',
+          icon: <SiBroadcom />,
+          locked: false,
+          tag: '',
+          url: 'https://techdocs.broadcom.com/us/en/ca-enterprise-software/other/Embedded-Entitlements-Manager/12-7.html',
+          target: '_blank',  // _blank ~ Opens in new tab, _self ~ Default
+          rel: '',
+          download: ''
+        }
+      ]
+    },
+    {
+      id: "core",
+      title: "Core Services",
+      accentColor: "bg-blue-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "right", // Controls opposite direction alignment cleanly
+        intervalTime: 50
+      },
+      items: [
+        {
+          name: 'Architecture',
+          url: '',
+          icon: <SiBroadcom />,
+          tag: '',
+          locked: false,
+          desc: 'CA Service Desk Manager Suite'
+        },
+        {
+          name: 'Implementation',
+          url: '',
+          icon: <VscSymbolClass />,
+          tag: '',
+          locked: false,
+          desc: 'CA Service Desk Manager Suite'
+        },
+        {
+          name: 'Configuration',
+          url: '',
+          icon: <VscSettingsGear />,
+          tag: '',
+          locked: false,
+          desc: 'CA Service Desk Manager Suite'
+        },
+        {
+          name: 'Integrations',
+          url: '',
+          icon: <VscTypeHierarchy />,
+          tag: '',
+          locked: false,
+          desc: 'PeopleSoft, Workday, BigFix, Spectrum, AutomationPoint, IT PAM'
+        },
+        {
+          name: 'Development',
+          url: '',
+          icon: <VscCode />,
+          tag: '',
+          locked: false,
+          desc: 'HTMPL/PDM_MACRO, SPEL, PERL, ANSI C, REST/SOAP'
+        },
+        {
+          name: 'Best Practices',
+          url: '',
+          icon: <VscWand />,
+          tag: '',
+          locked: false,
+          desc: 'Self-Healing Server Configurations, CI/CD Pipeline, Release Management'
+        },
+        {
+          name: 'Upgrades',
+          url: '',
+          icon: <VscThumbsup />,
+          tag: '',
+          locked: false,
+          desc: 'CA Service Desk Manager Suite'
+        },
+        {
+          name: 'Support',
+          url: '',
+          icon: <VscTelescope />,
+          tag: '',
+          locked: false,
+          desc: 'CA Service Desk Manager Suite'
+        },
+        {
+          name: 'Training',
+          url: '',
+          icon: <VscCopilot />,
+          tag: '',
+          locked: false,
+          desc: 'CA Service Desk Manager Suite'
+        }
+      ]
+    } 
+  ]
+};
+
+// LEGACY WAY TO POPULATE CARDS USING DATA[]
+// Note: CONFIG.section_title is required with DATA is populated
+export const DATA = [];
+  ------------------------------------------------
+
+  FILE: src/data/services/0002-snow.jsx
+  ------------------------------------------------
+// src/data/services/0002-snow.jsx
+import { SiJavascript } from "react-icons/si";
+import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot } from "react-icons/vsc";
+import ServiceNowIcon from "../../assets/service-now-icon.jsx";
+
+// Native Inline Custom SVG Component
+const hardServiceNowIcon = () => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width="1em" 
+    height="1em" 
+    fill="currentColor" // Allows icon color to inherit parent font colors dynamically
+    className="inline-block"
+  >
+    {/* Official ServiceNow vector geometry path tracing */}
+    <path d="M19.344 14.88c.84-.792 1.488-1.74 1.488-3.096 0-1.896-1.128-3.024-2.88-3.024H12.96v6.12h5.04c.528 0 .96-.144 1.344-.432l.024.432h1.68l-.12-.432h-.576zm-4.704-4.656h2.712c.96 0 1.464.456 1.464 1.368 0 .888-.504 1.368-1.464 1.368h-2.712v-2.736zM3.456 14.28c.456.408 1.152.6 1.968.6 1.488 0 2.376-.696 2.376-2.016 0-2.28-3.528-1.728-3.528-3.648 0-.696.552-1.152 1.464-1.152.792 0 1.44.24 1.848.6l.456-1.296C7.44 6.84 6.552 6.648 5.64 6.648c-1.608 0-2.832.84-2.832 2.376 0 2.232 3.528 1.632 3.528 3.696 0 .744-.6 1.224-1.632 1.224-.96 0-1.752-.336-2.208-.792l-.456 1.344zm7.224.6h1.68V6.84h-1.68v8.04z" />
+  </svg>
+);
+
+export const CONFIG = {
+  label: "ServiceNow Suite",
+  icon: <ServiceNowIcon />,
+  title: "ServiceNow ITSM & Custom Workflows",
+  subtitle: "Enterprise Workflow Automation and Service Management Optimization",
+  seo: {
+    title: "ServiceNow Integration & Implementation - Remote Tech",
+    description: "Expert ServiceNow development, configuration, ITSM scaling, and integration solutions.",
+    keywords: ["ServiceNow", "ITSM", "Workflow Automation", "JavaScript Scripting", "Service Portal"]
+  },
+  section_title: "Core ServiceNow Services", // ONLY USED WEHN DATA[] IS POPULATED
+  bg_color: "rgba(15, 32, 39, 0.8)",
+  accentColor: "bg-green-600",
+  sections: [
+    {
+      id: "featured-modules",
+      title: "Featured Software Modules",
+      accentColor: "bg-green-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "left",
+        intervalTime: 40,
+        step: 1
+      },
+      items: [
+        {
+          name: 'IT Service Management',
+          desc: 'ITSM Core Suite',
+          icon: <ServiceNowIcon />, // Use custom inline component directly
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        },
+        {
+          name: 'IT Operations Management',
+          desc: 'ITOM Operations Suite',
+          icon: <ServiceNowIcon />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        },
+        {
+          name: 'IT Asset Management',
+          desc: 'ITAM Asset Management',
+          icon: <ServiceNowIcon />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        },
+        {
+          name: 'Strategic Portfolio Mgmt',
+          desc: 'SPM Project Planning',
+          icon: <ServiceNowIcon />,
+          locked: false,
+          url: 'servicenow.com',
+          target: '_blank'
+        }
+      ]
+    },
+    {
+      id: "snow-core",
+      title: "Core Capabilities",
+      accentColor: "bg-green-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "right",
+        intervalTime: 50
+      },
+      items: [
+        { name: 'Architecture', desc: 'ServiceNow Platform Instance Design', icon: <ServiceNowIcon />, locked: false, url: '' },
+        { name: 'Implementation', desc: 'Out-of-box setup and workflows', icon: <VscSymbolClass />, locked: false, url: '' },
+        { name: 'Custom App Engine', desc: 'Scoped Applications & Custom Tables', icon: <VscSettingsGear />, locked: false, url: '' },
+        { name: 'Integrations', desc: 'REST/SOAP & Mid Server Pipelines', icon: <VscTypeHierarchy />, locked: false, url: '' },
+        { name: 'Development', desc: 'Business Rules & Script Includes', icon: <VscCode />, locked: false, url: '' },
+        { name: 'Service Portal', desc: 'Widget Customization & Angular', icon: <VscWand />, locked: false, url: '' },
+        { name: 'Upgrades', desc: 'Instance patches and skip-log remediations', icon: <VscThumbsup />, locked: false, url: '' },
+        { name: 'CMDB & Discovery', desc: 'CI Class Managers & Identification', icon: <VscTelescope />, locked: false, url: '' },
+        { name: 'Flow Designer', desc: 'Low-code execution action modules', icon: <VscCopilot />, locked: false, url: '' }
+      ]
+    }
+  ]
+};
+
+// LEGACY WAY TO POPULATE CARDS USING DATA[]
+// Note: CONFIG.section_title is required with DATA is populated
+export const DATA = [];
+  ------------------------------------------------
+
+  FILE: src/data/services/0003-azure.jsx
+  ------------------------------------------------
+// src/data/services/0003-azure.jsx
+import { SiTerraform, SiAnsible, SiDocker, SiKubernetes } from "react-icons/si";
+import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot } from "react-icons/vsc";
+
+export const CONFIG = {
+  label: "Microsoft Azure",
+  icon: <SiAnsible />,
+  title: "Azure Cloud & Infrastructure DevOps",
+  subtitle: "Cloud Automation, Hybrid Solutions, and Infrastructure as Code",
+  seo: {
+    title: "Azure Cloud Architecting & Pipelines - Remote Tech",
+    description: "Professional Microsoft Azure cloud setup, automation scripts, Terraform optimization, and CI/CD pipelines.",
+    keywords: ["Microsoft Azure", "DevOps", "Terraform IaC", "Cloud Architecture", "Azure Pipelines"]
+  },
+  section_title: "Core Azure Capabilities", // ONLY USED WHEN DATA[] IS POPULATED
+  bg_color: "rgba(23, 37, 42, 0.8)",
+  accentColor: "bg-blue-600",
+  sections: [
+    {
+      id: "featured-services",
+      title: "Featured Cloud Native Tech",
+      accentColor: "bg-blue-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "left",
+        intervalTime: 40,
+        step: 1
+      },
+      items: [
+        {
+          name: 'Azure DevOps Pipelines',
+          desc: 'Continuous Integration / Deployment Engines',
+          icon: '',
+          locked: false,
+          url: 'microsoft.com',
+          target: '_blank'
+        },
+        {
+          name: 'Terraform IaC Integration',
+          desc: 'Dynamic HashiCorp infrastructure blueprints',
+          icon: <SiTerraform />,
+          locked: false,
+          url: 'terraform.io',
+          target: '_blank'
+        },
+        {
+          name: 'Ansible Automation',
+          desc: 'Playbook cloud server state configuration',
+          icon: <SiAnsible />,
+          locked: false,
+          url: 'ansible.com',
+          target: '_blank'
+        },
+        {
+          name: 'Container Ecosystems',
+          desc: 'Docker Images & Azure Kubernetes Services',
+          icon: <SiKubernetes />,
+          locked: false,
+          url: 'microsoft.com',
+          target: '_blank'
+        }
+      ]
+    },
+    {
+      id: "azure-core",
+      title: "Engineering Services",
+      accentColor: "bg-blue-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "right",
+        intervalTime: 50
+      },
+      items: [
+        {
+          name: 'Cloud Architecture',
+          desc: 'Virtual Network and Resource Group Topologies',
+          icon: <VscSymbolClass />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Identity & Security',
+          desc: 'Azure Active Directory, Key Vaults, and IAM Policies',
+          icon: <VscSettingsGear />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Hybrid Networking',
+          desc: 'ExpressRoute, VPN Gateways, Hub-and-Spoke routers',
+          icon: <VscTypeHierarchy />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'App Services',
+          desc: 'Dynamic scaling WebApps and Serverless Functions',
+          icon: <VscCode />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Resource Monitoring',
+          desc: 'Azure Monitor Log Analytics and App Insights',
+          icon: <VscTelescope />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'ARM Templates & Bicep',
+          desc: 'Native JSON and declarative infrastructure configurations',
+          icon: <VscWand />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Migration Planning',
+          desc: 'On-prem server shifts to virtual hosting stacks',
+          icon: <VscThumbsup />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Cost Management',
+          desc: 'Consumption budget tracking and optimization strategies',
+          icon: <VscCopilot />,
+          locked: false,
+          url: ''
+        }
+      ]
+    }
+  ]
+};
+
+// LEGACY WAY TO POPULATE CARDS USING DATA[]
+// Note: CONFIG.section_title is required with DATA is populated
+export const DATA = [];
+
+  ------------------------------------------------
+
+  FILE: src/data/services/0004-remedy-ars.jsx
+  ------------------------------------------------
+// src/data/services/0004-remedy-ars.jsx
+import { VscSymbolClass, VscSettingsGear, VscTypeHierarchy, VscCode, VscWand, VscThumbsup, VscTelescope, VscCopilot, VscTools, VscTerminal } from "react-icons/vsc";
+import RemedyARSRRR from '../../assets/remedy-ars-rrr.jsx';
+
+// Custom inline SVG rendering a classic server/database stack to represent On-Prem architecture
+const RemedySuiteIcon = () => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width="1em" 
+    height="1em" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className="inline-block align-middle"
+  >
+    <ellipse cx="12" cy="5" rx="9" ry="3" />
+    <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v6" />
+  </svg>
+);
+
+export const CONFIG = {
+  label: "Remedy ARS", // Displays neatly in the sorted dropdown list
+  icon: <RemedyARSRRR className="h-6 w-6" />,
+  title: "BMC Remedy AR System Suite",
+  subtitle: "Legacy On-Premises Action Request System & ITIL Service Management Development",
+  seo: {
+    title: "BMC Remedy ARS On-Prem Service Engineering - Remote Tech",
+    description: "Expert BMC Remedy ARS development, Dev Studio workflow customizations, Mid-Tier server setups, and legacy migration tools.",
+    keywords: ["BMC Remedy", "Action Request System", "ARS Dev Studio", "On-Premises ITSM", "Mid-Tier Server"]
+  },
+  section_title: "Core Remedy Frameworks",  // ONLY NEEDED IF DATA[] IS POPULATED
+  bg_color: "rgba(30, 41, 59, 0.85)",
+  accentColor: "bg-orange-600",
+  sections: [
+    {
+      id: "remedy-modules",
+      title: "Legacy ITSM On-Prem applications",
+      accentColor: "bg-orange-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "left",
+        intervalTime: 45,
+        step: 1
+      },
+      items: [
+        {
+          name: 'Incident Management',
+          desc: 'Classic ARS Incident Lifecycle Systems',
+          icon: <RemedyARSRRR className="h-36 w-36" />,
+          locked: false,
+          url: '',
+          target: '_self'
+        },
+        {
+          name: 'Change Management',
+          desc: 'Forward Schedule of Changes & Approval Engines',
+          icon: <RemedyARSRRR className="h-36 w-36" />,
+          locked: false,
+          url: '',
+          target: '_self'
+        },
+        {
+          name: 'Asset Management',
+          desc: 'On-Premises CMDB & Asset Inventory Trackers',
+          icon: <RemedyARSRRR className="h-36 w-36" />,
+          locked: false,
+          url: '',
+          target: '_self'
+        },
+        {
+          name: 'Problem Management',
+          desc: 'Root Cause Analysis and Known Error Databases',
+          icon: <RemedyARSRRR className="h-36 w-36" />,
+          locked: false,
+          url: '',
+          target: '_self'
+        }
+      ]
+    },
+    {
+      id: "remedy-development",
+      title: "Workflow & Workflow Administration",
+      accentColor: "bg-orange-500",
+      layout: "carousel",
+      scrollOptions: {
+        direction: "right",
+        intervalTime: 50
+      },
+      items: [
+        {
+          name: 'Developer Studio',
+          desc: 'Custom Active Links, Filters, Escalations, and Guides configuration',
+          icon: <VscCode />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Schema Architecting',
+          desc: 'Regular, Vendor, Join, and View Form database setups',
+          icon: <VscSymbolClass />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Mid-Tier Engineering',
+          desc: 'Tomcat optimization, object caching tuning, and web configuration',
+          icon: <VscSettingsGear />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'API Integrations',
+          desc: 'Legacy C API, Java API hooks, and modern REST web services interfaces',
+          icon: <VscTypeHierarchy />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Remedy Flashboards',
+          desc: 'Real-time performance tracking monitors and operational dashboard graphics',
+          icon: <VscTelescope />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Data Import Utility',
+          desc: 'Bulk record migration mappings using classic .armx template scripts',
+          icon: <VscWand />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Server Upgrades',
+          desc: 'Zero-downtime database structural patches and service package scaling',
+          icon: <VscThumbsup />,
+          locked: false,
+          url: ''
+        },
+        {
+          name: 'Troubleshooting',
+          desc: 'SQL, API, and Filter execution log diagnostics and query debugging',
+          icon: <VscTools />,
+          locked: false,
+          url: ''
+        }
+      ]
+    }
+  ]
+};
+
+// Populating DATA will trigger display after above section
+// - Note: DATA section_title will be pulled from CONFIG.section_title
+export const DATA = [];
+
+  ------------------------------------------------
+
+  FILE: src/data/tech_stack.jsx
+  ------------------------------------------------
+// src/data/business_resources.jsx
+import { FaDatabase, FaProjectDiagram, FaRocketchat, FaGitAlt, FaTools, FaShieldAlt } from 'react-icons/fa';
+
+export const TECH_STACK = [
+  {
+    category: "DevOps & Hosting",
+    icon: <FaTools />,
+    items: [
+      { name: "Docker & Kubernetes", desc: "Container orchestration for self-healing apps." },
+      { name: "Gitea", desc: "Lightweight, self-hosted Git service for code sovereignty." }
+    ]
+  },
+  {
+    category: "Collaboration",
+    icon: <FaRocketchat />,
+    items: [
+      { name: "Rocket.Chat", desc: "Enterprise-grade chat without the Slack price tag." },
+      { name: "OpenProject", desc: "Full project management lifecycle control." }
+    ]
+  },
+  {
+    category: "Legacy Specialists",
+    icon: <FaDatabase />,
+    items: [
+      { name: "CA SDM (Service Desk)", desc: "Expert SPEL/HTMPL customization and logic." },
+      { name: "SQL Server / Postgres", desc: "High-availability database management." }
+    ]
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/hooks/ScrollToTop.jsx
+  ------------------------------------------------
+// src/hooks/ScrollToTop.jsx
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+export default function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // Standard window scroll
+    window.scrollTo(0, 0);
+    
+    // Immediate fallback for document elements if window is trapped
+    if (document.documentElement) {
+      document.documentElement.scrollTo(0, 0);
+    }
+    if (document.body) {
+      document.body.scrollTo(0, 0);
+    }
+  }, [pathname]);
+
+  return null;
+}
+  ------------------------------------------------
+
+  FILE: src/hooks/useAutoScroll.js
+  ------------------------------------------------
+// src/hooks/useAutoScroll.jsx
+
+import { useEffect, useRef } from 'react';
+
+export function useAutoScroll(options = {}) {
+  const {
+    step = 1,            // Pixels per interval
+    intervalTime = 30,   // Milliseconds *higher number delays movement
+    direction = 'left',  // 'left', 'right', 'top', 'bottom'
+    pauseOnHover = true, // Sometimes you may want a marquee effect that never stops, even when user interacts with it
+    isEnabled = true,    // This allows you to pause the scrolling dynamically
+  } = options;           // Instead of a long list of arguments, options allows: useAutoScroll({ direction: 'top' }) without having to pass step or interval
+
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || !isEnabled) return;
+
+    const startScrolling = () => {
+      return setInterval(() => {
+        // Handle Horizontal vs Vertical
+        if (direction === 'left' || direction === 'right') {
+          // Safety: Only scroll if there is content to scroll
+          if (container.scrollWidth <= container.clientWidth) return;
+
+          const move = direction === 'left' ? step : -step;
+          container.scrollLeft += move;
+
+          // Infinite Loop Logic (Horizontal)
+          if (direction === 'left' && container.scrollLeft >= container.scrollWidth - container.clientWidth) {
+            container.scrollLeft = 0;
+          } else if (direction === 'right' && container.scrollLeft <= 0) {
+            container.scrollLeft = container.scrollWidth - container.clientWidth;
+          }
+        } else {
+          const move = direction === 'top' ? step : -step;
+          container.scrollTop += move;
+
+          // Infinite Loop Logic (Vertical)
+          if (direction === 'top' && container.scrollTop >= container.scrollHeight - container.clientHeight) {
+            container.scrollTop = 0;
+          } else if (direction === 'bottom' && container.scrollTop <= 0) {
+            container.scrollTop = container.scrollHeight - container.clientHeight;
+          }
+        }
+      }, intervalTime);
+    };
+
+    let autoScroll = startScrolling();
+
+    const pause = () => { if (pauseOnHover) clearInterval(autoScroll); };
+    const resume = () => { if (pauseOnHover) autoScroll = startScrolling(); };
+
+    container.addEventListener('mouseenter', pause);
+    container.addEventListener('mouseleave', resume);
+
+    return () => {
+      clearInterval(autoScroll);
+      container.removeEventListener('mouseenter', pause);
+      container.removeEventListener('mouseleave', resume);
+    };
+  }, [step, intervalTime, direction, pauseOnHover, isEnabled]);
+
+  return scrollRef;
+}
+  ------------------------------------------------
+
+  FILE: src/index.css
+  ------------------------------------------------
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 5s ease-out;
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+/*
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+*/
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 1.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #ff7499;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+/* CUSTOM NAV BUTTON OVERRIDE CLASS */
+.nav-menu-btn {
+  color: #646cff !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  font-size: 1em !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+  ------------------------------------------------
+
+  FILE: src/main.jsx
+  ------------------------------------------------
+// src/main.jsx
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+
+import NavBar from './components/NavBar.jsx';
+import Footer from './components/footer.jsx';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import ScrollToTop from './hooks/ScrollToTop.jsx';
+
+import './index.css'
+import App from './App.jsx'
+import AboutPage from './pages/about.jsx';
+import TechStackPage from './pages/tech-stack.jsx';
+import CareersPage from './pages/careers.jsx';
+import ContactUsPage from './pages/contact-us.jsx';
+import PrivacyPage from './pages/privacy-policy.jsx';
+import TermsPage from './pages/terms-of-service.jsx';
+import ClientsPage from './pages/clients.jsx';
+import ProductsPage from './pages/products.jsx';
+import ServicesPage from './pages/services.jsx';
+import CaseStudiesPage from './pages/case-studies.jsx';
+import DevDocsPage from './pages/dev-docs.jsx';
+import DynamicProductsPage from './pages/dynamic-products.jsx';
+import DynamicServicesPage from './pages/dynamic-services.jsx';
+
+{/* Notes 
+    Use HashRouter if:
+      You are deploying to GitHub Pages (which doesn't support easy SPA redirection).
+      You are running a small internal tool on Unraid or a simple file server and don't want to mess with Nginx/Apache configuration files.
+
+    Use BrowserRouter if:
+      You are building a professional, client-facing site where SEO matters.
+      You want clean, "pretty" URLs.
+      You have control over your server configuration (e.g., using Nginx with a try_files $uri /index.html; rule).
+*/}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <HelmetProvider>
+    <HashRouter>
+      <NavBar /> {/* NavBar is now inside the Router context! */}
+      <main>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/contact-us" element={<ContactUsPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPage />} />
+          <Route path="/terms-of-service" element={<TermsPage />} />
+          <Route path="/tech-stack" element={<TechStackPage />} />
+          {/* Dynamic route for specific contact-us */}
+          <Route path="/contact-us/:id" element={<ContactUsPage />} />
+          <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/case-studies" element={<CaseStudiesPage />} />
+          <Route path="/dev-docs" element={<DevDocsPage />} />
+          <Route path="/products/:productId" element={<DynamicProductsPage />} />
+          <Route path="/services/:serviceId" element={<DynamicServicesPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </HashRouter>
+    </HelmetProvider>
+  </React.StrictMode>
+);
+  ------------------------------------------------
+
+  FILE: src/pages/about.jsx
+  ------------------------------------------------
+// src/pages/About.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaRocket, FaShieldAlt, FaCodeBranch, FaUsers } from 'react-icons/fa';
+
+export default function AboutPage() {
+  const features = [
+    {
+      icon: <FaShieldAlt className="text-blue-400" />,
+      title: "Privacy First",
+      desc: "We prioritize data sovereignty by self-hosting our entire infrastructure, ensuring your PII stays secure."
+    },
+    {
+      icon: <FaCodeBranch className="text-purple-400" />,
+      title: "Open Source Core",
+      desc: "Built on the power of community-driven software like Gitea, OpenProject, and RocketChat."
+    },
+    {
+      icon: <FaRocket className="text-yellow-400" />,
+      title: "Modern Architecture",
+      desc: "Leveraging Docker and Kubernetes to provide scalable, self-healing enterprise environments."
+    }
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-5xl mx-auto pb-20">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <img src={GLOBALS.app_logo} alt="Logo" className="w-24 mx-auto mb-6" />
+          <h1 className="text-4xl md:text-5xl font-black mb-4">{GLOBALS.app_title}</h1>
+          <p className="text-xl text-blue-400 font-medium max-w-2xl mx-auto">
+            Professional Open-Source Infrastructure & Services
+          </p>
+        </motion.div>
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          {features.map((f, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-center"
+            >
+              <div className="text-4xl mb-4 flex justify-center">{f.icon}</div>
+              <h3 className="text-xl font-bold mb-2 text-white">{f.title}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </section>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/5 border border-white/10 p-10 rounded-3xl"
+        >
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+            <FaUsers className="text-blue-500" /> Our Mission
+          </h2>
+          <div className="space-y-4 text-gray-300 leading-relaxed">
+            <p>
+              {GLOBALS.app_company} was founded on the principle that enterprise-grade 
+              infrastructure should be transparent, secure, and accessible. We specialize in 
+              the CA Service Desk Manager suite and modern DevOps orchestration.
+            </p>
+            <p>
+              By leveraging established open-source projects, we provide our clients 
+              with powerful tools for project management, code hosting, and real-time 
+              collaboration—without the high licensing costs or privacy concerns of 
+              proprietary SaaS platforms.
+            </p>
+          </div>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/careers.jsx
+  ------------------------------------------------
+// src/pages/careers.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { OPEN_POSITIONS } from '../data/business_careers.jsx';
+import { FaBriefcase, FaArrowRight } from 'react-icons/fa';
+
+export default function CareersPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-6xl mx-auto pb-20 w-full">
+        <header className="mb-16 text-center lg:text-left">
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaBriefcase className="text-blue-500" /> Join the Team
+          </h1>
+          <p className="text-gray-400 max-w-2xl">
+            Help us build the next generation of open-source enterprise infrastructure. 
+            We are looking for experts in legacy CA systems and modern cloud architecture.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 gap-6">
+          {OPEN_POSITIONS.map((job, index) => (
+            <motion.div 
+              key={job.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl group hover:border-blue-500/50 transition-all"
+            >
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div className="flex items-center gap-6">
+                  <div className="text-4xl text-blue-400 bg-blue-500/10 p-4 rounded-2xl">
+                    {job.icon}
+                  </div>
+                  <div>
+                    <div className="flex gap-2 mb-2">
+                      {job.tags.map(tag => (
+                        <span key={tag} className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold uppercase">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">{job.title}</h3>
+                    <p className="text-gray-400 text-sm">{job.department} • {job.location} • {job.type}</p>
+                  </div>
+                </div>
+
+                <div className="w-full lg:w-auto">
+                  <a 
+                    href={`mailto:careers@remote-tech.us?subject=Application: ${job.title}`}
+                    className="flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all w-full"
+                  >
+                    Apply Now <FaArrowRight />
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-white/5">
+                <p className="text-gray-300 mb-4">{job.desc}</p>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {job.requirements.map((req, i) => (
+                    <li key={i} className="text-sm text-gray-500 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/case-studies.jsx
+  ------------------------------------------------
+// src/pages/case-studies.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { CASE_STUDIES } from '../data/business_case_studies.jsx';
+import { FaProjectDiagram, FaCheckCircle, FaLightbulb, FaExclamationCircle } from 'react-icons/fa';
+
+export default function CaseStudiesPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-6xl mx-auto pb-20 w-full">
+        <header className="mb-16 text-center lg:text-left">
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaProjectDiagram className="text-blue-500" /> Case Studies
+          </h1>
+          <p className="text-gray-400 max-w-2xl">
+            Real-world solutions for complex infrastructure and legacy system challenges. 
+            See how we help organizations reclaim their data and optimize their workflows.
+          </p>
+        </header>
+
+        <div className="space-y-12">
+          {CASE_STUDIES.map((study, idx) => (
+            <motion.div 
+              key={study.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden"
+            >
+              <div className="p-8 lg:p-12">
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                  <div className="p-3 bg-blue-500/20 text-blue-400 rounded-xl text-2xl">
+                    {study.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">{study.title}</h2>
+                    <p className="text-blue-400 text-sm font-medium uppercase tracking-wider">{study.client} • {study.sector}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <div className="space-y-6">
+                    <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                      <h3 className="flex items-center gap-2 text-red-400 font-bold mb-2">
+                        <FaExclamationCircle /> The Challenge
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed italic">"{study.challenge}"</p>
+                    </div>
+
+                    <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                      <h3 className="flex items-center gap-2 text-green-400 font-bold mb-2">
+                        <FaLightbulb /> The Solution
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">{study.solution}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-600/10 p-8 rounded-3xl border border-blue-500/20">
+                    <h3 className="flex items-center gap-2 text-white font-bold mb-6">
+                      <FaCheckCircle className="text-blue-400" /> Key Results
+                    </h3>
+                    <ul className="space-y-4">
+                      {study.results.map((result, i) => (
+                        <li key={i} className="flex items-start gap-3 text-gray-200">
+                          <span className="mt-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full shrink-0" />
+                          {result}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="mt-8 pt-8 border-t border-white/10 flex flex-wrap gap-2">
+                      {study.tags.map(tag => (
+                        <span key={tag} className="text-[10px] bg-white/10 text-gray-400 px-3 py-1 rounded-full font-bold uppercase tracking-widest">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/clients.jsx
+  ------------------------------------------------
+// src/pages/clients.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+{/* Begin Application Files */}
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_CLIENTS } from '../data/featured_clients.jsx';
+import { BUSINESS_CLIENTS } from '../data/business_clients.jsx';
+
+function ClientsPage() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollClient = useAutoScroll(1, 30);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
+
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Clients
+          </h2>
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_CLIENTS.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Clients
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_CLIENTS.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ClientsPage
+  ------------------------------------------------
+
+  FILE: src/pages/contact-us.jsx
+  ------------------------------------------------
+// src/pages/contact-us.jsx
+import { useEffect, useState } from 'react'; 
+import { useParams } from 'react-router-dom'; 
+import { GLOBALS } from '../data/app__globals';
+import { CONTACTS } from '../data/business_contacts';
+import ContactCard from '../components/ContactCard.jsx';
+
+export default function ContactsPage() {
+  const { id } = useParams(); 
+  
+  // Set default filter mode: 'company' limits view to corporate profiles
+  const [filterMode, setFilterMode] = useState('company');
+
+  // Automatically switch filter modes if a specific direct route profile id is requested
+  useEffect(() => {
+    if (id) {
+      const match = CONTACTS.find(c => c.id === id || c.email?.split('@')[0] === id);
+      if (match) {
+        // Switch filter category automatically to prevent profile hiding on deep linking
+        setFilterMode(match.type || 'all');
+        
+        // Smooth scroll alignment
+        setTimeout(() => {
+          const element = document.getElementById(id);
+          if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+  }, [id]);
+
+  // Compute filtered array results dynamically based on item profile 'type' flag tags
+  const filteredContacts = CONTACTS.filter(contact => {
+    if (filterMode === 'all') return true;
+    return contact.type === filterMode; // e.g. matches 'company', 'partner', or 'vendor'
+  });
+  // src/pages/contact-us.jsx
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage: GLOBALS.bg_img
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})`
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="flex flex-col items-center w-full px-6 pt-24 pb-12">
+        
+        {/* Single Dynamic Smart Toggle Button */}
+        <div className="mb-8 z-10">
+          <button
+            onClick={() => setFilterMode(prev => prev === 'company' ? 'all' : 'company')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold shadow-xl border transition-all cursor-pointer ${
+              filterMode === 'company'
+                ? 'bg-slate-900/90 text-blue-400 border-blue-500/30 hover:border-blue-400 bg-gradient-to-r from-blue-600/10 to-transparent'
+                : 'bg-slate-900/90 text-blue-400 border-blue-500/30 hover:border-blue-400 bg-gradient-to-r from-blue-600/10 to-transparent'
+            }`}
+          >
+            <span>
+              {filterMode === 'company' ? '🔍 Showing: Company Only (Click to Show All)' : '🌐 Showing: All Contacts (Click to Filter Corporate)'}
+            </span>
+          </button>
+        </div>
+  
+        {/* Contacts Cards Display Grid Frame */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {filteredContacts.map((contact, index) => {
+            const cardId = contact.id || contact.email?.split('@')[0];
+            return (
+              <div
+                key={contact.email || index}
+                id={cardId}
+                className={`transition-all duration-300 ${id === cardId ? 'ring-2 ring-blue-500 rounded-xl scale-102' : ''}`}
+              >
+                <ContactCard contact={contact} index={index} />
+              </div>
+            );
+          })}
+        </div>
+        
+        {filteredContacts.length === 0 && (
+          <div className="text-gray-400 mt-12">No contact records found matching this filter group.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+  ------------------------------------------------
+
+  FILE: src/pages/dev-docs.jsx
+  ------------------------------------------------
+// src/pages/dev-docs.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { DEV_DOCS_CATEGORIES } from '../data/business_dev_docs.jsx';
+import { FaCheck, FaCopy, FaBook, FaChevronRight, FaTerminal } from 'react-icons/fa';
+import parse from 'html-react-parser';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; // Choose your theme
+
+export default function DocsPage() {
+  const [activePage, setActivePage] = useState(DEV_DOCS_CATEGORIES[0].pages[0]);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    // If code is a string, use it. If it's a JSX function, 
+    // you might want to add a 'copyText' string field to your data object.
+    const textToCopy = typeof activePage.code === 'string' 
+      ? activePage.code 
+      : activePage.copyText || ""; 
+
+    if (textToCopy) {
+      navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-fixed bg-cover"
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <div className="flex w-full pt-24">
+        {/* Sidebar */}
+        <aside className="hidden lg:block w-72 h-[calc(100vh-6rem)] overflow-y-auto border-r border-white/10 p-6 sticky top-24">
+          <div className="flex items-center gap-2 mb-8 text-blue-400 font-bold">
+            <FaBook /> <span>Documentation</span>
+          </div>
+          {DEV_DOCS_CATEGORIES.map((cat) => (
+            <div key={cat.id} className="mb-6">
+              <h3 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">{cat.title}</h3>
+              <ul className="space-y-1">
+                {cat.pages.map((page) => (
+                  <li key={page.id}>
+                    <button
+                      onClick={() => setActivePage(page)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                        activePage.id === page.id 
+                        ? '!bg-blue-600 text-white font-bold' 
+                        : 'text-gray-400 hover:text-blue-600 hover:bg-white/5'
+                      }`}
+                    >
+                      {page.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </aside>
+
+        {/* Content Area */}
+        <main className="flex-1 px-6 lg:px-16 pb-20">
+          <motion.div
+            key={activePage.id}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="max-w-3xl"
+          >
+            <div className="flex items-center gap-2 text-blue-500 mb-4 text-sm font-bold">
+              Docs <FaChevronRight className="text-[10px]" /> {activePage.title}
+            </div>
+            <h1 className="text-4xl font-black mb-8 text-white">{activePage.title}</h1>
+            
+            <div className="prose prose-invert max-w-none">
+              <p className="text-lg text-gray-300 leading-relaxed mb-8">
+                {activePage.content}
+              </p>
+              
+              {/* Decorative Code Block Placeholder */}
+              <div className="bg-black/60 rounded-2xl border border-white/10 overflow-hidden mb-8">
+                <div className="bg-white/5 px-4 py-2 border-b border-white/10 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    </div>
+                  </div>
+                  <FaTerminal className="text-gray-600 text-xs" />
+                </div>
+                  {/* Dynamic Language Label */}
+                  <span className="text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-2">
+                    {activePage.language || 'text'}
+                  </span>
+                {/* Syntax Highlighter renders the code exactly as typed in data file */}
+                <SyntaxHighlighter 
+                  language={activePage.language || 'javascript'} 
+                  style={atomDark}
+                  customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
+                >
+                  {activePage.code}
+                </SyntaxHighlighter>
+                <div className="p-6 font-mono text-sm text-blue-300">
+                  {/* Add the () to execute the function */}
+                  {/* {typeof activePage.code === 'function' ? activePage.code() : activePage.code}  */}
+                  {/* 1. If it's a function (the JSX approach), call it */}
+                  {/* {typeof activePage.code === 'function' && activePage.code()} */}
+
+                  {/* 2. If it's a string, render it inside a div that preserves whitespace */}
+                  {/*
+                  {typeof activePage.code === 'string' && (
+                    <div style={{ whiteSpace: "pre-wrap" }}>{activePage.code}</div>
+                  )}
+                  */}
+                </div>
+              </div>
+              {activePage.code && (
+                  <button onClick={handleCopy} className="text-gray-400 hover:text-white transition-all">
+                    {copied ? <FaCheck className="text-green-500" /> : <FaCopy />}
+                  </button>
+              )}
+            </div>
+          </motion.div>
+        </main>
+      </div>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/dynamic-products.jsx
+  ------------------------------------------------
+// src/pages/dynamic-products.jsx
+import DynamicPageTemplate from '../components/dynamic-page-template.jsx';
+
+const productFiles = import.meta.glob('../data/products/*.jsx', { eager: true });
+
+export default function DynamicProductsPage() {
+  return <DynamicPageTemplate filesDict={productFiles} fallbackType="Product" />;
+}
+
+  ------------------------------------------------
+
+  FILE: src/pages/dynamic-services.jsx
+  ------------------------------------------------
+// src/pages/dynamic-services.jsx
+import DynamicPageTemplate from '../components/dynamic-page-template.jsx';
+
+const serviceFiles = import.meta.glob('../data/services/*.jsx', { eager: true });
+
+export default function DynamicServicesPage() {
+  return <DynamicPageTemplate filesDict={serviceFiles} fallbackType="Service" />;
+}
+
+  ------------------------------------------------
+
+  FILE: src/pages/privacy-policy.jsx
+  ------------------------------------------------
+// src/pages/privacy-policy.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaShieldAlt, FaLock, FaUserShield, FaEnvelope } from 'react-icons/fa';
+
+export default function PrivacyPage() {
+  const sections = [
+    {
+      icon: <FaLock className="text-blue-400" />,
+      title: "Data Collection",
+      content: `We collect minimal personal information necessary to provide our services. This includes contact details provided via our contact forms and technical logs required for secure infrastructure management.`
+    },
+    {
+      icon: <FaShieldAlt className="text-green-400" />,
+      title: "Self-Hosted Security",
+      content: `Unlike traditional SaaS providers, we prioritize data sovereignty. Your information is stored on our private, self-hosted servers, reducing exposure to third-party data mining.`
+    },
+    {
+      icon: <FaUserShield className="text-purple-400" />,
+      title: "Your Rights",
+      content: `You have the right to access, correct, or delete your personal data. At ${GLOBALS.app_company}, we believe you should have full control over your digital footprint.`
+    }
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-4xl mx-auto pb-20 w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 text-center lg:text-left"
+        >
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaShieldAlt className="text-blue-500" /> Privacy Policy
+          </h1>
+          <p className="text-gray-400">
+            Last Updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
+        </motion.div>
+
+        <section className="grid grid-cols-1 gap-6 mb-12">
+          {sections.map((section, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-2xl p-3 bg-white/5 rounded-xl">
+                  {section.icon}
+                </div>
+                <h2 className="text-xl font-bold text-white">{section.title}</h2>
+              </div>
+              <p className="text-gray-300 leading-relaxed">
+                {section.content}
+              </p>
+            </motion.div>
+          ))}
+        </section>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="bg-blue-600/10 border border-blue-500/20 p-8 rounded-3xl"
+        >
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <FaEnvelope className="text-blue-400" /> Contact Us
+          </h2>
+          <p className="text-gray-300 mb-4">
+            If you have any questions regarding this Privacy Policy or how your data is handled by 
+            <strong> {GLOBALS.app_company}</strong>, please reach out to our privacy team.
+          </p>
+          <a 
+            href={`mailto:${GLOBALS.app_email || 'privacy@remote-tech.us'}`}
+            className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-colors"
+          >
+            Contact Privacy Officer
+          </a>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/products.jsx
+  ------------------------------------------------
+// src/pages/products.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_PRODUCTS } from '../data/featured_products.jsx';
+import { BUSINESS_PRODUCTS } from '../data/business_products.jsx';
+
+function ProductsPage() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollClient = useAutoScroll(1, 30);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
+
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Products
+          </h2>
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_PRODUCTS.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Products
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_PRODUCTS.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ProductsPage
+  ------------------------------------------------
+
+  FILE: src/pages/services.jsx
+  ------------------------------------------------
+// src/pages/services.jsx
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+import { useEffect, useRef } from 'react';
+
+{/* Begin Application Files */}
+import reactLogo from '../assets/react.svg';
+import viteLogo from '/vite.svg';
+import '../App.css';
+import { useAutoScroll } from '../hooks/useAutoScroll.js';
+import Card from '../components/Card.jsx';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FEATURED_SERVICES } from '../data/featured_services.jsx';
+import { BUSINESS_SERVICES } from '../data/business_services.jsx';
+
+function ServicesPage() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  // ADD Scrolling 
+  const scrollClient = useAutoScroll(1, 30);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.8)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Main Container */}
+      <div className="pt-24 px-6 max-w-7xl mx-auto">
+        <header className="mb-12 text-center lg:text-left">
+          {/*<h1 className="text-4xl font-black mb-2">{ GLOBALS.app_title }</h1>*/}
+          <p className="text-gray-400">{ GLOBALS.app_subtitle }</p>
+        </header>
+
+        {/* Section: Services Carousel */}
+        <section className="mb-16 w-full overflow-hidden">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+          </h2>
+          {/* 1. 'overflow-x-auto' enables the scroll.
+              2. 'flex-nowrap' prevents items from wrapping/squeezing.
+              3. 'snap-x' enables the snap-to-item behavior.
+              4. replace snap-mandatory with snap-proximity
+          */}
+          <div ref={scrollClient} className="flex flex-nowrap overflow-x-auto gap-6 pb-8 pt-4 snap-x snap-proximity scrollbar-hide">
+            {FEATURED_SERVICES.map((fclient) => (
+              <Card key={fclient.name} item={fclient} />
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+            {/*  CARDS GRID */}
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <span className="w-8 h-1 bg-yellow-500 rounded-full" /> Business Services
+            </h2>
+            <p></p>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {BUSINESS_SERVICES.map((bclient) => (
+                <Card  key={bclient.name} item={bclient} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ServicesPage
+  ------------------------------------------------
+
+  FILE: src/pages/tech-stack.jsx
+  ------------------------------------------------
+// src/pages/tech-stack.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { TECH_STACK } from '../data/tech_stack.jsx';
+import { FaLayerGroup } from 'react-icons/fa';
+
+export default function StackPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-6xl mx-auto pb-20 w-full">
+        <header className="mb-16 text-center lg:text-left">
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaLayerGroup className="text-blue-500" /> Our Tech Stack
+          </h1>
+          <p className="text-gray-400 max-w-2xl">
+            We don't rely on third-party SaaS for our core operations. We build, host, and 
+            maintain our own infrastructure using these industry-leading tools.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {TECH_STACK.map((group, idx) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+            >
+              <div className="text-3xl text-blue-400 mb-6 bg-white/5 w-fit p-3 rounded-2xl">
+                {group.icon}
+              </div>
+              <h2 className="text-xl font-bold mb-6 text-white">{group.category}</h2>
+              <div className="space-y-6">
+                {group.items.map((item, i) => (
+                  <div key={i} className="border-l-2 border-blue-500/30 pl-4 group">
+                    <h3 className="font-bold text-gray-200 group-hover:text-blue-400 transition-colors">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: src/pages/terms-of-service.jsx
+  ------------------------------------------------
+// src/pages/terms-of-service.jsx
+import { motion } from 'framer-motion';
+import { GLOBALS } from '../data/app__globals.jsx';
+import { FaGavel, FaHandshake, FaExclamationTriangle, FaCopyright } from 'react-icons/fa';
+
+export default function TermsPage() {
+  const sections = [
+    {
+      icon: <FaHandshake className="text-blue-400" />,
+      title: "1. Acceptance of Terms",
+      content: `By accessing or using the services provided by ${GLOBALS.app_company}, you agree to be bound by these Terms of Service. If you do not agree to these terms, please refrain from using our infrastructure and consulting services.`
+    },
+    {
+      icon: <FaGavel className="text-purple-400" />,
+      title: "2. Service Provision",
+      content: "We provide specialized infrastructure, open-source management, and CA Service Desk Manager consulting. While we strive for 99.9% uptime on our self-hosted platforms, services are provided 'as-is' unless otherwise specified in a separate Service Level Agreement (SLA)."
+    },
+    {
+      icon: <FaCopyright className="text-yellow-400" />,
+      title: "3. Intellectual Property",
+      content: `All custom code, configurations, and documentation provided by ${GLOBALS.app_company} remain our intellectual property until full payment is received. Open-source components used within our stack are governed by their respective licenses (GPL, MIT, etc.).`
+    },
+    {
+      icon: <FaExclamationTriangle className="text-red-400" />,
+      title: "4. Limitation of Liability",
+      content: `${GLOBALS.app_company} shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our services, including but not limited to data loss or system downtime.`
+    }
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        backgroundImage: GLOBALS.bg_img 
+        ? `linear-gradient(${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}, ${GLOBALS.bg_override_color || 'rgba(15, 23, 42, 0.9)'}), url(${GLOBALS.bg_img})` 
+        : 'none',
+      }}
+    >
+      <main className="pt-32 px-6 max-w-4xl mx-auto pb-20 w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 text-center lg:text-left"
+        >
+          <h1 className="text-4xl font-black mb-4 flex items-center gap-3 justify-center lg:justify-start">
+            <FaGavel className="text-blue-500" /> Terms of Service
+          </h1>
+          <p className="text-gray-400">
+            Effective Date: January 1, {new Date().getFullYear()}
+          </p>
+        </motion.div>
+
+        <section className="space-y-6">
+          {sections.map((section, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-2xl p-3 bg-white/5 rounded-xl">
+                  {section.icon}
+                </div>
+                <h2 className="text-xl font-bold text-white">{section.title}</h2>
+              </div>
+              <p className="text-gray-300 leading-relaxed italic border-l-2 border-blue-500/30 pl-4">
+                {section.content}
+              </p>
+            </motion.div>
+          ))}
+        </section>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12 p-8 bg-white/5 border border-white/10 rounded-3xl text-center"
+        >
+          <p className="text-gray-400 text-sm">
+            Questions about our Terms? Contact our legal team at{' '}
+            <a href={`mailto:${GLOBALS.app_support}`} className="text-blue-400 hover:underline">
+              {GLOBALS.app_support}
+            </a>
+          </p>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: tailwind.config.js
+  ------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
+  },
+  plugins: [],
+};
+
+  ------------------------------------------------
+
+  FILE: vite.config.js
+  ------------------------------------------------
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  //base: '/remote-tech.us/',//
+})
+  ------------------------------------------------

@@ -1,0 +1,2263 @@
+.
+├── README.md
+├── dumpit.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── img
+│   │   ├── 0.jpg
+│   │   ├── globe.mp4
+│   │   └── globe.mp4-
+│   ├── remote-tech-us_v2.svg
+│   ├── vite.svg
+│   └── william-earnhardt.vcf
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── app__globals.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── business_contacts.jsx
+│   ├── business_services.jsx
+│   ├── business_tools.jsx
+│   ├── components
+│   │   ├── ContactCard.jsx
+│   │   └── NavBar.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   └── qrcode-gen.jsx
+├── tailwind.config.js
+└── vite.config.js
+
+6 directories, 27 files
+  ================================================================================
+
+  FILE: eslint.config.js
+  ------------------------------------------------
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+  ------------------------------------------------
+
+  FILE: index.html
+  ------------------------------------------------
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/remote-tech-us_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REMOTE TECH US</title>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+  ------------------------------------------------
+
+  FILE: package.json
+  ------------------------------------------------
+{
+  "name": "react-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://remote-tech.us",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "framer-motion": "^12.9.2",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.14.2",
+    "react-tooltip": "^5.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1"
+  }
+}
+  ------------------------------------------------
+
+  FILE: postcss.config.js
+  ------------------------------------------------
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+
+  ------------------------------------------------
+
+  FILE: src/App.css
+  ------------------------------------------------
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+  ------------------------------------------------
+
+  FILE: src/App.jsx
+  ------------------------------------------------
+import { GLOBALS } from './app__globals';
+import { CONTACTS } from './business_contacts';
+import { TOOLS } from './business_tools';
+import { SERVICES } from './business_services';
+import NavBar from './components/NavBar';
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+      }}
+    >
+      <NavBar />
+      {/* Main Container */}
+
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/* DISTINCT BUSINESS CARD (Hero) */}
+          {CONTACTS.map((contact, index) => (
+            <motion.div
+              key={contact.name || index} // Added unique key
+              whileHover={{ y: -5 }}
+              className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
+              >
+              {/* Tag Badge (Coming Soon, New, etc) */}
+              {contact.tag  && (
+                <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+                  {contact.tag}
+                </span>
+              )}
+              {contact.logo && (
+                <img src={contact.logo} alt="Logo" className="w-20 mb-4" />
+              )}
+              <h2 className="text-3xl font-black mb-1">{contact.name}</h2>
+              {contact.title && (
+                <p className="text-blue-600 font-bold mb-6">{contact.title}</p>
+              )}
+              <div className="text-gray-600 space-y-2 mb-6 text-sm">
+                {contact.phone && (
+                  <p className="flex items-center justify-center gap-2 font-medium">
+                    <FaPhone className="text-blue-500" /> 
+                    {contact.phone_sms && (
+                      <FaSms className="text-blue-500" /> 
+                    )}
+                    {contact.phone}
+                  </p>
+                )}
+                {contact.address && (
+                  <p className="flex items-center justify-center gap-2 font-medium">
+                    <FaMapMarkerAlt className="text-blue-500" /> {contact.address}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-4 mb-8 text-2xl text-gray-700">
+                {contact.linkedin && (
+                  <a href={contact.linkedin} className="hover:text-blue-600"><FaLinkedin /></a>
+                )}
+                {contact.github && (
+                  <a href={contact.github} className="hover:text-gray-900"><FaGithub /></a>
+                )}
+                {contact.email && (
+                  <a href={`mailto:${contact.email}`} className="hover:text-red-500"><FaEnvelope /></a>
+                )}
+                {contact.chat && (
+                  <a href={contact.chat} className="hover:text-red-500"><FaRocketchat /></a>
+                )}
+                {contact.web && (
+                  <a href={contact.web} className="hover:text-red-500"><TbWorldWww /></a>
+                )}
+              </div>
+              <div className="flex flex-col w-full gap-3">
+                {contact.calcom && (
+                  <a 
+                    href={contact.calcom} 
+                    //className="w-full bg-black/40 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+                    className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+                    <FaRegCalendarAlt /> Schedule Meeting
+                  </a>
+                )}
+                {/* New Download Contact Button */}
+                {contact.vcfPath  && (
+                <a 
+                  href={contact.vcfPath} 
+                  download 
+                  className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+                  <FaAddressCard /> Save Contact
+                </a>
+                )}
+                {/* QR Code Section */}
+                {contact.qrValue  && (
+                <div className="bg-gray-50 p-4 rounded-xl mb-6 border border-gray-100 shadow-inner">
+                  <QRCodeSVG value={contact.qrValue} size={80} marginSize={2} className="mx-auto" />
+                  <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Scan to Share</p>
+                </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
+
+          {/* TOOLS CARDS GRID */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {TOOLS.map((tool) => (
+              <motion.a
+                key={tool.name}
+                //href={tool.url}
+                href={tool.locked ? "#" : tool.url} // Disable link if tool is locked 
+                whileHover={{ scale: 1.02 }}
+                //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+                className={`relative bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition 
+                  ${tool.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+                >
+                {/* Tag Badge (Coming Soon, New, etc) */}
+                {tool.tag  && (
+                  <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+                    {tool.tag}
+                  </span>
+                )}
+                <div className="text-3xl text-blue-400">
+                  {tool.icon}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">{tool.name}</h3>
+                  <p className="text-gray-400 text-sm">{tool.desc}</p>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+          {/* SERVICE CARDS GRID */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {SERVICES.map((service) => (
+              <motion.a
+                key={service.name}
+                //href={service.url}
+                href={service.locked ? "#" : service.url} // Disable link if service is locked 
+                whileHover={{ scale: 1.02 }}
+                //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+                className={`relative bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition 
+                  ${service.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+                >
+                {/* Coming Soon Badge */}
+                {service.tag  && (
+                  <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+                    {service.tag}
+                  </span>
+                )}
+                <div className="text-3xl text-blue-400">{service.icon}</div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">{service.name}</h3>
+                  <p className="text-gray-400 text-sm">{service.desc}</p>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App
+  ------------------------------------------------
+
+  FILE: src/app__globals.jsx
+  ------------------------------------------------
+//app_globals.jsx
+export const GLOBALS = {
+  bg_img:"/img/0.jpg"
+  //, bg_override_color: "#0f172a" // Tailwind's slate-900
+  //, bg_override_color: "blue" // Tailwind's slate-900
+};
+  ------------------------------------------------
+
+  FILE: src/business_contacts.jsx
+  ------------------------------------------------
+// src/business_contacts.js
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+export const CONTACTS = [
+  {
+    tag: 'Founder',
+    locked: false,
+    logo: "/remote-tech-us_v2.svg",
+    name: "William Earnhardt",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    phone_sms: "yes",
+    email: "william@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: "name:william earnhrdt|url:https://remote-tech.us/#/card" // Link for the QR code
+  },
+  {
+    logo: "/remote-tech-us_v2.svg"
+    ,name: "Frank Earnhardt"
+    //title: "Founder @ Remote Tech US",
+    ,phone: "+1 (502) 509-4553"
+    //phone_sms: "yes",
+    //email: "frank@remote-tech.us",
+    //address: "Sellersburg, IN, USA",
+    //web: "https://remote-tech.us",
+    //chat: "https://chat.remote-tech.us",
+    //linkedin: "https://www.linkedin.com/in/earnhardt",
+    //github: "https://github.com/remote-tech-us",
+    //vcfPath: "/william-earnhardt.vcf",
+    //calcom:"https://cal.com/remote-tech.us",
+    //qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  },
+  {
+    logo: "/remote-tech-us_v2.svg",
+    name: "Admin",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    //phone_sms: "yes",
+    email: "admin@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/business_services.jsx
+  ------------------------------------------------
+// src/business_services.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const SERVICES = [
+  { 
+    name: 'Broadcom',
+    url: 'https://broadcom.com',
+    icon: <SiBroadcom />,
+    tag: 'Acquired CA Technologies',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <FaCode />,
+    tag: '',
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: 'needs update',
+    locked: true,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/business_tools.jsx
+  ------------------------------------------------
+// src/business_tools.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+
+export const TOOLS = [
+  { 
+    name: 'Chat',
+    url: 'https://chat.remote-tech.us',
+    icon: <FaRocketchat />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting Rocketchat allowing for complete privacy and data retention!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <SiGitea />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: "",
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <BsKanban />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Jupyter Lab', 
+    url: 'https://jlab.remote-tech.us/board/1', 
+    icon: <SiJupyter />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/components/NavBar.jsx
+  ------------------------------------------------
+import { useState } from 'react';
+
+function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="bg-black bg-opacity=60 backdrop-blur-md fixed w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center text-white font-bold text-2xl">
+            REMOTE TECH US 
+          </div>
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-6">
+              <NavLink href="https://pm.remote-tech.us" label="Open Project" />
+              <NavLink href="https://kanboard.remote-tech.us" label="Kanboard" />
+              <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
+              <NavLink href="https://dashy.remote-tech.us" label="Dashy" />
+              <NavLink to="/about" className={({  isActive }) => isActive ? 'active' : ''}>About</NavLink>
+            </div>
+          </div>
+          <div className="mr-2 flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
+          <NavLink href="https://kanboard.remote-tech.us" label="Kanboard Project Management" mobile />
+          <NavLink href="https://gitea.remote-tech.us" label="Gitea Code Management" mobile />
+          <NavLink href="https://dashy.remote-tech.us" label="Dashy Dashboard" mobile />
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function NavLink({ href, label, mobile }) {
+  return (
+    <a
+      href={href}
+      className={`${
+        mobile ? 'block' : 'inline-block'
+      } text-white hover:text-blue-400 px-3 py-2 rounded-md text-base font-medium`}
+    >
+      {label}
+    </a>
+  );
+}
+
+export default NavBar;
+  ------------------------------------------------
+
+  FILE: src/index.css
+  ------------------------------------------------
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 5s ease-out;
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+/*
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+*/
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 1.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #ff7499;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+
+  ------------------------------------------------
+
+  FILE: src/main.jsx
+  ------------------------------------------------
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+  ------------------------------------------------
+
+  FILE: tailwind.config.js
+  ------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
+  },
+  plugins: [],
+};
+
+  ------------------------------------------------
+
+  FILE: vite.config.js
+  ------------------------------------------------
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  //base: '/remote-tech.us/',//
+})
+  ------------------------------------------------
+.
+├── README.md
+├── dumpit.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── img
+│   │   ├── 0.jpg
+│   │   ├── globe.mp4
+│   │   └── globe.mp4-
+│   ├── remote-tech-us_v2.svg
+│   ├── vite.svg
+│   └── william-earnhardt.vcf
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── Card.jsx
+│   │   ├── ContactCard.jsx
+│   │   └── NavBar.jsx
+│   ├── data
+│   │   ├── app__globals.jsx
+│   │   ├── business_contacts.jsx
+│   │   ├── business_services.jsx
+│   │   └── business_tools.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   └── ContactsPage.jsx
+│   └── qrcode-gen.jsx
+├── tailwind.config.js
+└── vite.config.js
+
+8 directories, 29 files
+  ================================================================================
+
+  FILE: eslint.config.js
+  ------------------------------------------------
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+  ------------------------------------------------
+
+  FILE: index.html
+  ------------------------------------------------
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/remote-tech-us_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REMOTE TECH US</title>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+  ------------------------------------------------
+
+  FILE: package.json
+  ------------------------------------------------
+{
+  "name": "react-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://remote-tech.us",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "framer-motion": "^12.9.2",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.14.2",
+    "react-tooltip": "^5.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1"
+  }
+}
+  ------------------------------------------------
+
+  FILE: postcss.config.js
+  ------------------------------------------------
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+
+  ------------------------------------------------
+
+  FILE: src/App.css
+  ------------------------------------------------
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+  ------------------------------------------------
+
+  FILE: src/App.jsx
+  ------------------------------------------------
+import { GLOBALS } from './data/app__globals.jsx';
+import { CONTACTS } from './data/business_contacts.jsx';
+import { TOOLS } from './data/business_tools.jsx';
+import { SERVICES } from './data/business_services.jsx';
+import NavBar from './components/NavBar.jsx';
+import Card from './components/Card.jsx';
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+      }}
+    >
+    <NavBar />
+    {/* Main Container */}
+    <main className="pt-24 px-6 max-w-7xl mx-auto">
+      <header className="mb-12 text-center lg:text-left">
+        <h1 className="text-4xl font-black mb-2">Remote Tech US</h1>
+        <p className="text-gray-400">Professional Open-Source Infrastructure & Services</p>
+      </header>
+      {/* Section: Services Carousel */}
+      <section className="mb-16">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+        </h2>
+        <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+          {SERVICES.map((service) => (
+            <Card key={service.name} item={service} />
+          ))}
+        </div>
+      </section>
+
+      {/* Section: Tools Carousel */}
+      <section>
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-purple-500 rounded-full" /> Internal Tools
+        </h2>
+        <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+          {TOOLS.map((tool) => (
+            <Card key={tool.name} item={tool} />
+          ))}
+        </div>
+      </section>
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/* TOOLS CARDS GRID */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {TOOLS.map((tool) => (
+              <Card  item={tool} />
+            ))}
+          </div>
+          {/* SERVICE CARDS GRID */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {SERVICES.map((service) => (
+              <Card item={service} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+)
+}
+
+export default App
+  ------------------------------------------------
+
+  FILE: src/components/NavBar.jsx
+  ------------------------------------------------
+import { useState } from 'react';
+
+function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="bg-black bg-opacity=60 backdrop-blur-md fixed w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center text-white font-bold text-2xl">
+            REMOTE TECH US 
+          </div>
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-6">
+              <NavLink href="https://pm.remote-tech.us" label="Open Project" />
+              <NavLink href="https://kanboard.remote-tech.us" label="Kanboard" />
+              <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
+              <NavLink href="https://dashy.remote-tech.us" label="Dashy" />
+              <NavLink to="/about" className={({  isActive }) => isActive ? 'active' : ''}>About</NavLink>
+            </div>
+          </div>
+          <div className="mr-2 flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
+          <NavLink href="https://kanboard.remote-tech.us" label="Kanboard Project Management" mobile />
+          <NavLink href="https://gitea.remote-tech.us" label="Gitea Code Management" mobile />
+          <NavLink href="https://dashy.remote-tech.us" label="Dashy Dashboard" mobile />
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function NavLink({ href, label, mobile }) {
+  return (
+    <a
+      href={href}
+      className={`${
+        mobile ? 'block' : 'inline-block'
+      } text-white hover:text-blue-400 px-3 py-2 rounded-md text-base font-medium`}
+    >
+      {label}
+    </a>
+  );
+}
+
+export default NavBar;
+  ------------------------------------------------
+
+  FILE: src/data/app__globals.jsx
+  ------------------------------------------------
+//app_globals.jsx
+export const GLOBALS = {
+  bg_img:"/img/0.jpg"
+  //, bg_override_color: "#0f172a" // Tailwind's slate-900
+  //, bg_override_color: "blue" // Tailwind's slate-900
+};
+  ------------------------------------------------
+
+  FILE: src/data/business_contacts.jsx
+  ------------------------------------------------
+// src/business_contacts.js
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+export const CONTACTS = [
+  {
+    tag: 'Founder',
+    locked: false,
+    logo: "/remote-tech-us_v2.svg",
+    name: "William Earnhardt",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    phone_sms: "yes",
+    email: "william@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: "name:william earnhrdt|url:https://remote-tech.us/#/card" // Link for the QR code
+  },
+  {
+    logo: "/remote-tech-us_v2.svg"
+    ,name: "Frank Earnhardt"
+    //title: "Founder @ Remote Tech US",
+    ,phone: "+1 (502) 509-4553"
+    //phone_sms: "yes",
+    //email: "frank@remote-tech.us",
+    //address: "Sellersburg, IN, USA",
+    //web: "https://remote-tech.us",
+    //chat: "https://chat.remote-tech.us",
+    //linkedin: "https://www.linkedin.com/in/earnhardt",
+    //github: "https://github.com/remote-tech-us",
+    //vcfPath: "/william-earnhardt.vcf",
+    //calcom:"https://cal.com/remote-tech.us",
+    //qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  },
+  {
+    logo: "/remote-tech-us_v2.svg",
+    name: "Admin",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    //phone_sms: "yes",
+    email: "admin@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_services.jsx
+  ------------------------------------------------
+// src/business_services.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const SERVICES = [
+  { 
+    name: 'Broadcom',
+    url: 'https://broadcom.com',
+    icon: <SiBroadcom />,
+    tag: 'Acquired CA Technologies',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <FaCode />,
+    tag: '',
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: 'needs update',
+    locked: true,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_tools.jsx
+  ------------------------------------------------
+// src/business_tools.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+
+export const TOOLS = [
+  { 
+    name: 'Chat',
+    url: 'https://chat.remote-tech.us',
+    icon: <FaRocketchat />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting Rocketchat allowing for complete privacy and data retention!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <SiGitea />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: "",
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <BsKanban />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Jupyter Lab', 
+    url: 'https://jlab.remote-tech.us/board/1', 
+    icon: <SiJupyter />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/index.css
+  ------------------------------------------------
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 5s ease-out;
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+/*
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+*/
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 1.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #ff7499;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+
+  ------------------------------------------------
+
+  FILE: src/main.jsx
+  ------------------------------------------------
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import './index.css'
+import App from './App.jsx'
+import ContactsPage from './pages/ContactsPage.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/contacts" element={<ContactsPage />} />
+      </Routes>
+    </HashRouter>
+  </React.StrictMode>,
+);
+  ------------------------------------------------
+
+  FILE: tailwind.config.js
+  ------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
+  },
+  plugins: [],
+};
+
+  ------------------------------------------------
+
+  FILE: vite.config.js
+  ------------------------------------------------
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  //base: '/remote-tech.us/',//
+})
+  ------------------------------------------------
+.
+├── README.md
+├── dumpit.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── public
+│   ├── img
+│   │   ├── 0.jpg
+│   │   ├── globe.mp4
+│   │   └── globe.mp4-
+│   ├── remote-tech-us_v2.svg
+│   ├── vite.svg
+│   └── william-earnhardt.vcf
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── Card.jsx
+│   │   ├── ContactCard.jsx
+│   │   └── NavBar.jsx
+│   ├── data
+│   │   ├── app__globals.jsx
+│   │   ├── business_contacts.jsx
+│   │   ├── business_services.jsx
+│   │   └── business_tools.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   └── ContactsPage.jsx
+│   └── qrcode-gen.jsx
+├── tailwind.config.js
+└── vite.config.js
+
+8 directories, 29 files
+  ================================================================================
+
+  FILE: eslint.config.js
+  ------------------------------------------------
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+  ------------------------------------------------
+
+  FILE: index.html
+  ------------------------------------------------
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/remote-tech-us_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REMOTE TECH US</title>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+  ------------------------------------------------
+
+  FILE: package.json
+  ------------------------------------------------
+{
+  "name": "react-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "https://remote-tech.us",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "framer-motion": "^12.9.2",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.14.2",
+    "react-tooltip": "^5.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
+    "vite": "^6.3.1"
+  }
+}
+  ------------------------------------------------
+
+  FILE: postcss.config.js
+  ------------------------------------------------
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+
+  ------------------------------------------------
+
+  FILE: src/App.css
+  ------------------------------------------------
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+  ------------------------------------------------
+
+  FILE: src/App.jsx
+  ------------------------------------------------
+import { GLOBALS } from './data/app__globals.jsx';
+import { CONTACTS } from './data/business_contacts.jsx';
+import { TOOLS } from './data/business_tools.jsx';
+import { SERVICES } from './data/business_services.jsx';
+import NavBar from './components/NavBar.jsx';
+import Card from './components/Card.jsx';
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  // Debugging should happen here, not in the JSX
+  console.log("Background Image URL:", GLOBALS.bg_img);
+
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed" 
+      style={{ 
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none' 
+      }}
+    >
+    <NavBar />
+    {/* Main Container */}
+    <main className="pt-24 px-6 max-w-7xl mx-auto">
+      <header className="mb-12 text-center lg:text-left">
+        <h1 className="text-4xl font-black mb-2">Remote Tech US</h1>
+        <p className="text-gray-400">Professional Open-Source Infrastructure & Services</p>
+      </header>
+      {/* Section: Services Carousel */}
+      <section className="mb-16">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-blue-500 rounded-full" /> Featured Services
+        </h2>
+        <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+          {SERVICES.map((service) => (
+            <Card key={service.name} item={service} />
+          ))}
+        </div>
+      </section>
+
+      {/* Section: Tools Carousel */}
+      <section>
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <span className="w-8 h-1 bg-purple-500 rounded-full" /> Internal Tools
+        </h2>
+        <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide">
+          {TOOLS.map((tool) => (
+            <Card key={tool.name} item={tool} />
+          ))}
+        </div>
+      </section>
+      <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+          {/* TOOLS CARDS GRID */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {TOOLS.map((tool) => (
+              <Card  item={tool} />
+            ))}
+          </div>
+          {/* SERVICE CARDS GRID */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {SERVICES.map((service) => (
+              <Card item={service} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+)
+}
+
+export default App
+  ------------------------------------------------
+
+  FILE: src/components/Card.jsx
+  ------------------------------------------------
+// src/components/Card.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const Card = ({ item }, { index }) => {
+  return (
+    <motion.a
+      key={item.name}
+      //href={item.url}
+      href={item.locked ? "#" : item.url} // Disable link if item is locked
+      whileHover={{ scale: 1.02 }}
+      //className="bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition">
+      className={`relative bg-black/40 backdrop-blur-xl border border-white/20 p-6 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition
+        ${item.locked ? 'opacity-60 cursor-not-allowed' : 'hover:bg-white/10'}`}
+      >
+      {/* Tag Badge (Coming Soon, New, etc) */}
+      {item.tag  && (
+        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+          {item.tag}
+        </span>
+      )}
+      {item.icon  && (
+      <div className="text-3xl text-blue-400">
+        {item.icon}
+      </div>
+      )}
+      {item.desc  && (
+      <div>
+        <h3 className="text-xl font-bold text-white">{item.name}</h3>
+        <p className="text-gray-400 text-sm">{item.desc}</p>
+      </div>
+      )}
+    </motion.a>
+  );
+};
+
+export default ContactCard;
+
+  ------------------------------------------------
+
+  FILE: src/components/ContactCard.jsx
+  ------------------------------------------------
+// src/components/ContactCard.jsx
+import { motion } from 'framer-motion';
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaPhone, FaMapMarkerAlt, FaComment, FaRegCalendarAlt, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { QRCodeSVG } from 'qrcode.react'; // Install: npm install qrcode.react
+
+const ContactCard = ({ contact , index }) => {
+  return (
+    <motion.div
+        key={contact.name || index} // Added unique key
+        whileHover={{ y: -5 }}
+        className="relative lg:col-span-1 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center border-4 border-blue-500"
+      >
+      {/* Tag Badge (Coming Soon, New, etc) */}
+      {contact.tag  && (
+        <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-lg">
+          {contact.tag}
+        </span>
+      )}
+      {contact.logo && (
+        <img src={contact.logo} alt="Logo" className="w-20 mb-4" />
+      )}
+      <h2 className="text-3xl font-black mb-1">{contact.name}</h2>
+      {contact.title && (
+        <p className="text-blue-600 font-bold mb-6">{contact.title}</p>
+      )}
+      <div className="text-gray-600 space-y-2 mb-6 text-sm">
+        {contact.phone && (
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <FaPhone className="text-blue-500" />
+            {contact.phone_sms && (
+              <FaSms className="text-blue-500" />
+            )}
+            {contact.phone}
+          </p>
+        )}
+        {contact.address && (
+          <p className="flex items-center justify-center gap-2 font-medium">
+            <FaMapMarkerAlt className="text-blue-500" /> {contact.address}
+          </p>
+        )}
+      </div>
+      <div className="flex gap-4 mb-8 text-2xl text-gray-700">
+        {contact.linkedin && (
+          <a href={contact.linkedin} className="hover:text-blue-600"><FaLinkedin /></a>
+        )}
+        {contact.github && (
+          <a href={contact.github} className="hover:text-gray-900"><FaGithub /></a>
+        )}
+        {contact.email && (
+          <a href={`mailto:${contact.email}`} className="hover:text-red-500"><FaEnvelope /></a>
+        )}
+        {contact.chat && (
+          <a href={contact.chat} className="hover:text-red-500"><FaRocketchat /></a>
+        )}
+        {contact.web && (
+          <a href={contact.web} className="hover:text-red-500"><TbWorldWww /></a>
+        )}
+      </div>
+      <div className="flex flex-col w-full gap-3">
+        {contact.calcom && (
+          <a
+            href={contact.calcom}
+            //className="w-full bg-black/40 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+            <FaRegCalendarAlt /> Schedule Meeting
+          </a>
+        )}
+        {/* New Download Contact Button */}
+        {contact.vcfPath  && (
+          <a
+            href={contact.vcfPath}
+            download
+            className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition border border-gray-300" >
+            <FaAddressCard /> Save Contact
+          </a>
+        )}
+        {/* QR Code Section */}
+        {contact.qrValue  && (
+          <div className="bg-gray-50 p-4 rounded-xl mb-6 border border-gray-100 shadow-inner">
+            <QRCodeSVG value={contact.qrValue} size={80} marginSize={2} className="mx-auto" />
+            <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Scan to Share</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+export default ContactCard;
+
+  ------------------------------------------------
+
+  FILE: src/components/NavBar.jsx
+  ------------------------------------------------
+import { useState } from 'react';
+
+function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <nav className="bg-black bg-opacity=60 backdrop-blur-md fixed w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center text-white font-bold text-2xl">
+            REMOTE TECH US 
+          </div>
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-6">
+              <NavLink href="https://pm.remote-tech.us" label="Open Project" />
+              <NavLink href="https://kanboard.remote-tech.us" label="Kanboard" />
+              <NavLink href="https://gitea.remote-tech.us" label="Gitea" />
+              <NavLink href="https://dashy.remote-tech.us" label="Dashy" />
+              <NavLink to="/about" className={({  isActive }) => isActive ? 'active' : ''}>About</NavLink>
+            </div>
+          </div>
+          <div className="mr-2 flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLink href="https://pm.remote-tech.us" label="Open Project Management" mobile />
+          <NavLink href="https://kanboard.remote-tech.us" label="Kanboard Project Management" mobile />
+          <NavLink href="https://gitea.remote-tech.us" label="Gitea Code Management" mobile />
+          <NavLink href="https://dashy.remote-tech.us" label="Dashy Dashboard" mobile />
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function NavLink({ href, label, mobile }) {
+  return (
+    <a
+      href={href}
+      className={`${
+        mobile ? 'block' : 'inline-block'
+      } text-white hover:text-blue-400 px-3 py-2 rounded-md text-base font-medium`}
+    >
+      {label}
+    </a>
+  );
+}
+
+export default NavBar;
+  ------------------------------------------------
+
+  FILE: src/data/app__globals.jsx
+  ------------------------------------------------
+//app_globals.jsx
+export const GLOBALS = {
+  bg_img:"/img/0.jpg"
+  //, bg_override_color: "#0f172a" // Tailwind's slate-900
+  //, bg_override_color: "blue" // Tailwind's slate-900
+};
+  ------------------------------------------------
+
+  FILE: src/data/business_contacts.jsx
+  ------------------------------------------------
+// src/business_contacts.js
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms } from 'react-icons/fa';
+export const CONTACTS = [
+  {
+    tag: 'Founder',
+    locked: false,
+    logo: "/remote-tech-us_v2.svg",
+    name: "William Earnhardt",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    phone_sms: "yes",
+    email: "william@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  },
+  {
+    logo: "/remote-tech-us_v2.svg"
+    ,name: "Frank Earnhardt"
+    //title: "Founder @ Remote Tech US",
+    ,phone: "+1 (502) 509-4553"
+    //phone_sms: "yes",
+    //email: "frank@remote-tech.us",
+    //address: "Sellersburg, IN, USA",
+    //web: "https://remote-tech.us",
+    //chat: "https://chat.remote-tech.us",
+    //linkedin: "https://www.linkedin.com/in/earnhardt",
+    //github: "https://github.com/remote-tech-us",
+    //vcfPath: "/william-earnhardt.vcf",
+    //calcom:"https://cal.com/remote-tech.us",
+    //qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  },
+  {
+    logo: "/remote-tech-us_v2.svg",
+    name: "Admin",
+    title: "Founder @ Remote Tech US",
+    phone: "+1 (502) 509-4553",
+    //phone_sms: "yes",
+    email: "admin@remote-tech.us",
+    address: "Sellersburg, IN, USA",
+    web: "https://remote-tech.us",
+    chat: "https://chat.remote-tech.us",
+    linkedin: "https://www.linkedin.com/in/earnhardt",
+    github: "https://github.com/remote-tech-us",
+    vcfPath: "/william-earnhardt.vcf",
+    calcom:"https://cal.com/remote-tech.us",
+    qrValue: "https://remote-tech.us/#/card" // Link for the QR code
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_services.jsx
+  ------------------------------------------------
+// src/business_services.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiBroadcom } from "react-icons/si";
+import { SiGitea } from "react-icons/si";
+
+export const SERVICES = [
+  { 
+    name: 'Broadcom',
+    url: 'https://broadcom.com',
+    icon: <SiBroadcom />,
+    tag: 'Acquired CA Technologies',
+    locked: false,
+    desc: 'CA Service Desk Manager Suite!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <FaCode />,
+    tag: '',
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <FaProjectDiagram />,
+    tag: '',
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: 'needs update',
+    locked: true,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/data/business_tools.jsx
+  ------------------------------------------------
+// src/business_tools.jsx
+import { FaLinkedin, FaGithub, FaEnvelope, FaCode, FaProjectDiagram, FaHdd, FaAddressCard, FaSms, FaRocketchat } from 'react-icons/fa';
+import { TbWorldWww } from "react-icons/tb";
+import { BsKanban } from "react-icons/bs";
+import { SiGitea, SiJupyter, SiKubernetes  } from "react-icons/si";
+
+export const TOOLS = [
+  { 
+    name: 'Chat',
+    url: 'https://chat.remote-tech.us',
+    icon: <FaRocketchat />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting Rocketchat allowing for complete privacy and data retention!'
+  },
+  { 
+    name: 'Gitea', 
+    url: 'https://gitea.remote-tech.us', 
+    icon: <SiGitea />,
+    tag: "",
+    locked: false,
+    desc: 'Self-hosting a github style environment shows the power of Open Source Community!' 
+  },
+  { 
+    name: 'OpenProject', 
+    url: 'https://pm.remote-tech.us', 
+    icon: <FaProjectDiagram />,
+    tag: "",
+    locked: false,
+    desc: 'This Open Source project has been a key success with mutiple engagements tracking timeline, budget, & specifications' 
+  },
+  { 
+    name: 'Kanboard', 
+    url: 'https://kanboard.remote-tech.us/board/1', 
+    icon: <BsKanban />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Jupyter Lab', 
+    url: 'https://jlab.remote-tech.us/board/1', 
+    icon: <SiJupyter />,
+    tag: "",
+    locked: false,
+    desc: 'Leveraging another Open Source project to track multiple project as highlighted in this Get-A-Job project.'
+  },
+  { 
+    name: 'Dashy', 
+    url: 'https://dashy.remote-tech.us', 
+    icon: <FaHdd />, 
+    tag: "",
+    locked: false,
+    desc: 'Many years of Research Collectively Orchestrating'
+  }
+];
+  ------------------------------------------------
+
+  FILE: src/index.css
+  ------------------------------------------------
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animation */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 5s ease-out;
+}
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+/*
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+*/
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 1.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #ff7499;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+
+  ------------------------------------------------
+
+  FILE: src/main.jsx
+  ------------------------------------------------
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import './index.css'
+import App from './App.jsx'
+import ContactsPage from './pages/ContactsPage.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/contacts" element={<ContactsPage />} />
+      </Routes>
+    </HashRouter>
+  </React.StrictMode>,
+);
+  ------------------------------------------------
+
+  FILE: src/pages/ContactsPage.jsx
+  ------------------------------------------------
+import { GLOBALS } from '../data/app__globals';
+import { CONTACTS } from '../data/business_contacts';
+import { ContactCard } from '../components/ContactCard.jsx';
+import { QRCodeSVG } from 'qrcode.react';
+
+export default function ContactsPage() {
+  return (
+    <div className="flex min-h-screen bg-cover bg-center bg-fixed"
+      style={{
+        // If bg_override_color exists, use it. Otherwise, let index.css handle it.
+        // backgroundColor: GLOBALS.bg_override_color ?? 'transparent',
+        // backgroundImage: GLOBALS.bg_img ? `url(${GLOBALS.bg_img})` : 'none'
+        // Using a gradient allows the override color to act as a "tint" over the image
+        backgroundImage: GLOBALS.bg_img ? `linear-gradient(${GLOBALS.bg_override_color}, ${GLOBALS.bg_override_color}), url(${GLOBALS.bg_img})` : 'none'
+      }}
+    >
+    <div className="flex flex-col items-center justify-center w-full px-6 pt-24 pb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl w-full items-start">
+        {CONTACTS.map((contact, index) => (
+          <ContactCard contact={contact} index={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+  ------------------------------------------------
+
+  FILE: tailwind.config.js
+  ------------------------------------------------
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'corporate-blue': '#0070f3',
+      },
+      animation: {
+        'fade-in': 'fade-in 2s ease-out',
+      },
+    },
+  },
+  plugins: [],
+};
+
+  ------------------------------------------------
+
+  FILE: vite.config.js
+  ------------------------------------------------
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  //base: '/remote-tech.us/',//
+})
+  ------------------------------------------------
