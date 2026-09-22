@@ -39,8 +39,8 @@ export const BUSINESS_PROJECTS = [
   { 
     name: 'Smart - Autonomous Subscription Services',
     url: 'https://sass.remote-tech.us',
-    tag: "",
-    locked: false,
+    tag: "Coming Soon",
+    locked: true,
     desc: "SCOPE OF WORK:Python/Flask/SQLAlchemy subscription services project"
   },
 ];
